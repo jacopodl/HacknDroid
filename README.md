@@ -1,5 +1,5 @@
 # HacknDroid
-The script is used for automate some MAPT activities and the interaction with the mobile Android device. The script was created to solve many problems:
+The script is used for the automation of some MAPT activities and the interaction with the mobile Android device. The script was created to solve many problems:
 - the command `adb root` is not enabled after device rooting on many mobile devices;
 - the files need to be shared before on the external SD Card and then on the device;
 - the retrieving of the application data (APKs, Shared preferences, Stored data) needs to be found and retrieved with several commands;
