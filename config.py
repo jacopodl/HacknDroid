@@ -1,4 +1,4 @@
-from modules import apk_analyzer, apk_install,app_logs, cli_management, file_transfer
+from modules import apk_analyzer, apk_install,app_logs, cli_management, file_transfer, utility
 
 OPTIONS =   {
                 'main': { 
@@ -55,7 +55,7 @@ OPTIONS =   {
                             'function': file_transfer.download
                         },
                         "install" : {
-                            'description': 'Install an app on the mobile device.',
+                            'description': ['Install an app on the mobile device.',],
                             'children': {
                                 "from_apk_on_pc" : {
                                     'description' : ["Write the path of the apk on your PC to be installed",],
@@ -70,6 +70,28 @@ OPTIONS =   {
                                         "back" : dict(),
                                     },
                                     'function': apk_install.install_from_playstore
+                                },
+                                "back" : dict()
+                            }
+                        },
+                        "track_logs" : {
+                            'description': ['Process for logs gathering:',
+                                            ' > automated mode: the application will be opened by the script',
+                                            ' > manual mode: the application needs to be launched by the user'],
+                            'children': {
+                                "all_logs" : {
+                                    'description' : ["Write the app id or a part of the app name to be launched",],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': app_logs.all_logs
+                                },
+                                "app_logs" : {
+                                    'description' : ["Write the app id or a part of the app name to be launched",],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': app_logs.app_logs
                                 },
                                 "back" : dict()
                             }
