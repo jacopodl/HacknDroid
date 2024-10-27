@@ -14,5 +14,3 @@ Install python requirements using the following command:
 ```bash
 pip install -r requirements.txt
 ```
-
-`readline` is a python default module on Unix-based systems, `pyreadline` needs to be installed only on Windows systems.
