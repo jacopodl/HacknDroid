@@ -1,3 +1,5 @@
+import config
+
 from termcolor import cprint, colored
 
 from prompt_toolkit import prompt, print_formatted_text
@@ -7,29 +9,20 @@ from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit import Application
 from prompt_toolkit.shortcuts import clear
 
+# Function pointer in OPTIONS
+from modules import apk_analyzer, apk_install, app_logs, cli_management, file_transfer
+
 class CLI():
-    def __init__(self, options):
+
+    def __init__(self):
         global CURRENT_OPTION
-        self._options = options
+        self._options = config.OPTIONS
         self._current_path = []
         self._current_path.append(list(self._options.keys())[0])
         CURRENT_OPTION = self._options[self._current_path[0]]
 
         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
-        self._style = Style.from_dict({
-            'section': 'bg:#ffffff bold black',
-            'section1': 'bg:#dd0000 bold white',
-            'section2': 'bg:#ff00ff bold white',
-            'section3': 'bg:#ff66ff bold white',
-            'option': 'ansigreen bold',
-            'descr': 'ansiyellow bold',
-            'error':'bg:#ff0000 bold white',
-            'completion-menu.completion': 'bg:#008888 #ffffff',
-            'completion-menu.completion.current': 'bg:#00aaaa #000000',
-            'scrollbar.background': 'bg:#88aaaa',
-            'scrollbar.button': 'bg:#222222',
-            'space':'white'
-        })
+        self._style = Style.from_dict(config.STYLE)
 
     def completer(text, state):
         """Tab completion"""
@@ -84,7 +77,7 @@ class CLI():
                         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))    
                 elif len(CURRENT_OPTION['children']) == 1:
                     CURRENT_OPTION['function'](choice)
-                    x=input()
+                    print(CURRENT_OPTION['function'])
                 elif choice == 'exit':
                     break
                     
