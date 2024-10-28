@@ -2,6 +2,12 @@ import config
 import subprocess
 import re
 
+def split_user_input(user_input):
+    #Remove a sequence of more than one whitespace
+    user_input = re.sub(r"\s{2,}", " ", user_input)
+    # Take the full list of the values to be searched
+    return user_input.split(' ')
+
 def get_app_id(grep_string):
     '''
     Retrieve the full list of the applications on the device:
@@ -10,10 +16,7 @@ def get_app_id(grep_string):
     Grep the content based on keywords inserted by the user and separated by whitespaces
     '''
 
-    #Remove a sequence of more than one whitespace
-    grep_string = re.sub(r"\s{2,}", " ", grep_string)
-    # Take the full list of the values to be searched
-    grep_values = grep_string.split(' ')
+    keywords = split_user_input(grep_string)
     
     # List all the application IDs
     command = ['adb', 'shell', 'pm', 'list', 'packages']
@@ -28,11 +31,11 @@ def get_app_id(grep_string):
         # Iterate over the lines looking for a match
         for l in lines:
             # Check that the first value in grep_string is in the line
-            check = grep_values[0] in l
+            check = keywords[0] in l
 
             # Check that also 
-            if len(grep_values)>1:
-                for v in grep_values[1:]:
+            if len(keywords)>1:
+                for v in keywords[1:]:
                     # If the previous keyword was not found in the app ID,
                     # the app ID could not be a good candidate
                     if not check:
@@ -126,8 +129,7 @@ def cmd_to_subprocess_string(cmd):
     '''
     return '\n'.join(cmd)
 
-if __name__=="__main__":
-    '''
-    check_user_input("ahehexndjax")
-    x=input("Press ENTER to continue")
-    '''
+'''if __name__=="__main__":
+    x=input()
+    check_user_input(x)
+    x=input("Press ENTER to continue")'''

@@ -26,10 +26,10 @@ def all_logs(user_input):
         adb shell monkey -p 'your package name' -v 500
         Check when the App was shutdown (if empty string, the app is not running)
         while True:
-        adb shell pidof package_name
+            adb shell pidof package_name
     '''
     # User input is an app ID or a list of keywords to identify the application 
-    
+
 
     # Flush logs
     command = ['adb', 'logcat', '-c']
