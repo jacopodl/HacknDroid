@@ -15,7 +15,6 @@ def get_app_id(grep_string):
     
     Grep the content based on keywords inserted by the user and separated by whitespaces
     '''
-
     keywords = split_user_input(grep_string)
     
     # List all the application IDs
