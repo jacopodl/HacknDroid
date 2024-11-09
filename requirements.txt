@@ -1,8 +1,4 @@
 # Common dependencies
 termcolor
-
-# OS-specific dependencies
-# Windows
-prompt_toolkit; platform_system == "Windows"
-
-# Linux
+prompt_toolkit
+pyfiglet

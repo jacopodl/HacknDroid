@@ -1,6 +1,7 @@
 import config
 import subprocess
 import netifaces
+import ipaddress
 
 '''
 TO BE DONE: Install certificate (specific on device)
@@ -42,10 +43,10 @@ def del_proxy():
 
     print("Proxy removed on mobile device")
 
-def set_burp_proxy(user_input):
+def set_current_pc_proxy(user_input):
     '''
-        Set proxy on the device using the IP machine and the port specified as user input
-        adb shell settings put global http_proxy <address>:<port>
+        Set proxy on the device using the port specified as user input
+        adb shell settings put global http_proxy <this_pc_ip>:<port>
     '''
     # If the user input is not a port, ask the user to insert it again
     while not is_port(user_input):
@@ -57,15 +58,45 @@ def set_burp_proxy(user_input):
     set_proxy(ip, user_input)
 
 
+def is_ip(ip_string):
+    try:
+        ip = ipaddress.ip_address(ip_string)
+    except ValueError:
+        return False
+    
+    return True
+
+
 def set_generic_proxy(user_input):
-    pass
+    '''
+        Set proxy on the device using the IP machine and the port specified as user input
+        adb shell settings put global http_proxy <address>:<port>
+    '''
+
+    address = []
+    check = True
+    ip = ''
+    port = ''
+
+    if ":" in address:
+        address = user_input.split(":")        
+        check = (not is_ip(address[0])) or (not is_port(address[1]))
+
+    while check:
+        user_input = input("Insert a valid port number")
+
+        if ":" in address:
+            address = user_input.split(":")
+            check = (not is_ip(address[0])) or (not is_port(address[1]))
+
+    set_proxy(ip, port)
+    
 
 def set_proxy(ip, port):
     '''
         Set proxy on the device
         adb shell settings put global http_proxy <address>:<port>
     '''
-
     command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', f'{ip}:{port}']
     result = subprocess.run(command, capture_output=True, text=True)
 

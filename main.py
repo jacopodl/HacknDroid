@@ -1,5 +1,4 @@
 from modules.cli_management import CLI
-import modules.utility
 
 def main():
     cli_mgmt = CLI()

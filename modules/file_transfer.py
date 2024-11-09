@@ -1,5 +1,5 @@
 import config
-import utility
+from modules import utility
 import subprocess
 import os
 

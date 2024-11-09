@@ -1,26 +1,24 @@
 import subprocess
 import signal
-from utility import check_user_input
+from modules.utility import check_user_input
 import time
 import re
 import os
 import config
 
-REGEX_LOG = r"\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.\d{3}\s{1,2}(\d{4,5})\s{1,2}(\d{4,5})\s(.+)"
-
 def app_logs(user_input):
-    global REGEX_LOG
     app_id, pid = all_logs(user_input)
 
     lines = []
     with open(f"{app_id}.log", "r") as fd:
         lines = fd.readlines()
 
-    input()
-    with open(f"{app_id}.log", "w") as fd:
+    with open(f"{app_id}-bis.log", "w") as fd:
         for l in lines:
             if pid in l:
                 fd.write(l)
+
+    print('END')
 
         
 def all_logs(user_input):
@@ -51,11 +49,13 @@ def all_logs(user_input):
     # Collect logs
     with open(f"{app_id}.log", "w") as f:
         command = ['adb', 'logcat']
-        process1 = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=f, text=True, shell=True)
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=f, text=True, shell=True)
 
         pid = run_app_and_wait(app_id)
 
-        os.kill(process1.pid, signal.SIGTERM)
+        #os.kill(process.pid, signal.SIGTERM)
+        process.terminate()
+        process.wait()
     
     print(f"{app_id}.log")
     return app_id, pid
@@ -88,3 +88,6 @@ def run_app_and_wait(app_id):
             break
 
     return pid
+
+if __name__=="__main__":
+    app_logs("a2a eu")

@@ -8,6 +8,7 @@ from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit import Application
 from prompt_toolkit.shortcuts import clear
+from pyfiglet import Figlet
 
 # Function pointer in OPTIONS
 from modules import apk_analyzer, apk_install, app_logs, cli_management, file_transfer
@@ -23,6 +24,9 @@ class CLI():
 
         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
         self._style = Style.from_dict(config.STYLE)
+
+        self._title = "HacknDroid" 
+        self._title_f = Figlet(font='slant')
 
     def completer(text, state):
         """Tab completion"""
@@ -40,13 +44,17 @@ class CLI():
         while True:        
             try:
                 clear()
+                
+                print(self._title_f.renderText(self._title))
                 print_formatted_text(HTML("<option>[TAB to see options | Ctrl+C or exit to terminate the program]</option>"), style=self._style)
+
+                print("")
                 
                 for x in CURRENT_OPTION['description']:
                     print_formatted_text(HTML(f"<descr>{x}</descr>"), style=self._style)
-    
+                
                 if len(self._current_path)>1:
-                    print(self._current_path)
+                    print("")
                     path = f"<section{1}> {self._current_path[2]} </section{1}>"
                     
                     for i in range(4,len(self._current_path),2):
@@ -65,7 +73,6 @@ class CLI():
                             CURRENT_OPTION = CURRENT_OPTION[i]
                         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
                     elif len(CURRENT_OPTION['children'][choice]['children'].keys())>1:
-                        print('ciao ciao!!!')
                         self._current_path.append('children')
                         self._current_path.append(choice)
                         CURRENT_OPTION = CURRENT_OPTION['children'][choice]
@@ -75,11 +82,11 @@ class CLI():
                         self._current_path.append(choice)
                         CURRENT_OPTION = CURRENT_OPTION['children'][choice]
                         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))    
+                elif choice == 'exit':
+                    break
                 elif len(CURRENT_OPTION['children']) == 1:
                     CURRENT_OPTION['function'](choice)
                     print(CURRENT_OPTION['function'])
-                elif choice == 'exit':
-                    break
                     
             except (KeyboardInterrupt, EOFError):
                 break

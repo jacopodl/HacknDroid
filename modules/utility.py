@@ -1,6 +1,6 @@
-import config
 import subprocess
 import re
+import config
 
 def split_user_input(user_input):
     #Remove a sequence of more than one whitespace
