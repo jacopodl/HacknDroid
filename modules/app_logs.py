@@ -1,10 +1,18 @@
 import subprocess
 import signal
-from modules.utility import check_user_input
+from modules.utility import app_id_from_user_input
 import time
 import re
 import os
 import config
+
+def app_crash_logs(user_input):
+    pass
+
+
+def all_crash_logs(user_input):
+    pass
+
 
 def app_logs(user_input):
     app_id, pid = all_logs(user_input)
@@ -42,7 +50,7 @@ def all_logs(user_input):
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
 
     # Take App ID
-    app_id = check_user_input(user_input)
+    app_id = app_id_from_user_input(user_input)
 
     pid=-1
 
@@ -88,6 +96,3 @@ def run_app_and_wait(app_id):
             break
 
     return pid
-
-if __name__=="__main__":
-    app_logs("a2a eu")

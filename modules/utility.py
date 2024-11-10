@@ -1,6 +1,7 @@
 import subprocess
 import re
 import config
+import os
 
 def split_user_input(user_input):
     #Remove a sequence of more than one whitespace
@@ -66,7 +67,7 @@ def is_app_id(user_input):
 
     return user_input in packages 
 
-def check_user_input(user_input):
+def app_id_from_user_input(user_input):
     '''
         Check if the user input is a valid app ID or a valid set of keywords
     '''
@@ -132,3 +133,21 @@ def cmd_to_subprocess_string(cmd):
     x=input()
     check_user_input(x)
     x=input("Press ENTER to continue")'''
+
+def rsc_from_path(path):
+    rsc_name = os.path.basename(path)
+    if rsc_name == '':
+        rsc_name = os.path.basename(path[:-1])
+
+    return rsc_name
+
+def is_apk_on_system(apks):
+    check = True
+
+    for f in apks:
+        check = check and f.endswith(".apk") and os.path.isfile(f)
+
+        if not check:
+            return check
+        
+    return check

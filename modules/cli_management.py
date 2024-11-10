@@ -86,7 +86,8 @@ class CLI():
                     break
                 elif len(CURRENT_OPTION['children']) == 1:
                     CURRENT_OPTION['function'](choice)
-                    print(CURRENT_OPTION['function'])
+                    print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+                    x=input()
                     
             except (KeyboardInterrupt, EOFError):
                 break

@@ -1,4 +1,4 @@
-from modules import apk_analyzer, apk_install, app_logs, file_transfer, merge_apks, mirroring, mobsf, proxy, signature, utility
+from modules import apk_analyzer, apk_install, app_logs, backup, file_transfer, merge_apks, mirroring, mobsf, proxy, signature, useful_stuff, utility
 
 OPTIONS =   {
                 'main': { 
@@ -39,9 +39,22 @@ OPTIONS =   {
                         "apk_compiling": { 
                             'description': ['Compile an apk file from the folder with decompiled and modified code',],
                             'children': {
+                                "compile": { 
+                                    'description': ['Compile an apk file from the folder with decompiled and modified code',],
+                                    'children': {
+                                        'back' : dict(),
+                                    },
+                                    'function' : apk_analyzer.apk_compile_from_folder
+                                },
+                                "compile_and_sign": { 
+                                    'description': ['Compile and sign an apk file from the folder with decompiled and modified code',],
+                                    'children': {
+                                        'back' : dict(),
+                                    },
+                                    'function' : apk_analyzer.apk_compile_and_sign_from_folder
+                                },
                                 'back' : dict(),
                             },
-                            'function' : apk_analyzer.apk_decompiler_from_file
                         },
                         "apk_decompiling": { 
                             'description': ['Decompile an apk file',],
@@ -118,6 +131,40 @@ OPTIONS =   {
                                 'back' : dict()
                             }
                         },
+                        "backup_and_data" : {
+                            'description': ['Backup the mobile device or an application',],
+                            'children': {
+                                "device" : { 
+                                    'description': ["Backup the mobile device"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function' : backup.device_backup
+                                },
+                                "specific_app" : { 
+                                    'description': ["Backup a specific app, writing its app id or a keyword to identify it"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': backup.app_backup
+                                },
+                                "reset_app_data" : { 
+                                    'description': ["Reset App data"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': backup.app_data_reset
+                                },
+                                "restore_backup" : { 
+                                    'description': ["Specify the backup file path on your system"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': backup.restore_backup
+                                },
+                                'back' : dict()
+                            }
+                        },
                         "download_from_mobile" :  { 
                             'description': ["Write the following two strings (separated by space):",
                                             " > the path of the file/folder on the mobile device",
@@ -125,9 +172,9 @@ OPTIONS =   {
                             'children': {
                                 "back" : dict(),
                             },
-                            'function': file_transfer.download
+                            'function': file_transfer.download_from_user_input
                         },
-                        "install" : {
+                        "install_uninstall" : {
                             'description': ['Install an app on the mobile device.',],
                             'children': {
                                 "from_apk_on_pc" : {
@@ -257,7 +304,137 @@ OPTIONS =   {
                                 "back" : dict(),
                             },
                             'function': file_transfer.upload
-                        }
+                        },
+                        "useful_staffs" : {
+                            'description': ['Process for logs gathering:',
+                                            ' > automated mode: the application will be opened by the script',
+                                            ' > manual mode: the application needs to be launched by the user'],
+                            'children': {
+                                "battery_saver" : {
+                                    'description' : ["Battery Saver mode",],
+                                    'children': {
+                                        "off" : {
+                                            'description' : ["Turn off battery saver mode",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.battery_saver_off
+                                        },
+                                        "on" : {
+                                            'description' : ["Turn on battery saver mode",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.battery_saver_on
+                                        },
+                                        "back" : dict(),
+                                    }
+                                },
+                                "do_not_disturb_mode" : {
+                                    'description' : ["Do Not Disturb mode",],
+                                    'children': {
+                                        "off" : {
+                                            'description' : ["Turn off Do Not Disturb mode",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.donotdisturb_disabled
+                                        },
+                                        "on" : {
+                                            'description' : ["Turn on Do Not Disturb mode",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.donotdisturb_enabled
+                                        },
+                                        "back" : dict(),
+                                    }
+                                },
+                                "connectivity" : {
+                                    'description' : ["Connectivity options management (Wifi, airplane mode)",],
+                                    'children': {
+                                        "wifi_off" : {
+                                            'description' : ["Turn off Wifi option",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.disable_wifi
+                                        },
+                                        "wifi_on" : {
+                                            'description' : ["Turn on Wifi option",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.enable_wifi
+                                        },
+                                        "airplane_off" : {
+                                            'description' : ["Turn off Airplane mode",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.disable_airplane_mode
+                                        },
+                                        "airplane_on" : {
+                                            'description' : ["Turn on Airplane mode",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.enable_airplane_mode
+                                        },
+                                        "back" : dict(),
+                                    }
+                                },
+                                "screenshot_video" : {
+                                    'description' : ["Screenshot/Video on the mobile device",],
+                                    'children': {
+                                        "screenshot" : {
+                                            'description' : ["Screenshot.","Press enter to continue...",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.screenshot
+                                        },
+                                        "video" : {
+                                            'description' : ["Video","Press enter to start recording...",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.record_video
+                                        },
+                                        "back" : dict(),
+                                    },
+                                    'function': app_logs.all_logs
+                                },
+                                "reboot" : {
+                                    'description' : ["Reboot the device with several options",],
+                                    'children': {
+                                        "reboot" : {
+                                            'description' : ["Reboot the mobile device.","Press enter to continue...",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.reboot
+                                        },
+                                        "reboot_recovery" : {
+                                            'description' : ["Reboot the mobile device in recovery mode.","Press enter to continue...",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.reboot_recovery
+                                        },
+                                        "reboot_bootloader" : {
+                                            'description' : ["Reboot the mobile device in bootloader mode.","Press enter to continue...",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.reboot_bootloader
+                                        },
+                                        "back" : dict(),
+                                    },
+                                },
+                                "back" : dict()
+                            }
+                        },
                     }
                 }
             }

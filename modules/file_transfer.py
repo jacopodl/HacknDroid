@@ -3,20 +3,43 @@ from modules import utility
 import subprocess
 import os
 
-def rsc_from_path(path):
-    rsc_name = os.path.basename(path)
-    if rsc_name == '':
-        rsc_name = os.path.basename(path[:-1])
+def mobile_exists(paths):
+    check = True
+    for mobile_path in paths:
+        command = ['adb', 'shell']
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+        shell_input = ["su root",f"""(test -f "{mobile_path}" || test -d "{mobile_path}") && echo "1" """, "exit"]
+        output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
+    
+        check = check and (output.strip() == "1")
 
-    return rsc_name
+        if not check:
+            print(f"{mobile_path} NOT FOUND")
+            return check
+    
+    return check
 
-def mobile_exists(mobile_path):
+def is_mobile_folder(mobile_path):
+    check = True
+    
     command = ['adb', 'shell']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-    shell_input = f"""(test -f "{mobile_path}" || test -d "{mobile_path}") && echo "1" """
-    output, error = process.communicate(input=shell_input)
-    
+    shell_input = ["su root",f"""(test -d "{mobile_path}") && echo "1" """, "exit"]
+    output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
+
     return output.strip() == "1"
+
+
+def is_mobile_file(mobile_path):
+    check = True
+    
+    command = ['adb', 'shell']
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    shell_input = ["su root",f"""(test -f "{mobile_path}") && echo "1" """, "exit"]
+    output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
+
+    return output.strip() == "1"
+
 
 def upload(user_input):
     paths = utility.split_user_input(user_input)
@@ -58,21 +81,72 @@ def upload_to_dest(file_folder, dest_folder="/data/tmp"):
     command = ['adb', 'shell']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
 
-    rsc_name = rsc_from_path(file_folder)
+    rsc_name = utility.rsc_from_path(file_folder)
     shell_input = ["su root",f"mv {sdcard}/{rsc_name} {dest_folder}", "exit"]
     output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
 
     print("Upload done!!!")
 
-def download(user_input):
+def download_from_user_input(user_input):
     '''
         Download process
         adp pull <mobile_file_folder> <pc_folder>
     '''
-    pass
+
+    paths = user_input.split(" ")
+    
+    while len(paths)<2 or not (mobile_exists(paths[:-1]) and os.path.exists(paths[-1]) and os.path.isdir(paths[-1])):
+        user_input = input("""Insert at least two paths separated by spaces:\n > list of the paths of mobile files/folders to be downloaded\n > pc folder where the files will be downloaded\n\n""")
+        paths = user_input.split(" ")
+
+    print("ciao")
+    for mobile_path in paths[:-1]:
+        print(mobile_path)
+        download(mobile_path, paths[-1])  
+
+def download(mobile_path, dest_path, permissions_check=True):
+    '''
+        Download process
+        adp pull <mobile_path> <dest_path>
+    '''
+
+    command = ['adb', 'pull', mobile_path, dest_path]
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    out, err = process.communicate()
+
+    if permissions_check:
+        if "permission denied" in out.lower() or "0 files pulled" in out.lower():
+            x = input("[PERMISSION DENIED] Do you want to download the file/folder as Super User (y/n)? ")
+
+            if x.lower() == "y":
+                su_download(mobile_path, dest_path)
 
 
-'''
-if __name__=="__main__":
-    print(mobile_exists("/data/tmp"))
-'''
+def su_download(mobile_path, dest_path):
+    command = ['adb', 'shell']
+    sdcard = utility.sd_path()
+    rsc_name = utility.rsc_from_path(mobile_path)
+
+    if is_mobile_folder(mobile_path):
+        shell_input = ["su root",
+                       f'if [ -d "{sdcard}/{rsc_name}" ]; then rm -r "{sdcard}/{rsc_name}"; fi', 
+                       f"cp -r {mobile_path} {sdcard}/{rsc_name}", 
+                       f"chmod 666 {sdcard}/{rsc_name}",
+                       "exit"]
+        
+        print(utility.cmd_to_subprocess_string(shell_input))
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
+        out, err = process.communicate(utility.cmd_to_subprocess_string(shell_input))
+        download(f"{sdcard}/{rsc_name}", dest_path, permissions_check=False)
+
+    elif is_mobile_file(mobile_path):
+        shell_input = ["su root",
+                       f'if [ -f "{sdcard}/{rsc_name}" ]; then rm "{sdcard}/{rsc_name}"; fi',
+                       f"cp {mobile_path} {sdcard}/{rsc_name}", 
+                       f"chmod 666 {sdcard}/{rsc_name}", 
+                       "exit"]
+        
+        print(utility.cmd_to_subprocess_string(shell_input))
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
+        out, err = process.communicate(utility.cmd_to_subprocess_string(shell_input))
+        download(f"{sdcard}/{rsc_name}", dest_path, permissions_check=False)
