@@ -54,6 +54,17 @@ pip install -r requirements.txt
 
 ---
 
+## Run the program
+```bash
+python main.py
+```
+![Run Example](.img/run_example_0.png)
+![Run Example](.img/run_example_1.png)
+![Run Example](.img/run_example_2.png)
+
+
+---
+
 ## Script features
 - [ ] `apk_analysis`<br>Analysis of the APKs (signature schema verifier, apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in smali files, etc.)
   - [ ] `from_apk_on_pc`
