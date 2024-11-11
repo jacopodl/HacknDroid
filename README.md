@@ -41,8 +41,8 @@ Insert the wrapper and the JAR in one of the paths registered in the `PATH` envi
 
 - UNIX-based systems (`APKEditor`)
 ```bash
-$APKEDITOR_PATH = ""
-java -jar 
+$APKEDITOR_PATH = "./APKEditor.jar"
+java -jar $APKEDITOR_PATH "$@"
 ```
 Insert the wrapper and the JAR in `/usr/local/bin`.
 
