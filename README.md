@@ -14,15 +14,17 @@ Install the following programs and add their folder with binary files in the `PA
 - [***JADX***](https://github.com/skylot/jadx) to explore source obtained from the decompiled code from the APK;
 - [**Apktool**](https://apktool.org/) to compile and decompile APKs;
 - [**APKEditor**]() to merge APKs.
+- [**ABE**](https://github.com/nelenkov/android-backup-extractor) Android Backup Extractor to create TAR from Android Backup.
 
 ### APKEditor and Apktool
 For the following programs, create the wrapper to call the program without writing `java -jar`.
 As described for Apktool [here](https://apktool.org/docs/install), rename the tools JAR files as:
 - `apktool.jar`
 - `APKEditor.jar`
+- `abe.jar`
 
 Create a wrapper for both the JAR files.
-For APKEditor, you can create one of the following wrappers depending on the Operating System:
+For APKEditor and ABE, you can create one of the following wrappers depending on the Operating System:
 - Windows (`APKEditor.bat`)
 ```bash
 @echo off
@@ -83,10 +85,11 @@ python main.py
     - [ ] `create_jar_file`: 
     - [ ] `jadx_create_and_open_file`: 
 - [ ] `backup_and_data`<br>Backup the mobile device or an application
-  - [x] `device`: Backup the mobile device
-  - [x] `specific_app`: Backup a specific app specifing its app ID
+  - [x] `backup_device`: Backup the mobile device
+  - [x] `backup_specific_app`: Backup a specific app specifing its app ID
+  - [x] `backup_restore`: Specify the backup file path on your system
+  - [x] `backup_to_folder`: Convert the AB file to an unpacked folder
   - [x] `reset_app_data`: Reset App data
-  - [ ] `restore_backup`: Specify the backup file path on your system
 - [ ] `download_from_mobile`<br>Download file from the mobile device
 - [ ] `install_uninstall`<br>Install/Uninstall an app on the mobile device
   - [ ] `from_apk_on_pc`
@@ -99,8 +102,11 @@ python main.py
   - [ ] `from_mobile_device`
 - [ ] `mirroring`<br>Launch scrcpy for mobile device mirroring
 - [x] `proxy`<br>Set global proxy on the mobile device
-  - [x] `proxy_on_the_machine`
-  - [x] `proxy_on_other_machine`
+  - [x] `get_current_proxy`
+  - [ ] `install_certificates`
+  - [x] `set_proxy_with_current_ip`
+  - [x] `set_proxy_with_other_ip`
+  - [x] `del_proxy`
 - [ ] `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
 - [ ] `track_logs`<br>Logs gathering
   - [x] `all_logs`

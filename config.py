@@ -134,19 +134,33 @@ OPTIONS =   {
                         "backup_and_data" : {
                             'description': ['Backup the mobile device or an application',],
                             'children': {
-                                "device" : { 
+                                "backup_device" : { 
                                     'description': ["Backup the mobile device"],
                                     'children': {
                                         "back" : dict(),
                                     },
                                     'function' : backup.device_backup
                                 },
-                                "specific_app" : { 
+                                "backup_specific_app" : { 
                                     'description': ["Backup a specific app, writing its app id or a keyword to identify it"],
                                     'children': {
                                         "back" : dict(),
                                     },
                                     'function': backup.app_backup
+                                },
+                                "backup_restore" : { 
+                                    'description': ["Specify the backup file path on your system to be restored on the mobile device"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': backup.restore_backup
+                                },
+                                "backup_to_folder" : { 
+                                    'description': ["Specify the backup file path on your system to be extracted"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': backup.tar_extract
                                 },
                                 "reset_app_data" : { 
                                     'description': ["Reset App data"],
@@ -154,13 +168,6 @@ OPTIONS =   {
                                         "back" : dict(),
                                     },
                                     'function': backup.app_data_reset
-                                },
-                                "restore_backup" : { 
-                                    'description': ["Specify the backup file path on your system"],
-                                    'children': {
-                                        "back" : dict(),
-                                    },
-                                    'function': backup.restore_backup
                                 },
                                 'back' : dict()
                             }
@@ -247,14 +254,21 @@ OPTIONS =   {
                                             ' > using the current PC IP',
                                             ' > using another IP'],
                             'children': {
-                                "proxy_on_the_machine" : {
+                                "get_current_proxy" : {
+                                    'description' : ["Press ENTER to see current proxy settings"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': proxy.get_current_proxy_settings
+                                },
+                                "set_proxy_with_current_ip" : {
                                     'description' : ["Write the port number for the proxy on the current PC",],
                                     'children': {
                                         "back" : dict(),
                                     },
                                     'function': proxy.set_current_pc_proxy
                                 },
-                                "proxy_on_other_machine" : {
+                                "set_proxy_with_other_ip" : {
                                     'description' : ["Write the following values:",
                                                      " > IP address of the proxy",
                                                      " > port number of the proxy"],
@@ -262,6 +276,13 @@ OPTIONS =   {
                                         "back" : dict(),
                                     },
                                     'function': proxy.set_generic_proxy
+                                },
+                                "del_proxy" : {
+                                    'description' : ["Press ENTER to reset proxy configuration"],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': proxy.del_proxy
                                 },
                                 "back" : dict(),
                             },

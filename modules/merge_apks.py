@@ -26,7 +26,6 @@ def merge_from_list(user_input):
         apks = user_input.split(" ")
         check = utility.is_apk_on_system(apks)
 
-
     if not os.path.exists(".tmp_merge_apks"):
         os.mkdir(".tmp_merge_apks")
 

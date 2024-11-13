@@ -22,6 +22,20 @@ def is_port(user_input):
     except ValueError:
         return False    
 
+def get_current_proxy_settings(user_input):
+    '''
+        Get the global proxy settings
+        settings get global http_proxy
+    '''
+    print("Proxy set on mobile device:", end=" ")
+    proxy = get_proxy()
+    
+    if proxy==":0":
+        proxy = "NO PROXY"
+
+    print(proxy)
+
+
 def get_proxy():
     '''
         Get the global proxy settings
@@ -32,7 +46,7 @@ def get_proxy():
 
     return result.stdout.strip()
 
-def del_proxy():
+def del_proxy(user_input):
     '''
         Reset the global proxy settings
         settings put global http_proxy :0

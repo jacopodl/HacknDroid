@@ -4,3 +4,6 @@ logcat.log
 .tmp
 *.ab
 *.apk
+*.ab
+*.tar
+backup_*/
