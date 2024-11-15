@@ -67,6 +67,7 @@ def is_app_id(user_input):
 
     return user_input in packages 
 
+
 def app_id_from_user_input(user_input):
     '''
         Check if the user input is a valid app ID or a valid set of keywords
@@ -87,7 +88,7 @@ def app_id_from_user_input(user_input):
         # If some app IDs related to the specified keywords are found
         # List the app IDs previously found
         for (i,x) in enumerate(possible_app_ids):
-            print(f"{i})  {x}")
+            print(f"{i:2d})  {x}")
 
         # The user continues to choose the ID until a valid number is inserted by him
         choice = -1
@@ -100,7 +101,85 @@ def app_id_from_user_input(user_input):
 
         # Return the app ID related to the number chosen by the user
         return possible_app_ids[choice]
+    
+def active_applications():
+    command = "adb shell \"ps -A | awk '{print $9}'\""
+    print(command)
+    process = subprocess.Popen("adb shell \"ps -A | awk '{print $9}'\"", stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    output, error = process.communicate()
 
+    lines = output.splitlines()
+    apps = []
+    for l in lines:
+        if "[" not in l and l.count(".")>=2 and ":" not in l and "@" not in l:
+            apps.append(l.strip())
+
+    return apps
+
+def is_active_app_id(user_input):
+    '''
+        Check if the user input is a valid app ID
+    '''
+
+    apps = active_applications()
+
+    return user_input in apps
+
+
+def get_active_app_id(user_input):
+    apps = active_applications()
+    possible_apps = []
+
+    for a in apps:
+        keywords = split_user_input(user_input)
+
+        check = keywords[0] in a
+
+        for k in keywords[1:]:
+            check = check and (k in l)
+
+            if not check:
+                break
+
+        if check:
+            possible_apps.append(a)
+
+    return possible_apps
+
+
+def active_app_id_from_user_input(user_input):
+    '''
+        Check if the user input is a valid app ID or a valid set of keywords
+    '''
+    # Check if the user input is a valid app ID
+    if is_active_app_id(user_input):
+        # Return the app IDs
+        return user_input
+    else:
+        # List of app IDs the matches the user input
+        possible_app_ids = get_active_app_id(user_input)
+
+        # If no possible match was found, ask keywords again to the user 
+        while not possible_app_ids:
+            user_input=input("Write a valid app ID or a set of keyword to be searched\n")
+            possible_app_ids = get_active_app_id(user_input)
+
+        # If some app IDs related to the specified keywords are found
+        # List the app IDs previously found
+        for (i,x) in enumerate(possible_app_ids):
+            print(f"{i:2d})  {x}")
+
+        # The user continues to choose the ID until a valid number is inserted by him
+        choice = -1
+        while choice<0 or choice>=len(possible_app_ids): 
+            try:
+                # Number inserted by the user
+                choice = int(input("Select the app you want to test: "))
+            except ValueError:
+                choice = -1
+
+        # Return the app ID related to the number chosen by the user
+        return possible_app_ids[choice]
 
 def sd_path():
     '''

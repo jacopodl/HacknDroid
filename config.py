@@ -181,6 +181,13 @@ OPTIONS =   {
                             },
                             'function': file_transfer.download_from_user_input
                         },
+                        "force_app_stop" :  { 
+                            'description': ["Write the app id of the mobile app or some keywords to identify it"],
+                            'children': {
+                                "back" : dict(),
+                            },
+                            'function': useful_stuff.force_app_stop
+                        },
                         "install_uninstall" : {
                             'description': ['Install an app on the mobile device.',],
                             'children': {
