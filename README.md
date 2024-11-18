@@ -91,9 +91,10 @@ python main.py
   - [x] `backup_to_folder`: Convert the AB file to an unpacked folder
   - [x] `reset_app_data`: Reset App data
 - [ ] `download_from_mobile`<br>Download file from the mobile device
-- [ ] `install_uninstall`<br>Install/Uninstall an app on the mobile device
-  - [ ] `from_apk_on_pc`
-  - [ ] `from_play_store`
+- [x] `install_uninstall`<br>Install/Uninstall an app on the mobile device
+  - [x] `install_from_apk`
+  - [x] `install_from_playstore`
+  - [x] `uninstall`
 - [x] `merge_apks`<br>Merge several APKs using APKEditor
   - [x] `from_directory`
   - [x] `from_list`

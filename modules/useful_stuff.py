@@ -19,34 +19,10 @@ def reboot_bootloader(user_input):
     # adb reboot bootloader
     pass
 
-def enable_wifi(user_input):
-    pass
-
-def disable_wifi(user_input):
-    pass
-
-def enable_airplane_mode(user_input):
-    pass
-
-def disable_airplane_mode(user_input):
-    pass
-
 def screen_lock_disabled(user_input):
     pass
 
 def screen_lock_enabled(user_input):
-    pass
-
-def battery_saver_on(user_input):
-    pass
-
-def battery_saver_off(user_input):
-    pass
-
-def donotdisturb_enabled(user_input):
-    pass
-
-def donotdisturb_disabled(user_input):
     pass
 
 def send_sms(user_input):
@@ -54,13 +30,6 @@ def send_sms(user_input):
     adb shell am start -a android.intent.action.SENDTO -d sms:+1234567890 --es sms_body "Hello, this is a test message" --ez exit_on_sent true
     """
     pass
-
-def check_battery_status(user_input):
-    """
-    adb shell dumpsys battery
-    """
-    pass
-
 
 def get_device_info(user_input):
     """

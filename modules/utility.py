@@ -2,6 +2,9 @@ import subprocess
 import re
 import config
 import os
+import requests
+
+APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
 def split_user_input(user_input):
     #Remove a sequence of more than one whitespace
@@ -230,3 +233,28 @@ def is_apk_on_system(apks):
             return check
         
     return check
+
+def valid_apk_file(user_input):
+    while not os.path.exists(user_input) or not user_input.endswith(".apk"):
+        user_input = input("Write the path of an APK file to be installed: ")
+
+    return user_input
+
+def get_valid_playstore_app_id(user_input):
+    while not is_valid_app_id(user_input) or not is_app_on_store(user_input):
+        user_input = input("Write a valid and existing app ID to be searched on Play Store: ")
+
+    return user_input
+
+def is_valid_app_id(app_id):
+    if re.match(APP_ID_REGEX, app_id):
+        return True
+    
+    return False
+
+def is_app_on_store(app_id):
+    store_url = f"https://play.google.com/store/apps/details?id={app_id}"
+
+    response = requests.get(store_url)
+
+    return response.status_code == 200

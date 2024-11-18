@@ -1,4 +1,4 @@
-from modules import apk_analyzer, apk_install, app_logs, backup, file_transfer, merge_apks, mirroring, mobsf, proxy, signature, useful_stuff, utility
+from modules import apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, merge_apks, mirroring, mobsf, proxy, signature, useful_stuff, utility
 
 OPTIONS =   {
                 'main': { 
@@ -191,19 +191,26 @@ OPTIONS =   {
                         "install_uninstall" : {
                             'description': ['Install an app on the mobile device.',],
                             'children': {
-                                "from_apk_on_pc" : {
+                                "install_from_apk" : {
                                     'description' : ["Write the path of the apk on your PC to be installed",],
                                     'children': {
                                         "back" : dict(),
                                     },
                                     'function': apk_install.install_from_apk
                                 },
-                                "from_play_store" : {
+                                "install_from_playstore" : {
                                     'description' : ["Write the app id of the app to be installed (the command prompt will be open)",],
                                     'children': {
                                         "back" : dict(),
                                     },
                                     'function': apk_install.install_from_playstore
+                                },                                
+                                "uninstall" : {
+                                    'description' : ["Write the app id of the app to be uninstalled",],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': apk_install.uninstall_app
                                 },
                                 "back" : dict()
                             }
@@ -333,7 +340,7 @@ OPTIONS =   {
                             },
                             'function': file_transfer.upload
                         },
-                        "useful_staffs" : {
+                        "useful_stuffs" : {
                             'description': ['Process for logs gathering:',
                                             ' > automated mode: the application will be opened by the script',
                                             ' > manual mode: the application needs to be launched by the user'],
@@ -346,17 +353,24 @@ OPTIONS =   {
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.battery_saver_off
+                                            'function': battery.battery_saver_off
                                         },
                                         "on" : {
                                             'description' : ["Turn on battery saver mode",],
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.battery_saver_on
+                                            'function': battery.battery_saver_on
                                         },
                                         "back" : dict(),
                                     }
+                                },
+                                "battery_status" : {
+                                    'description' : ["Battery Status",],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': battery.check_battery_status
                                 },
                                 "do_not_disturb_mode" : {
                                     'description' : ["Do Not Disturb mode",],
@@ -366,14 +380,28 @@ OPTIONS =   {
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.donotdisturb_disabled
+                                            'function': connectivity.donotdisturb_disabled
                                         },
-                                        "on" : {
-                                            'description' : ["Turn on Do Not Disturb mode",],
+                                        "alarms_only" : {
+                                            'description' : ["Turn on Do Not Disturb mode with alarms only",],
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.donotdisturb_enabled
+                                            'function': connectivity.donotdisturb_alarms_only
+                                        },
+                                        "priority_only" : {
+                                            'description' : ["Turn on Do Not Disturb mode with priority only",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': connectivity.donotdisturb_priority_only
+                                        },
+                                        "total_silence" : {
+                                            'description' : ["Turn on Do Not Disturb mode with total silence",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': connectivity.donotdisturb_total_silence
                                         },
                                         "back" : dict(),
                                     }
@@ -386,28 +414,28 @@ OPTIONS =   {
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.disable_wifi
+                                            'function': connectivity.disable_wifi
                                         },
                                         "wifi_on" : {
                                             'description' : ["Turn on Wifi option",],
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.enable_wifi
+                                            'function': connectivity.enable_wifi
                                         },
                                         "airplane_off" : {
                                             'description' : ["Turn off Airplane mode",],
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.disable_airplane_mode
+                                            'function': connectivity.disable_airplane_mode
                                         },
                                         "airplane_on" : {
                                             'description' : ["Turn on Airplane mode",],
                                             'children': {
                                                 "back" : dict(),
                                             },
-                                            'function': useful_stuff.enable_airplane_mode
+                                            'function': connectivity.enable_airplane_mode
                                         },
                                         "back" : dict(),
                                     }
