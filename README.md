@@ -90,7 +90,7 @@ python main.py
   - [x] `backup_restore`: Specify the backup file path on your system
   - [x] `backup_to_folder`: Convert the AB file to an unpacked folder
   - [x] `reset_app_data`: Reset App data
-- [ ] `download_from_mobile`<br>Download file from the mobile device
+- [x] `download_from_mobile`<br>Download file from the mobile device
 - [x] `install_uninstall`<br>Install/Uninstall an app on the mobile device
   - [x] `install_from_apk`
   - [x] `install_from_playstore`
@@ -116,11 +116,11 @@ python main.py
   - [ ] `app_crash_logs`
 - [x] `upload_to_mobile`<br>Upload a file from PC to mobile device
 - [ ] `useful_staffs`
-  - [ ] `battery_saver`: Battery Saver mode (ON/OFF)
-  - [ ] `do_not_disturb_mode`: Do Not Disturb mode (ON/OFF)
-  - [ ] `connectivity`: Connectivity options management
-    - [ ] `wifi`: Wifi option Management (ON/OFF)
-    - [ ] `airplane`: Airplane mode Management (ON/OFF)
+  - [x] `battery_saver`: Battery Saver mode (ON/OFF)
+  - [x] `do_not_disturb_mode`: Do Not Disturb mode (ON/OFF)
+  - [x] `connectivity`: Connectivity options management
+    - [x] `wifi`: Wifi option Management (ON/OFF)
+    - [x] `airplane`: Airplane mode Management (ON/OFF)
   - [ ] `screenshot_video`: Screenshot/Video on the mobile device
     - [ ] `screenshot`
     - [ ] `video`
