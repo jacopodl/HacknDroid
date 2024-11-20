@@ -100,11 +100,10 @@ OPTIONS =   {
                                             'children':{
                                                 "back":dict(),
                                             },
-                                            'function': apk_analyzer.jar_from_file
+                                            'function': apk_analyzer.jadx_from_file
                                         },
                                         "back" : dict(),
                                     },
-                                    'function' : apk_analyzer.apk_decompiler_from_file
                                 },
                                 "from_mobile_device" : { 
                                     'description': ["Convert am apk from the mobile device to a jar file"],
@@ -123,7 +122,7 @@ OPTIONS =   {
                                             'children':{
                                                 "back":dict(),
                                             },
-                                            'function': apk_analyzer.jar_from_device
+                                            'function': apk_analyzer.jadx_from_device
                                         },
                                         "back" : dict(),
                                     },

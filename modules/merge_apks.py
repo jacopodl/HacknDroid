@@ -15,6 +15,8 @@ def merge_from_dir(user_input):
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
     process.communicate()
 
+    return apk_name
+
 def merge_from_list(user_input):
     check = True
     apks = user_input.split(" ")       
@@ -32,6 +34,6 @@ def merge_from_list(user_input):
     for f in apks:
         shutil.copy(f,".tmp_merge_apks")
 
-    merge_from_dir(".tmp_merge_apks")
+    apk_name = merge_from_dir(".tmp_merge_apks")
 
     shutil.rmtree(".tmp_merge_apks")

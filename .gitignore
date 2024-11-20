@@ -7,3 +7,5 @@ logcat.log
 *.ab
 *.tar
 backup_*/
+merged_*/
+*.jar

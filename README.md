@@ -71,20 +71,20 @@ python main.py
 - [ ] `apk_analysis`<br>Analysis of the APKs (signature schema verifier, apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in smali files, etc.)
   - [ ] `from_apk_on_pc`
   - [ ] `from_mobile_device`
-- [ ] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
-  - [ ] `compile`: Compile an apk file from the folder with decompiled and modified code
-  - [ ] `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
-- [ ] `apk_decompiling`<br>Decompile an APK file
-  - [ ] `from_apk_on_pc`: 
+- [x] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
+  - [x] `compile`: Compile an apk file from the folder with decompiled and modified code
+  - [x] `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
+- [x] `apk_decompiling`<br>Decompile an APK file
+  - [x] `from_apk_on_pc`: 
   - [x] `from_mobile_device`: 
-- [ ] `apk_to_jar`<br>>Convert the apk to a jar file
-  - [ ] `from_apk_on_pc`: 
-    - [ ] `create_jar_file`: 
-    - [ ] `jadx_create_and_open_file`: 
-  - [ ] `from_mobile_device`: 
-    - [ ] `create_jar_file`: 
-    - [ ] `jadx_create_and_open_file`: 
-- [ ] `backup_and_data`<br>Backup the mobile device or an application
+- [x] `apk_to_jar`<br>>Convert the apk to a jar file
+  - [x] `from_apk_on_pc`: 
+    - [x] `create_jar_file`: 
+    - [x] `jadx_create_and_open_file`: 
+  - [x] `from_mobile_device`: 
+    - [x] `create_jar_file`: 
+    - [x] `jadx_create_and_open_file`: 
+- [x] `backup_and_data`<br>Backup the mobile device or an application
   - [x] `backup_device`: Backup the mobile device
   - [x] `backup_specific_app`: Backup a specific app specifing its app ID
   - [x] `backup_restore`: Specify the backup file path on your system
@@ -108,7 +108,7 @@ python main.py
   - [x] `set_proxy_with_current_ip`
   - [x] `set_proxy_with_other_ip`
   - [x] `del_proxy`
-- [ ] `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
+- [x] `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
 - [ ] `track_logs`<br>Logs gathering
   - [x] `all_logs`
   - [ ] `all_crash_logs`
