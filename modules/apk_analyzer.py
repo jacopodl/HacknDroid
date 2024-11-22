@@ -118,7 +118,7 @@ def jadx_run_on_apk_file(apk_filepath):
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
     stdout, stderr = process.communicate()
 
-    print(stdout)    
+    print(stdout)
 
 def apk_compile_from_folder(user_input):
     while not os.path.exists(user_input):

@@ -1,6 +1,6 @@
 **/__pycache__/
 .venv/
-logcat.log
+*.log
 .tmp
 *.ab
 *.apk

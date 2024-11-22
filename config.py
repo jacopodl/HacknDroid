@@ -320,12 +320,26 @@ OPTIONS =   {
                                     },
                                     'function': app_logs.all_logs
                                 },
+                                "all_crash_logs" : {
+                                    'description' : ["Write the app id or a part of the app name to be launched",],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': app_logs.all_crash_logs
+                                },
                                 "app_logs" : {
                                     'description' : ["Write the app id or a part of the app name to be launched",],
                                     'children': {
                                         "back" : dict(),
                                     },
                                     'function': app_logs.app_logs
+                                },
+                                "app_crash_logs" : {
+                                    'description' : ["Write the app id or a part of the app name to be launched",],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': app_logs.app_crash_logs
                                 },
                                 "back" : dict()
                             }
@@ -344,6 +358,67 @@ OPTIONS =   {
                                             ' > automated mode: the application will be opened by the script',
                                             ' > manual mode: the application needs to be launched by the user'],
                             'children': {
+                                "device_info": {
+                                    'description' : ["Get mobile device information",],
+                                    'children': {
+                                        "apps_list": {
+                                            'description' : ["Get list of all the installed apps",],
+                                            'children': {
+                                                "3rd_party_apps": {
+                                                    'description' : ["Get list of all the installed 3rd-party apps",],
+                                                    'children': {
+                                                        "back" : dict(),
+                                                    },
+                                                    'function': useful_stuff.third_party_apps
+                                                },
+                                                "system_apps": {
+                                                    'description' : ["Get list of all the installed system apps",],
+                                                    'children': {
+                                                        "back" : dict(),
+                                                    },
+                                                    'function': useful_stuff.system_apps
+                                                },
+                                                "back" : dict(),
+                                            },
+                                        },
+                                        "cpu_info": {
+                                            'description' : ["Get CPU information",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.cpu_info
+                                        },
+                                        "general_info": {
+                                            'description' : ["Get mobile device general information",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.general_info
+                                        },
+                                        "network_info": {
+                                            'description' : ["Get Network information",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.network_info
+                                        },
+                                        "ram_info": {
+                                            'description' : ["Get RAM information",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.ram_info
+                                        },
+                                        "storage_info": {
+                                            'description' : ["Get Storage information",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.storage_info
+                                        },
+                                        "back" : dict(),
+                                    },
+                                },
                                 "battery_saver" : {
                                     'description' : ["Battery Saver mode",],
                                     'children': {
@@ -460,9 +535,16 @@ OPTIONS =   {
                                     },
                                     'function': app_logs.all_logs
                                 },
-                                "reboot" : {
+                                "shutdown_reboot" : {
                                     'description' : ["Reboot the device with several options",],
                                     'children': {
+                                        "reboot" : {
+                                            'description' : ["Shutdown the mobile device.","Press enter to continue...",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': useful_stuff.shutdown
+                                        },
                                         "reboot" : {
                                             'description' : ["Reboot the mobile device.","Press enter to continue...",],
                                             'children': {

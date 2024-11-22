@@ -22,7 +22,7 @@ def get_app_id(grep_string):
     keywords = split_user_input(grep_string)
     
     # List all the application IDs
-    command = ['adb', 'shell', 'pm', 'list', 'packages']
+    command = ['adb', 'shell', 'pm', 'list', 'packages', '-3']
     result = subprocess.run(command, capture_output=True, text=True)
 
     packages = []

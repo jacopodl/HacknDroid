@@ -71,13 +71,16 @@ python main.py
 - [ ] `apk_analysis`<br>Analysis of the APKs (signature schema verifier, apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in smali files, etc.)
   - [ ] `from_apk_on_pc`
   - [ ] `from_mobile_device`
+    - [ ] Cordova
+    - [ ] Flutter
+    - [ ] 
 - [x] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
   - [x] `compile`: Compile an apk file from the folder with decompiled and modified code
   - [x] `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
 - [x] `apk_decompiling`<br>Decompile an APK file
   - [x] `from_apk_on_pc`: 
   - [x] `from_mobile_device`: 
-- [x] `apk_to_jar`<br>>Convert the apk to a jar file
+- [x] `apk_to_jar`<br>Convert the apk to a jar file
   - [x] `from_apk_on_pc`: 
     - [x] `create_jar_file`: 
     - [x] `jadx_create_and_open_file`: 
@@ -91,6 +94,8 @@ python main.py
   - [x] `backup_to_folder`: Convert the AB file to an unpacked folder
   - [x] `reset_app_data`: Reset App data
 - [x] `download_from_mobile`<br>Download file from the mobile device
+- [ ] `frida`: Use Frida for several functionalities
+  - [ ] `function_hooking`
 - [x] `install_uninstall`<br>Install/Uninstall an app on the mobile device
   - [x] `install_from_apk`
   - [x] `install_from_playstore`
@@ -103,11 +108,23 @@ python main.py
   - [ ] `from_mobile_device`
 - [ ] `mirroring`<br>Launch scrcpy for mobile device mirroring
 - [x] `proxy`<br>Set global proxy on the mobile device
-  - [x] `get_current_proxy`
+  - [ ] `system_proxy`
+    - [x] `get_current_proxy`
+    - [x] `set_proxy_with_current_ip`
+    - [x] `set_proxy_with_other_ip`
+    - [x] `del_proxy`
+  - [ ] `invisible_proxy`
+    - [ ] `ip_tables`
+      - [ ] `get_current_proxy`
+      - [ ] `set_proxy_with_current_ip`
+      - [ ] `set_proxy_with_other_ip`
+      - [ ] `del_proxy`
+    - [ ] `dns`
+      - [ ] `get_current_proxy`
+      - [ ] `set_proxy_with_current_ip`
+      - [ ] `set_proxy_with_other_ip`
+      - [ ] `del_proxy`
   - [ ] `install_certificates`
-  - [x] `set_proxy_with_current_ip`
-  - [x] `set_proxy_with_other_ip`
-  - [x] `del_proxy`
 - [x] `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
 - [ ] `track_logs`<br>Logs gathering
   - [x] `all_logs`
@@ -115,7 +132,15 @@ python main.py
   - [x] `app_logs`
   - [ ] `app_crash_logs`
 - [x] `upload_to_mobile`<br>Upload a file from PC to mobile device
-- [ ] `useful_staffs`
+- [x] `useful_staffs`
+  - [x] `device_info`
+    - [x] `apps_list`
+      - [x] `3rd_party_apps`: Get list of all the installed 3rd-party apps
+      - [x] `system_apps`: Get list of all the installed system apps
+    - [x] `cpu_info`: Get CPU information
+    - [x] `general_info`: Get mobile device general information
+    - [x] `ram_info`: Get RAM information
+    - [x] `storage_info`: Get Storage information
   - [x] `battery_saver`: Battery Saver mode (ON/OFF)
   - [x] `do_not_disturb_mode`: Do Not Disturb mode (ON/OFF)
   - [x] `connectivity`: Connectivity options management
@@ -124,7 +149,8 @@ python main.py
   - [ ] `screenshot_video`: Screenshot/Video on the mobile device
     - [ ] `screenshot`
     - [ ] `video`
-  - [ ] `reboot`<br>Reboot the device with several options
-    - [ ] `reboot`: Reboot the mobile device
-    - [ ] `reboot_recovery`: Reboot the mobile device in recovery mode
-    - [ ] `reboot_bootloader`: Reboot the mobile device in bootloader mode
+  - [x] `shutdown`<br>Shutdown/Reboot the device with several options
+    - [x] `shutdown`: Shutdown the mobile device
+    - [x] `reboot`: Reboot the mobile device
+    - [x] `reboot_recovery`: Reboot the mobile device in recovery mode
+    - [x] `reboot_bootloader`: Reboot the mobile device in bootloader mode
