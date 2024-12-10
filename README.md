@@ -64,16 +64,31 @@ python main.py
 ![Run Example](.img/run_example_1.png)
 ![Run Example](.img/run_example_2.png)
 
+### Proxy via DNS Spoofing (on Windows)
+To run DNS Server using the tool, ensure that the Windows Firewall is disabled on the PC where the script will be run:
+![Run Example](.img/disable_windows_firewall_0.png)
+![Run Example](.img/disable_windows_firewall_1.png)
+
+If everything was set successfully, you can intercept the traffic on ports 80, 443 in Burp Suite as follows:
+![Run Example](.img/dns_proxy_intercept.png)
 
 ---
 
+
 ## Script features
+- [ ] ***Task Manager***
+  - [] Daemon tasks
+    - [x] logcat
+    - [x] mirroring
+    - [ ] proxy with dns spoofing
+  - [x] Sequential tasks
+
+- [ ] ***Functionalities***
 - [ ] `apk_analysis`<br>Analysis of the APKs (signature schema verifier, apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in smali files, etc.)
   - [ ] `from_apk_on_pc`
   - [ ] `from_mobile_device`
     - [ ] Cordova
     - [ ] Flutter
-    - [ ] 
 - [x] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
   - [x] `compile`: Compile an apk file from the folder with decompiled and modified code
   - [x] `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
@@ -96,6 +111,7 @@ python main.py
 - [x] `download_from_mobile`<br>Download file from the mobile device
 - [ ] `frida`: Use Frida for several functionalities
   - [ ] `function_hooking`
+  - [ ] `script`
 - [x] `install_uninstall`<br>Install/Uninstall an app on the mobile device
   - [x] `install_from_apk`
   - [x] `install_from_playstore`
@@ -103,12 +119,9 @@ python main.py
 - [x] `merge_apks`<br>Merge several APKs using APKEditor
   - [x] `from_directory`
   - [x] `from_list`
-- [ ] `mobsf`<br>Static Analysis of the APK using MobSF
-  - [ ] `from_apk_on_pc`
-  - [ ] `from_mobile_device`
-- [ ] `mirroring`<br>Launch scrcpy for mobile device mirroring
+- [x] `mirroring`<br>Launch scrcpy for mobile device mirroring
 - [x] `proxy`<br>Set global proxy on the mobile device
-  - [ ] `system_proxy`
+  - [x] `system_proxy`
     - [x] `get_current_proxy`
     - [x] `set_proxy_with_current_ip`
     - [x] `set_proxy_with_other_ip`
@@ -119,18 +132,25 @@ python main.py
       - [ ] `set_proxy_with_current_ip`
       - [ ] `set_proxy_with_other_ip`
       - [ ] `del_proxy`
-    - [ ] `dns`
-      - [ ] `get_current_proxy`
-      - [ ] `set_proxy_with_current_ip`
-      - [ ] `set_proxy_with_other_ip`
-      - [ ] `del_proxy`
+    - [x] `dns`
+      - [x] `get_current_proxy`
+      - [x] `dns_server_with_current_ip`
+      - [x] `dns_server_with_another_ip`
   - [ ] `install_certificates`
+    - [ ] install depending on android
+      - [ ] Android <=10
+      - [ ] Android 10+
+    - [ ] Install without Rooted device
+      - [ ] MDM install 
+      - [ ] install certificates on user land and modify android manifest
+      - [ ] VPN certificate in userland 
 - [x] `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
+- [ ] `system_mount_for_root`: Device rooting
+  - [ ] Android <=10
+  - [ ] Android 10+
 - [ ] `track_logs`<br>Logs gathering
   - [x] `all_logs`
   - [ ] `all_crash_logs`
-  - [x] `app_logs`
-  - [ ] `app_crash_logs`
 - [x] `upload_to_mobile`<br>Upload a file from PC to mobile device
 - [x] `useful_staffs`
   - [x] `device_info`

@@ -2,6 +2,7 @@ import subprocess
 import os
 from modules import utility
 import shutil
+from modules.tasks_management import Task
 
 def merge_from_dir(user_input):
     while not os.path.exists(user_input):
@@ -12,8 +13,7 @@ def merge_from_dir(user_input):
     # -f forces the delete of output apk name if it already exists
     command = [f'APKEditor.bat','m',"-f","-i", user_input, "-o", apk_name]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    process.communicate()
+    output, error = Task().run(command, is_shell=True)
 
     return apk_name
 

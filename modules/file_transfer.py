@@ -1,15 +1,15 @@
-import config
+import config.menu as menu
 from modules import utility
 import subprocess
 import os
+from modules.tasks_management import Task
 
 def mobile_exists(paths):
     check = True
     for mobile_path in paths:
         command = ['adb', 'shell']
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
         shell_input = ["su root",f"""(test -f "{mobile_path}" || test -d "{mobile_path}") && echo "1" """, "exit"]
-        output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
+        output, error = Task().run(command, input_to_cmd=shell_input)
     
         check = check and (output.strip() == "1")
 
@@ -20,23 +20,17 @@ def mobile_exists(paths):
     return check
 
 def is_mobile_folder(mobile_path):
-    check = True
-    
     command = ['adb', 'shell']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     shell_input = ["su root",f"""(test -d "{mobile_path}") && echo "1" """, "exit"]
-    output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
+    output, error = Task().run(command, input_to_cmd=shell_input)
 
     return output.strip() == "1"
 
 
 def is_mobile_file(mobile_path):
-    check = True
-    
     command = ['adb', 'shell']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     shell_input = ["su root",f"""(test -f "{mobile_path}") && echo "1" """, "exit"]
-    output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
+    output, error = Task().run(command, input_to_cmd=shell_input)
 
     return output.strip() == "1"
 
@@ -76,14 +70,12 @@ def upload_to_dest(file_folder, dest_folder="/data/tmp"):
 
     sdcard = utility.sd_path()
     command = ['adb', 'push', file_folder, sdcard]
-    result = subprocess.run(command, capture_output=True, text=True)
+    output, error = Task().run(command)
 
     command = ['adb', 'shell']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-
     rsc_name = utility.rsc_from_path(file_folder)
     shell_input = ["su root",f"mv {sdcard}/{rsc_name} {dest_folder}", "exit"]
-    output, error = process.communicate(input=utility.cmd_to_subprocess_string(shell_input))
+    output, error = Task().run(command, input_to_cmd=shell_input)
 
     print("Upload done!!!")
 
@@ -111,11 +103,10 @@ def download(mobile_path, dest_path, permissions_check=True):
     '''
 
     command = ['adb', 'pull', mobile_path, dest_path]
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-    out, err = process.communicate()
+    output, error = Task().run(command)
 
     if permissions_check:
-        if "permission denied" in out.lower() or "0 files pulled" in out.lower():
+        if "permission denied" in output.lower() or "0 files pulled" in output.lower():
             x = input("[PERMISSION DENIED] Do you want to download the file/folder as Super User (y/n)? ")
 
             if x.lower() == "y":
@@ -134,9 +125,8 @@ def su_download(mobile_path, dest_path):
                        f"chmod 666 {sdcard}/{rsc_name}",
                        "exit"]
         
-        print(utility.cmd_to_subprocess_string(shell_input))
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
-        out, err = process.communicate(utility.cmd_to_subprocess_string(shell_input))
+        print("\n".join(shell_input))
+        output, error = Task().run(command, input_to_cmd=shell_input)
         download(f"{sdcard}/{rsc_name}", dest_path, permissions_check=False)
 
     elif is_mobile_file(mobile_path):
@@ -146,7 +136,6 @@ def su_download(mobile_path, dest_path):
                        f"chmod 666 {sdcard}/{rsc_name}", 
                        "exit"]
         
-        print(utility.cmd_to_subprocess_string(shell_input))
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
-        out, err = process.communicate(utility.cmd_to_subprocess_string(shell_input))
+        print("\n".join(shell_input))
+        output, error = Task().run(command, input_to_cmd=shell_input)
         download(f"{sdcard}/{rsc_name}", dest_path, permissions_check=False)

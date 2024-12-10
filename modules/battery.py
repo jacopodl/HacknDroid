@@ -2,21 +2,21 @@ import subprocess
 from prompt_toolkit import prompt, print_formatted_text
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
-import config
+import config.menu as menu
+import config.style as tool_style
+from modules.tasks_management import Task
 
 def battery_saver_on(user_input):    
     # Open ADB shell
     command = ['adb' ,'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'true']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-    output, error = process.communicate()
+    output, error = Task().run(command)
     print(output)
 
 
 def battery_saver_off(user_input):
     # Open ADB shell
     command = ['adb' ,'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'false']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-    output, error = process.communicate()
+    output, error = Task().run(command)
     print(output)
 
 def check_battery_status(user_input):
@@ -29,7 +29,7 @@ def check_battery_status(user_input):
     output, error = process.communicate()
 
 
-    style = Style.from_dict(config.STYLE)
+    style = Style.from_dict(tool_style.STYLE)
     
     lines = output.splitlines()
     

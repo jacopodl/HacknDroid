@@ -3,6 +3,7 @@ import subprocess
 import os
 import zlib
 import tarfile
+from modules.tasks_management import Task
 
 def app_backup(user_input : str):
     # Retrieve App ID from user input
@@ -13,8 +14,7 @@ def app_backup(user_input : str):
     backup_name = "backup_"+app_id
     command = ['adb','backup',"-apk","-f", backup_name+".ab", app_id]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    process.communicate()
+    output, error = Task().run(command, is_shell=True)
 
     # Convert backup file (comppressed file) as TAR file backup_<app_id>.tar 
     # and unpack it to a folder with name backup_<app_id>
@@ -26,8 +26,7 @@ def device_backup(user_input : str):
     backup_name = "backup_device"
     command = ['adb','backup',"-apk","-shared", "-all", "-f", backup_name+".ab"]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    process.communicate()
+    output, error = Task().run(command, is_shell=True)
 
     # Convert backup file (comppressed file) as TAR file backup_<app_id>.tar 
     # and unpack it to a folder with name backup_<app_id>
@@ -44,8 +43,7 @@ def tar_extract(user_input : str):
     tar_file = user_input.replace(".ab", ".tar")
     command = ['abe', 'unpack', user_input, tar_file, password]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    process.communicate()
+    output, error = Task().run(command, is_shell=True)
 
     # Create the directory for the unpacked TAR file
     folder = user_input.replace(".ab", "")
@@ -64,8 +62,7 @@ def ab_to_tar_extract(backup_name):
     # Unpack the Android Backup file using ABE and save it to <backup_name>.tar file
     command = ['abe', 'unpack', backup_name+".ab", backup_name+".tar", password]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    process.communicate()
+    output, error = Task().run(command, is_shell=True)
 
     # Create the directory for the unpacked TAR file
     if not os.path.exists(backup_name):
@@ -85,8 +82,7 @@ def restore_backup(user_input):
     # Restore the AB file specified from the user 
     command = ['adb','restore',user_input]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    process.communicate()
+    output, error = Task().run(command, is_shell=True)
 
 
 def app_data_reset(user_input):
@@ -96,5 +92,4 @@ def app_data_reset(user_input):
     # Reset App data for the application with App ID <app_id>
     command = ['adb','shell',"pm","clear",app_id]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    process.communicate()
+    output, error = Task().run(command, is_shell=True)

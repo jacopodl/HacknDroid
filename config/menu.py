@@ -1,4 +1,5 @@
-from modules import apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, merge_apks, mirroring, mobsf, proxy, signature, useful_stuff, utility
+from modules import apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, merge_apks, mirroring, proxy, signature, useful_stuff, utility
+import modules.tasks_management
 
 OPTIONS =   {
                 'main': { 
@@ -234,72 +235,145 @@ OPTIONS =   {
                                 "back" : dict(),
                             },
                         },
-                        "mobsf" :  { 
-                            'description': ["Static Analysis of the APK using MobSF"],
-                            'children': {
-                                "from_apk_on_pc" : { 
-                                    'description': ["Write the path of the apk on your PC to be analysed (or the folder with all the APKs related to the app)"],
-                                    'children': {
-                                        "back" : dict(),
-                                    },
-                                    'function' : mobsf.mobsf_from_file
-                                },
-                                "from_mobile_device" : { 
-                                    'description': ["Write the app id or a part of the app name to be analysed",],
-                                    'children': {
-                                        "back" : dict(),
-                                    },
-                                    'function': mobsf.mobsf_from_device
-                                },
-                                "back" : dict(),
-                            },
-                            'function': file_transfer.download
-                        },
                         "mirroring" : {
                             'description': ['Launch scrcpy for mobile device mirroring (Press any key to continue)',],
                             'children': {
+                                "mirroring" : {
+                                    'description': ['Launch scrcpy for mobile device mirroring (Press any key to continue)',],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': mirroring.mirroring
+                                },
+                                "stop_mirroring" : {
+                                    'description': ['Stop scrcpy session for mobile device mirroring (Press any key to continue)',],
+                                    'children': {
+                                        "back" : dict(),
+                                    },
+                                    'function': mirroring.stop_mirroring
+                                },
                                 "back" : dict(),
-                            },
-                            'function': mirroring.mirroring
+                            }
                         },
                         "proxy" : {
                             'description': ['Set global proxy on the mobile device:',
                                             ' > using the current PC IP',
                                             ' > using another IP'],
                             'children': {
-                                "get_current_proxy" : {
-                                    'description' : ["Press ENTER to see current proxy settings"],
+                                "dns" : {
+                                    'description': ['Set proxy routes using a DNS server'],
                                     'children': {
+                                        "get_current_proxy" : {
+                                            'description' : ["Press ENTER to see current DNS proxy settings"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.get_current_dns_proxy
+                                        },
+                                        "set_proxy_with_current_ip" : {
+                                            'description' : ["",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.set_current_pc_dns_proxy
+                                        },
+                                        "set_proxy_with_other_ip" : {
+                                            'description' : ["Write the following values:",
+                                                            " > IP address of the proxy",
+                                                            " > port number of the proxy"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.set_generic_dns_proxy
+                                        },
+                                        "del_proxy" : {
+                                            'description' : ["Press ENTER to reset proxy configuration"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.del_dns_proxy
+                                        },
                                         "back" : dict(),
                                     },
-                                    'function': proxy.get_current_proxy_settings
                                 },
-                                "set_proxy_with_current_ip" : {
-                                    'description' : ["Write the port number for the proxy on the current PC",],
+                                "system_proxy" : {
+                                    'description': ['Set global proxy on the mobile device:',
+                                                    ' > using the current PC IP',
+                                                    ' > using another IP'],
                                     'children': {
+                                        "get_current_proxy" : {
+                                            'description' : ["Press ENTER to see current proxy settings"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.get_current_invisible_proxy
+                                        },
+                                        "set_proxy_with_current_ip" : {
+                                            'description' : ["Write the port number for the proxy on the current PC",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.set_current_pc_invisible_proxy
+                                        },
+                                        "set_proxy_with_other_ip" : {
+                                            'description' : ["Write the following values:",
+                                                            " > IP address of the proxy",
+                                                            " > port number of the proxy"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.set_generic_invisible_proxy
+                                        },
+                                        "del_proxy" : {
+                                            'description' : ["Press ENTER to reset proxy configuration"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.del_invisible_proxy
+                                        },
                                         "back" : dict(),
                                     },
-                                    'function': proxy.set_current_pc_proxy
                                 },
-                                "set_proxy_with_other_ip" : {
-                                    'description' : ["Write the following values:",
-                                                     " > IP address of the proxy",
-                                                     " > port number of the proxy"],
+                                "system_proxy" : {
+                                    'description': ['Set global proxy on the mobile device:',
+                                                    ' > using the current PC IP',
+                                                    ' > using another IP'],
                                     'children': {
+                                        "get_current_proxy" : {
+                                            'description' : ["Press ENTER to see current proxy settings"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.get_current_proxy_settings
+                                        },
+                                        "set_proxy_with_current_ip" : {
+                                            'description' : ["Write the port number for the proxy on the current PC",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.set_current_pc_proxy
+                                        },
+                                        "set_proxy_with_other_ip" : {
+                                            'description' : ["Write the following values:",
+                                                            " > IP address of the proxy",
+                                                            " > port number of the proxy"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.set_generic_proxy
+                                        },
+                                        "del_proxy" : {
+                                            'description' : ["Press ENTER to reset proxy configuration"],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': proxy.del_proxy
+                                        },
                                         "back" : dict(),
                                     },
-                                    'function': proxy.set_generic_proxy
-                                },
-                                "del_proxy" : {
-                                    'description' : ["Press ENTER to reset proxy configuration"],
-                                    'children': {
-                                        "back" : dict(),
-                                    },
-                                    'function': proxy.del_proxy
                                 },
                                 "back" : dict(),
-                            },
-                            'function': mirroring.mirroring
+                            }
                         },
                         "sign_apk":{
                             'description': ['Sign an apk on your PC. Write the path of the apk you want to test'],
@@ -313,33 +387,52 @@ OPTIONS =   {
                                             ' > automated mode: the application will be opened by the script',
                                             ' > manual mode: the application needs to be launched by the user'],
                             'children': {
-                                "all_logs" : {
-                                    'description' : ["Write the app id or a part of the app name to be launched",],
+                                "run_and_log" : {
+                                    'description' : ["Run the app and logs it using the tool",],
                                     'children': {
+                                        "normal_logs" : {
+                                            'description' : ["Write the app id or a part of the app name to be launched and the log it",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': app_logs.run_and_logs
+                                        },
+                                        "crash_logs" : {
+                                            'description' : ["Write the app id or a part of the app name to be launched and the log its crashes",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': app_logs.run_and_crash_logs
+                                        },
                                         "back" : dict(),
                                     },
-                                    'function': app_logs.all_logs
                                 },
-                                "all_crash_logs" : {
-                                    'description' : ["Write the app id or a part of the app name to be launched",],
+                                "running_app_log" : {
+                                    'description' : ["Log a running app",],
                                     'children': {
+                                        "normal_logs" : {
+                                            'description' : ["Write the app id or a part of the app name to be logged",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': app_logs.logs_from_running_process
+                                        },
+                                        "crash_logs" : {
+                                            'description' : ["Write the app id or a part of the app name to be logged",],
+                                            'children': {
+                                                "back" : dict(),
+                                            },
+                                            'function': app_logs.crash_logs_from_running_process
+                                        },
                                         "back" : dict(),
                                     },
-                                    'function': app_logs.all_crash_logs
                                 },
-                                "app_logs" : {
-                                    'description' : ["Write the app id or a part of the app name to be launched",],
+                                "log_sessions" : {
+                                    'description' : ["List logging sessions",],
                                     'children': {
                                         "back" : dict(),
                                     },
-                                    'function': app_logs.app_logs
-                                },
-                                "app_crash_logs" : {
-                                    'description' : ["Write the app id or a part of the app name to be launched",],
-                                    'children': {
-                                        "back" : dict(),
-                                    },
-                                    'function': app_logs.app_crash_logs
+                                    'function': app_logs.list_daemons
                                 },
                                 "back" : dict()
                             }
@@ -533,7 +626,6 @@ OPTIONS =   {
                                         },
                                         "back" : dict(),
                                     },
-                                    'function': app_logs.all_logs
                                 },
                                 "shutdown_reboot" : {
                                     'description' : ["Reboot the device with several options",],
@@ -572,21 +664,13 @@ OPTIONS =   {
                                 "back" : dict()
                             }
                         },
+                        "processes_list" : {
+                            'description' : ["List all the processes","Press enter to continue...",],
+                            'children': {
+                                "back" : dict(),
+                            },
+                            'function': modules.tasks_management.list_daemons
+                        },
                     }
                 }
             }
-
-STYLE = {
-    'section': 'bg:#ffffff bold',
-    'section1': 'bg:#dd0000 bold white',
-    'section2': 'bg:#dd5500 bold white',
-    'section3': 'bg:#dd8800 bold white',
-    'option': 'ansigreen bold',
-    'descr': 'ansiyellow bold',
-    'error':'bg:#ff0000 bold white',
-    'completion-menu.completion': 'bg:#008888 #ffffff',
-    'completion-menu.completion.current': 'bg:#00aaaa #000000',
-    'scrollbar.background': 'bg:#88aaaa',
-    'scrollbar.button': 'bg:#222222',
-    'space':'white'
-}

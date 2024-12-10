@@ -1,4 +1,5 @@
-import config
+import config.menu as menu
+import config.style as tool_style
 
 from termcolor import cprint, colored
 
@@ -12,18 +13,19 @@ from pyfiglet import Figlet
 
 # Function pointer in OPTIONS
 from modules import apk_analyzer, apk_install, app_logs, cli_management, file_transfer
+from modules.tasks_management import DAEMONS_MANAGER
 
 class CLI():
 
     def __init__(self):
         global CURRENT_OPTION
-        self._options = config.OPTIONS
+        self._options = menu.OPTIONS
         self._current_path = []
         self._current_path.append(list(self._options.keys())[0])
         CURRENT_OPTION = self._options[self._current_path[0]]
 
         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
-        self._style = Style.from_dict(config.STYLE)
+        self._style = Style.from_dict(tool_style.STYLE)
 
         self._title = "HacknDroid" 
         self._title_f = Figlet(font='slant')
@@ -91,3 +93,7 @@ class CLI():
                     
             except (KeyboardInterrupt, EOFError):
                 break
+
+        DAEMONS_MANAGER.stop_all_tasks()
+
+        

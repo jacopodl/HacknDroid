@@ -1,12 +1,12 @@
-import config
-from modules.utility import app_id_from_user_input, cmd_to_subprocess_string, valid_apk_file
+import config.menu as menu
+from modules.utility import app_id_from_user_input, valid_apk_file
 from modules.file_transfer import download
 from modules.merge_apks import merge_from_dir
-import subprocess
 import os
 import glob
 import shutil
 from modules.signature import sign_apk
+from modules.tasks_management import Task
 
 DATA_APP_FOLDER = "/data/app"
 
@@ -51,7 +51,7 @@ def get_apk_from_device(user_input, check_for_merge=False):
     return apk_name
 
 
-def apk_decompiler_from_device(user_input, check_for_merge):
+def apk_decompiler_from_device(user_input):
     # Decompile the program
     # apktool d APP.apk -o <dir>
     apk_filepath = get_apk_from_device(user_input)
@@ -68,10 +68,9 @@ def apk_decompiler_from_file(user_input):
     dest_folder = os.path.basename(user_input).replace(".apk", "")
     command = ['apktool','d', user_input, "-o", dest_folder]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
 
-    print(stdout)
+    output, error = Task().run(command, is_shell=True)
+    print(output)
 
 
 def jar_from_device(user_input):
@@ -92,10 +91,8 @@ def create_jar_from_apk_path(apk_filepath):
     # --force to overwrite current JAR file
     command = ['d2j-dex2jar', apk_filepath, "--force", "-o", os.path.basename(apk_filepath).replace(".apk",".jar")]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-
-    print(stdout)
+    output, error = Task().run(command, is_shell=True)
+    print(output)
 
 
 def jadx_from_device(user_input):
@@ -115,10 +112,8 @@ def jadx_from_file(user_input):
 def jadx_run_on_apk_file(apk_filepath):
     command = ['jadx-gui', apk_filepath]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-
-    print(stdout)
+    output, error = Task().run(command, is_shell=True)
+    print(output)
 
 def apk_compile_from_folder(user_input):
     while not os.path.exists(user_input):
@@ -136,15 +131,13 @@ def apk_compile_from_folder(user_input):
     # apksigner sign --ks <keystore_name> --v1-signing-enabled true --v2-signing-enabled true <zip_aligned_apk.apk>
     command = ['apktool','b', user_input, "-o", f"{user_input}.apk"]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-    print(stdout)
+    output, error = Task().run(command, is_shell=True)
+    print(output)
 
     command = ['zipalign', '-v', '4', f"{user_input}.apk", f"zipaligned_{user_input}.apk"]
     print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-    print(stdout)
+    output, error = Task().run(command, is_shell=True)
+    print(output)
 
     return f"zipaligned_{user_input}.apk"
 
@@ -171,10 +164,10 @@ def transfer_apks_from_device(user_input):
     print("GET APKS: "+app_id)
 
     command = ['adb', 'shell']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-
     shell_input = ["su root",f'ls {DATA_APP_FOLDER} | grep "{app_id}"', "exit"]
-    output, error = process.communicate(input=cmd_to_subprocess_string(shell_input))
+
+    output, error = Task().run(command, input_to_cmd=shell_input)
+    print(output)
 
     if not os.path.exists('.tmp'):
         os.mkdir(".tmp")

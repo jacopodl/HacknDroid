@@ -1,6 +1,6 @@
 import subprocess
 import re
-import config
+import config.menu as menu
 import os
 import requests
 
@@ -22,7 +22,7 @@ def get_app_id(grep_string):
     keywords = split_user_input(grep_string)
     
     # List all the application IDs
-    command = ['adb', 'shell', 'pm', 'list', 'packages', '-3']
+    command = ['adb', 'shell', 'pm', 'list', 'packages']
     result = subprocess.run(command, capture_output=True, text=True)
 
     packages = []
@@ -107,7 +107,6 @@ def app_id_from_user_input(user_input):
     
 def active_applications():
     command = "adb shell \"ps -A | awk '{print $9}'\""
-    print(command)
     process = subprocess.Popen("adb shell \"ps -A | awk '{print $9}'\"", stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     output, error = process.communicate()
 
