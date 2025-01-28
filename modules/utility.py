@@ -7,18 +7,30 @@ import requests
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
 def split_user_input(user_input):
+    """
+    Remove a sequence of more than one whitespace and split the user input into a list of keywords.
+
+    Args:
+        user_input (str): The input string from the user.
+
+    Returns:
+        list: A list of keywords.
+    """
     #Remove a sequence of more than one whitespace
     user_input = re.sub(r"\s{2,}", " ", user_input)
     # Take the full list of the values to be searched
     return user_input.split(' ')
 
 def get_app_id(grep_string):
-    '''
-    Retrieve the full list of the applications on the device:
-        adb shell pm list packages
-    
-    Grep the content based on keywords inserted by the user and separated by whitespaces
-    '''
+    """
+    Retrieve the list of application IDs on the device that match the given keywords.
+
+    Args:
+        grep_string (str): Keywords to search for in the application IDs.
+
+    Returns:
+        list: A list of matching application IDs.
+    """
     keywords = split_user_input(grep_string)
     
     # List all the application IDs
@@ -56,9 +68,15 @@ def get_app_id(grep_string):
     return packages
 
 def is_app_id(user_input):
-    '''
-        Check if the user input is a valid app ID
-    '''
+    """
+    Check if the user input is a valid app ID.
+
+    Args:
+        user_input (str): The input string from the user.
+
+    Returns:
+        bool: True if the input is a valid app ID, False otherwise.
+    """
     command = ['adb', 'shell', 'pm', 'list', 'packages']
     result = subprocess.run(command, capture_output=True, text=True)
 
@@ -72,9 +90,15 @@ def is_app_id(user_input):
 
 
 def app_id_from_user_input(user_input):
-    '''
-        Check if the user input is a valid app ID or a valid set of keywords
-    '''
+    """
+    Check if the user input is a valid app ID or a valid set of keywords and return the corresponding app ID.
+
+    Args:
+        user_input (str): The input string from the user.
+
+    Returns:
+        str: The valid app ID.
+    """
     # Check if the user input is a valid app ID
     if is_app_id(user_input):
         # Return the app IDs
@@ -106,6 +130,12 @@ def app_id_from_user_input(user_input):
         return possible_app_ids[choice]
     
 def active_applications():
+    """
+    Retrieve the list of active applications on the device.
+
+    Returns:
+        list: A list of active application IDs.
+    """
     command = "adb shell \"ps -A | awk '{print $9}'\""
     process = subprocess.Popen("adb shell \"ps -A | awk '{print $9}'\"", stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     output, error = process.communicate()
@@ -119,16 +149,30 @@ def active_applications():
     return apps
 
 def is_active_app_id(user_input):
-    '''
-        Check if the user input is a valid app ID
-    '''
+    """
+    Check if the user input is a valid active app ID.
 
+    Args:
+        user_input (str): The input string from the user.
+
+    Returns:
+        bool: True if the input is a valid active app ID, False otherwise.
+    """
     apps = active_applications()
 
     return user_input in apps
 
 
 def get_active_app_id(user_input):
+    """
+    Retrieve the list of active application IDs on the device that match the given keywords.
+
+    Args:
+        user_input (str): Keywords to search for in the active application IDs.
+
+    Returns:
+        list: A list of matching active application IDs.
+    """
     apps = active_applications()
     possible_apps = []
 
@@ -150,9 +194,15 @@ def get_active_app_id(user_input):
 
 
 def active_app_id_from_user_input(user_input):
-    '''
-        Check if the user input is a valid app ID or a valid set of keywords
-    '''
+    """
+    Check if the user input is a valid active app ID or a valid set of keywords and return the corresponding active app ID.
+
+    Args:
+        user_input (str): The input string from the user.
+
+    Returns:
+        str: The valid active app ID.
+    """
     # Check if the user input is a valid app ID
     if is_active_app_id(user_input):
         # Return the app IDs
@@ -184,13 +234,12 @@ def active_app_id_from_user_input(user_input):
         return possible_app_ids[choice]
 
 def sd_path():
-    '''
-    Identify current SD Card folder
-        adb shell
-        > echo $EXTERNAL_STORAGE
-        > exit
-    '''
-    
+    """
+    Identify the current SD Card folder on the device.
+
+    Returns:
+        str: The path to the SD Card folder.
+    """
     # Open ADB shell
     command = ['adb', 'shell']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
@@ -204,18 +253,28 @@ def sd_path():
     return sdcard_path
 
 def cmd_to_subprocess_string(cmd):
-    '''
-        Return a list of commands as a string of commands separated by \n
-        to be passed as stdin to a python subprocess 
-    '''
+    """
+    Convert a list of commands into a string of commands separated by newlines.
+    (To be used as stdin for a subprcess)
+
+    Args:
+        cmd (list): A list of commands.
+
+    Returns:
+        str: A string of commands separated by newlines.
+    """
     return '\n'.join(cmd)
 
-'''if __name__=="__main__":
-    x=input()
-    check_user_input(x)
-    x=input("Press ENTER to continue")'''
-
 def rsc_from_path(path):
+    """
+    Extract the resource name from a given path.
+
+    Args:
+        path (str): The file path.
+
+    Returns:
+        str: The resource name.
+    """
     rsc_name = os.path.basename(path)
     if rsc_name == '':
         rsc_name = os.path.basename(path[:-1])
@@ -223,6 +282,15 @@ def rsc_from_path(path):
     return rsc_name
 
 def is_apk_on_system(apks):
+    """
+    Check if the provided list of APK files exists on the system.
+
+    Args:
+        apks (list): A list of APK file paths.
+
+    Returns:
+        bool: True if all APK files exist, False otherwise.
+    """
     check = True
 
     for f in apks:
@@ -234,24 +302,60 @@ def is_apk_on_system(apks):
     return check
 
 def valid_apk_file(user_input):
+    """
+    Prompt the user to provide a valid APK file path.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        str: The valid APK file path.
+    """
     while not os.path.exists(user_input) or not user_input.endswith(".apk"):
         user_input = input("Write the path of an APK file to be installed: ")
 
     return user_input
 
 def get_valid_playstore_app_id(user_input):
+    """
+    Prompt the user to provide a valid and existing app ID from the Play Store.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        str: The valid Play Store app ID.
+    """
     while not is_valid_app_id(user_input) or not is_app_on_store(user_input):
         user_input = input("Write a valid and existing app ID to be searched on Play Store: ")
 
     return user_input
 
 def is_valid_app_id(app_id):
+    """
+    Check if the provided app ID matches the valid app ID regex pattern.
+
+    Args:
+        app_id (str): The app ID to check.
+
+    Returns:
+        bool: True if the app ID is valid, False otherwise.
+    """
     if re.match(APP_ID_REGEX, app_id):
         return True
     
     return False
 
 def is_app_on_store(app_id):
+    """
+    Check if the provided app ID exists on the Play Store.
+
+    Args:
+        app_id (str): The app ID to check.
+
+    Returns:
+        bool: True if the app ID exists on the Play Store, False otherwise.
+    """
     store_url = f"https://play.google.com/store/apps/details?id={app_id}"
 
     response = requests.get(store_url)

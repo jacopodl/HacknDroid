@@ -3,7 +3,7 @@ from dnslib.server import DNSServer
 import socket
 import sys
 import os
-from tasks_management import DaemonTask
+from modules.tasks_management import DaemonTask
 
 # Burp Suite IP address 
 OVERRIDE_IP = '192.168.1.53'
@@ -16,6 +16,16 @@ FORWARD_DNS = "8.8.8.8"
 
 class OverrideDNSResolver:
     def resolve(self, request, handler):
+        """
+        Resolve the DNS request by overriding the IP address.
+
+        Args:
+            request (DNSRecord): The DNS request.
+            handler: The request handler.
+
+        Returns:
+            DNSRecord: The DNS response with the overridden IP address.
+        """
         sys.stdout = open(os.devnull, 'w')  # Redirect stdout to null
         # Parse the DNS request
         reply = request.reply()
@@ -29,6 +39,15 @@ class OverrideDNSResolver:
         return reply
  
     def forward_request(self, request):
+        """
+        Forward the DNS request to the upstream DNS server.
+
+        Args:
+            request (DNSRecord): The DNS request.
+
+        Returns:
+            DNSRecord: The DNS response from the upstream DNS server.
+        """
         sys.stdout = open(os.devnull, 'w')  # Redirect stdout to null
         # Send the request to the forward DNS server
         try:
@@ -49,6 +68,13 @@ class OverrideDNSResolver:
 
 
 def dns_proxy(fake_ip, stop_flag):
+    """
+    Start a DNS proxy server that overrides DNS responses with a fake IP.
+
+    Args:
+        fake_ip (str): The IP address to use for overriding DNS responses.
+        stop_flag (threading.Event): A flag to stop the DNS server.
+    """
     global OVERRIDE_IP
 
     OVERRIDE_IP = fake_ip

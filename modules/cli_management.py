@@ -18,6 +18,9 @@ from modules.tasks_management import DAEMONS_MANAGER
 class CLI():
 
     def __init__(self):
+        """
+        Initialize the CLI with options and styles.
+        """
         global CURRENT_OPTION
         self._options = menu.OPTIONS
         self._current_path = []
@@ -31,7 +34,16 @@ class CLI():
         self._title_f = Figlet(font='slant')
 
     def completer(text, state):
-        """Tab completion"""
+        """
+        Tab completion for CLI options.
+
+        Args:
+            text (str): The current input text.
+            state (int): The state of the completion.
+
+        Returns:
+            str: The matching option.
+        """
         matches = [option for option in list(CURRENT_OPTION['children'].keys()) if option.startswith(text)]
 
         if state < len(matches):
@@ -41,6 +53,9 @@ class CLI():
 
 
     def cli_options(self):
+        """
+        Display and handle CLI options.
+        """
         global CURRENT_OPTION
 
         while True:        
@@ -96,4 +111,3 @@ class CLI():
 
         DAEMONS_MANAGER.stop_all_tasks()
 
-        

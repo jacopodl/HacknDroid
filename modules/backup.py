@@ -6,6 +6,12 @@ import tarfile
 from modules.tasks_management import Task
 
 def app_backup(user_input : str):
+    """
+    Backup an application on the mobile device.
+
+    Args:
+        user_input (str): The App ID of the application to backup.
+    """
     # Retrieve App ID from user input
     app_id = utility.app_id_from_user_input(user_input)
 
@@ -22,6 +28,12 @@ def app_backup(user_input : str):
 
 
 def device_backup(user_input : str):
+    """
+    Backup the entire mobile device.
+
+    Args:
+        user_input (str): User input (not used in this function).
+    """
     # Backup of the device, including all data and apps
     backup_name = "backup_device"
     command = ['adb','backup',"-apk","-shared", "-all", "-f", backup_name+".ab"]
@@ -33,6 +45,12 @@ def device_backup(user_input : str):
     ab_to_tar_extract(backup_name)
 
 def tar_extract(user_input : str):
+    """
+    Extract a TAR file from an Android Backup file.
+
+    Args:
+        user_input (str): The path to the Android Backup file.
+    """
     # Ask again the AB file path if it doesn't exist or it hasn't AB extension
     if (not os.path.isfile(user_input)) or (not user_input.endswith(".ab")):
         user_input = input("Write the path of a valida Android Backup on your PC to be extracted:\n")
@@ -57,6 +75,12 @@ def tar_extract(user_input : str):
     print(f"\nTAR Extracted in: {folder}")
 
 def ab_to_tar_extract(backup_name):
+    """
+    Convert an Android Backup file to a TAR file and extract it.
+
+    Args:
+        backup_name (str): The name of the backup file.
+    """
     # Collect the password of the Android Backup file from stdin
     password = input("Insert the password used on the mobile device for the backup:\n")
     # Unpack the Android Backup file using ABE and save it to <backup_name>.tar file
@@ -75,6 +99,12 @@ def ab_to_tar_extract(backup_name):
     print(f"\nTAR Extracted in: {backup_name}")
 
 def restore_backup(user_input):
+    """
+    Restore an Android Backup file on the mobile device.
+
+    Args:
+        user_input (str): The path to the Android Backup file.
+    """
     # Ask again the AB file path if it doesn't exist or it hasn't AB extension
     if (not os.path.isfile(user_input)) or (not user_input.endswith(".ab")):
         user_input = input("Write the path of a valida Android Backup on your PC to be restored:\n")
@@ -86,6 +116,12 @@ def restore_backup(user_input):
 
 
 def app_data_reset(user_input):
+    """
+    Reset the data of an application on the mobile device.
+
+    Args:
+        user_input (str): The App ID of the application to reset.
+    """
     # Retrieve App ID from user input
     app_id = utility.app_id_from_user_input(user_input)
     

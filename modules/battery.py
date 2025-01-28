@@ -6,7 +6,13 @@ import config.menu as menu
 import config.style as tool_style
 from modules.tasks_management import Task
 
-def battery_saver_on(user_input):    
+def battery_saver_on(user_input):
+    """
+    Enable battery saver mode on the mobile device.
+
+    Args:
+        user_input (str): User input (not used in this function).
+    """
     # Open ADB shell
     command = ['adb' ,'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'true']
     output, error = Task().run(command)
@@ -14,6 +20,12 @@ def battery_saver_on(user_input):
 
 
 def battery_saver_off(user_input):
+    """
+    Disable battery saver mode on the mobile device.
+
+    Args:
+        user_input (str): User input (not used in this function).
+    """
     # Open ADB shell
     command = ['adb' ,'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'false']
     output, error = Task().run(command)
@@ -21,7 +33,10 @@ def battery_saver_off(user_input):
 
 def check_battery_status(user_input):
     """
-    adb shell dumpsys battery
+    Check the battery status of the mobile device.
+
+    Args:
+        user_input (str): User input (not used in this function).
     """
     # Open ADB shell
     command = ['adb' ,'shell', 'dumpsys', 'battery']
