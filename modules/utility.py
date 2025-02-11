@@ -2,6 +2,8 @@ import subprocess
 import re
 import config.menu as menu
 import os
+import sys
+import time
 import requests
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
@@ -361,3 +363,14 @@ def is_app_on_store(app_id):
     response = requests.get(store_url)
 
     return response.status_code == 200
+
+def loading_animation(loading_str, gap, max_time):
+    dots = ['.', '..', '...']
+    time_steps = int(max_time // gap)
+    for i in range(time_steps):
+        sys.stdout.write(f"\r{loading_str}{len(dots)*' '}")  # Carriage return to overwrite the line
+        sys.stdout.write(f'\r{loading_str}{dots[(i%len(dots))]}')  # Carriage return to overwrite the line
+        sys.stdout.flush()  # Ensure it prints immediately
+        time.sleep(gap)  # Delay between dots
+
+    sys.stdout.write(f"\r{loading_str}{len(dots)*'.'}")

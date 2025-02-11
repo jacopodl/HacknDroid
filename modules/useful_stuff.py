@@ -7,6 +7,8 @@ import config.menu as menu
 import config.style as tool_style
 from tabulate import tabulate
 from modules.tasks_management import Task
+import re
+from termcolor import colored
 
 def reboot(user_input):
     """
@@ -237,8 +239,16 @@ def ram_info(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    pass
+    command = ['adb', 'shell', 'cat', '/proc/meminfo']
+    output, error = Task().run(command)
+    rows = output.strip().split("\n")
+    
+    rows = [re.split(r'\s{2,}', r) for r in rows]
 
+    for r in rows:
+        r[0] = colored(r[0], 'blue')
+
+    print(tabulate(rows, tablefmt='fancy_grid'))
 
 def storage_info(user_input):
     """

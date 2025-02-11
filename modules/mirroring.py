@@ -30,8 +30,10 @@ def stop_mirroring(user_input):
         user_input (str): User input (not used in this function).
     """
     global MIRRORING_TASK_ID
-    DAEMONS_MANAGER.stop_task('mirroring', MIRRORING_TASK_ID)
-    MIRRORING_TASK_ID = -1
+    
+    if MIRRORING_TASK_ID != -1:
+        DAEMONS_MANAGER.stop_task('mirroring', MIRRORING_TASK_ID)
+        MIRRORING_TASK_ID = -1
 
 def screenshot(user_input):
     """

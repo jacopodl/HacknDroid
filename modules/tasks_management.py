@@ -2,16 +2,26 @@ import subprocess
 import threading
 from modules.utility import cmd_to_subprocess_string 
 from tabulate import tabulate
+from dnslib import DNSRecord, RR, QTYPE, A
+from dnslib.server import DNSServer
+import socket
+import sys
+import time
+import os
+import copy
+from termcolor import colored
 
 class DaemonTask():
-    def __init__(self):
+    def __init__(self, command, args=tuple()):
         """
         Initialize a DaemonTask instance.
         """
         self._PROCESS = None
         self._THREAD = None
+        self._command = command
+        self._args = args
 
-    def run(self, command, args=tuple()):
+    def run(self):
         """
         Run the daemon task.
 
@@ -20,10 +30,10 @@ class DaemonTask():
             args (tuple): Arguments for the command.
         """
         if not self._PROCESS:
-            if callable(command):
-                self._THREAD = threading.Thread(target=command, args=args)
+            if callable(self._command):
+                self._THREAD = threading.Thread(target=self._command, args=self._args)
             else:
-                self._THREAD = threading.Thread(target=self.thread_function, args=(command,))
+                self._THREAD = threading.Thread(target=self.thread_function, args=(self._command,))
 
             self._THREAD.daemon = True
             self._THREAD.start()
@@ -59,7 +69,8 @@ class DaemonTaskManager():
         """
         self._TOOL_TASKS = {}
         self._ID = 0
-        self._HEADERS = ['Functionality', 'Task ID']
+        self._TASK_HEADERS = ['Functionality', 'Task ID']
+        self._ADDITIONAL_HEADERS = []
 
     def add_task(self, functionality, command, args=None):
         """
@@ -73,11 +84,14 @@ class DaemonTaskManager():
         Returns:
             int: The ID of the added task.
         """
-        task = DaemonTask()
+        task = None 
+        task = DaemonTask(command, args)
         if args:
-            task.run(command, args)
+            task = DaemonTask(command, args)
         else:
-            task.run(command)
+            task = DaemonTask(command)
+
+        task.run()
 
         if functionality not in self._TOOL_TASKS:
             self._TOOL_TASKS[functionality] = {}
@@ -87,7 +101,7 @@ class DaemonTaskManager():
         self._ID += 1
 
         return id
-
+    
     def stop_task(self, functionality, id):
         """
         Stop a specific daemon task.
@@ -99,6 +113,10 @@ class DaemonTaskManager():
         if functionality in self._TOOL_TASKS:
             if id in self._TOOL_TASKS[functionality]:
                 self._TOOL_TASKS[functionality][id]['task'].stop()
+
+                for additional_key in list(self._TOOL_TASKS[functionality][id]['additional info'].keys()):
+                    self._ADDITIONAL_HEADERS.remove(additional_key)
+
                 del self._TOOL_TASKS[functionality][id]
 
             if not self._TOOL_TASKS[functionality].keys():
@@ -146,8 +164,7 @@ class DaemonTaskManager():
             dict_info (dict): The additional information to add.
         """
         for k in dict_info:
-            if k not in self._HEADERS:
-                self._HEADERS.append(k)
+            self._ADDITIONAL_HEADERS.append(k)
 
         self._TOOL_TASKS[functionality][id]['additional info']=dict_info
 
@@ -158,7 +175,12 @@ class DaemonTaskManager():
         Returns:
             list: The list of headers.
         """
-        return self._HEADERS
+        headers = copy.deepcopy(self._TASK_HEADERS)
+
+        for k in list(set(self._ADDITIONAL_HEADERS)):
+            headers.append(k)
+
+        return headers
         
 
 class Task():
@@ -207,6 +229,7 @@ def list_daemons(user_input):
     global DAEMONS_MANAGER
     
     headers = DAEMONS_MANAGER.get_headers()
+
     row_list = []
     TASKS_DICT = DAEMONS_MANAGER.get_dict()
 
@@ -221,9 +244,9 @@ def list_daemons(user_input):
 
             for k in headers:
                 if k=="Functionality":
-                    row.append(functionality)
+                    row.append(colored(functionality, 'green'))
                 elif k=="Task ID":
-                    row.append(id)
+                    row.append(colored(id, color='red'))
                 elif TASKS_DICT[functionality][id]['additional info'] and k in TASKS_DICT[functionality][id]['additional info']:
                         row.append(TASKS_DICT[functionality][id]['additional info'][k])
                 else:
@@ -232,7 +255,8 @@ def list_daemons(user_input):
 
             row_list.append(row)
 
-
-    print(tabulate(row_list, headers=headers, tablefmt='fancy_grid'))
+    color_headers = [colored(h, 'blue') for h in headers]
+    print("\n")
+    print(tabulate(row_list, headers=color_headers, tablefmt='fancy_grid'), end='\n\n')
 
     return row_list

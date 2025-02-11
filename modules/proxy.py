@@ -1,19 +1,14 @@
-import config.menu as menu
-import subprocess
-import netifaces
-import ipaddress
-import threading
-import time
-import socket
-from modules import dns_spoofing
 import sys
+import time
+import netifaces
 import ipaddress
 from modules.tasks_management import Task, DAEMONS_MANAGER
 import platform
 import re
 from tabulate import tabulate
+from modules.utility import loading_animation
 
-DNS_END = False
+DNS_TASK_ID = -1
 
 def pc_wifi_ip():
     """
@@ -160,69 +155,6 @@ def set_proxy(ip, port):
     print("Proxy set on mobile device:", end=" ")
     print(get_proxy())
 
-class thread_with_trace(threading.Thread):
-    def __init__(self, *args, **keywords):
-        """
-        Initialize a thread_with_trace instance.
-        """
-        threading.Thread.__init__(self, *args, **keywords)
-        self.killed = False
-
-    def start(self):
-        """
-        Start the thread.
-        """
-        self.__run_backup = self.run
-        self.run = self.__run      
-        threading.Thread.start(self)
-
-    def __run(self):
-        """
-        Run the thread with trace.
-        """
-        sys.settrace(self.globaltrace)
-        self.__run_backup()
-        self.run = self.__run_backup
-
-    def globaltrace(self, frame, event, arg):
-        """
-        Global trace function for the thread.
-
-        Args:
-            frame: The current stack frame.
-            event: The event type.
-            arg: The event argument.
-
-        Returns:
-            function: The local trace function.
-        """
-        if event == 'call':
-            return self.localtrace
-        else:
-            return None
-
-    def localtrace(self, frame, event, arg):
-        """
-        Local trace function for the thread.
-
-        Args:
-            frame: The current stack frame.
-            event: The event type.
-            arg: The event argument.
-
-        Returns:
-            function: The local trace function.
-        """
-        if self.killed:
-            if event == 'line':
-                raise SystemExit()
-        return self.localtrace
-
-    def kill(self):
-        """
-        Kill the thread.
-        """
-        self.killed = True
 
 # Main function
 def dns_proxy(target_ip):
@@ -232,14 +164,17 @@ def dns_proxy(target_ip):
     Args:
         target_ip (str): The target IP address for DNS spoofing.
     """
-    global dns_thread, stop_flag
-    # Start DNSChef in a separate thread
-    stop_flag = threading.Event()
-    dns_thread = thread_with_trace(target=dns_spoofing.dns_proxy, args=(target_ip,stop_flag))
-    dns_thread.start()
+    global DNS_TASK_ID, DAEMONS_MANAGER
 
-    # Here you can perform other tasks in the main thread
-    print("DNS Server is running...")
+    if DNS_TASK_ID == -1:
+        # Get the next available ID from the DAEMONS_MANAGER
+        DNS_TASK_ID = DAEMONS_MANAGER.get_next_id()
+        # Add a new DNS task to the DAEMONS_MANAGER
+        DAEMONS_MANAGER.add_task('dns', [sys.executable, 'modules/dns_spoofing.py', target_ip])
+
+        additional_info = {'Fake DNS IP':target_ip,}
+        DAEMONS_MANAGER.add_info('dns', DNS_TASK_ID, additional_info)
+
 
 def get_current_dns_proxy(user_input):
     """
@@ -358,6 +293,7 @@ def set_generic_dns_proxy(user_input):
     x=input("Press ENTER to launch the DNS Server (or CTRL+C to stop the operation)...\n")
     dns_proxy(remote_ip)
 
+
 def del_dns_proxy(user_input):
     """
     Delete the DNS proxy settings on the mobile device.
@@ -365,22 +301,43 @@ def del_dns_proxy(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    global dns_thread, stop_flag
-    stop_flag.set()
-    dns_thread.join()
-    
+    global DNS_TASK_ID, DAEMONS_MANAGER
+
+    if DNS_TASK_ID != -1:
+        DAEMONS_MANAGER.stop_task('dns', DNS_TASK_ID)
+        DNS_TASK_ID = -1
+        loading_animation("Stopping DNS Server", 3, 30)
+        print("DNS Server STOPPED!!!\n")
+
 
 def get_current_invisible_proxy(user_input):
+    # output dnat
+    #iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination $IP:443
+    #iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination $IP:80
+
+    # postrouting masquerade
+    # iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE
+    #iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE
     pass
 
 def set_current_pc_invisible_proxy(user_input):
+    # output dnat
+    #iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination $IP:443
+    #iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination $IP:80
+
+    # postrouting masquerade
+    # iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE
+    #iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE
     pass
 
 def set_generic_invisible_proxy(user_input):
     pass
 
 def del_invisible_proxy(user_input):
+    # flush previous configuration
+    #iptables -t nat -F
     pass
+
 
 def get_current_pc_wifi_ssid():
     """

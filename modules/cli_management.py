@@ -21,16 +21,29 @@ class CLI():
         """
         Initialize the CLI with options and styles.
         """
+        # Initialize the global variable CURRENT_OPTION
         global CURRENT_OPTION
+        
+        # Load the CLI options from the menu configuration
         self._options = menu.OPTIONS
+        
+        # Initialize the current path with the root option
         self._current_path = []
         self._current_path.append(list(self._options.keys())[0])
+        
+        # Set the CURRENT_OPTION to the root option
         CURRENT_OPTION = self._options[self._current_path[0]]
 
+        # Initialize the prompt completer with the children of the current option
         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
+        
+        # Load the CLI style from the tool_style configuration
         self._style = Style.from_dict(tool_style.STYLE)
 
-        self._title = "HacknDroid" 
+        # Set the title of the CLI
+        self._title = "HacknDroid"
+        
+        # Initialize the Figlet object for rendering the title
         self._title_f = Figlet(font='slant')
 
     def completer(text, state):
@@ -44,8 +57,10 @@ class CLI():
         Returns:
             str: The matching option.
         """
+        # Get the matching options
         matches = [option for option in list(CURRENT_OPTION['children'].keys()) if option.startswith(text)]
 
+        # Return the matching option
         if state < len(matches):
             return matches[state]
         else:
@@ -60,17 +75,26 @@ class CLI():
 
         while True:        
             try:
+                # Clear the screen
                 clear()
-                
+                # Print the title
                 print(self._title_f.renderText(self._title))
-                print_formatted_text(HTML("<option>[TAB to see options | Ctrl+C or exit to terminate the program]</option>"), style=self._style)
+                # Print the shortcut keys
+                print_formatted_text(HTML("<option> > TAB to see options</option>"), style=self._style)
+                print_formatted_text(HTML("<option> > Ctrl+D to stop the program</option>"), style=self._style)
+                
+                # If arrived at a leaf node, print the CTRL+C shortcut key to cancel the action
+                if len(CURRENT_OPTION['children']) == 2:
+                    print_formatted_text(HTML("<option> > Ctrl+C to cancel the action</option>"), style=self._style)    
 
                 print("")
                 
+                # Print the description of the current option
                 for x in CURRENT_OPTION['description']:
                     print_formatted_text(HTML(f"<descr>{x}</descr>"), style=self._style)
                 
                 if len(self._current_path)>1:
+                    # Print the current path between functionality
                     print("")
                     path = f"<section{1}> {self._current_path[2]} </section{1}>"
                     
@@ -78,36 +102,53 @@ class CLI():
                         path+=f"<section{i/2}> {self._current_path[i]} </section{i/2}>"
 
                 else:
+                    # Print the home path ('main')
                     path = f"<section> {self._current_path[-1]} </section>"
 
+                # Prompt the user for input (tab completion enabled)
                 choice = prompt(HTML(path+" "), completer=self._prompt_completer, style=self._style, multiline=False)
                 
                 if choice in CURRENT_OPTION['children']:
+                    # If the input (choice) is a valid option, navigate to the selected level
+
                     if choice == 'back' and len(self._current_path)>1:
+                        # If the input is 'back' and the program is not in the homepage, navigate back to the parent level
                         self._current_path = self._current_path[:-2]
                         CURRENT_OPTION = self._options[self._current_path[0]]
                         for i in self._current_path[1:]:
                             CURRENT_OPTION = CURRENT_OPTION[i]
-                        self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
-                    elif len(CURRENT_OPTION['children'][choice]['children'].keys())>1:
-                        self._current_path.append('children')
-                        self._current_path.append(choice)
-                        CURRENT_OPTION = CURRENT_OPTION['children'][choice]
-                        self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
+
+                    elif choice == 'home' and len(self._current_path)>1:
+                        self._current_path = self._current_path[:1]
+                        CURRENT_OPTION = self._options[self._current_path[0]]
+
                     else:
+                        # If the input is not 'back', navigate to the selected level
                         self._current_path.append('children')
                         self._current_path.append(choice)
                         CURRENT_OPTION = CURRENT_OPTION['children'][choice]
-                        self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))    
-                elif choice == 'exit':
-                    break
-                elif len(CURRENT_OPTION['children']) == 1:
+
+                    # Update the completer with the new options for the current level
+                    self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
+                
+                elif len(CURRENT_OPTION['children']) == 2:
+                    # If the input is a leaf node, execute the associated function
                     CURRENT_OPTION['function'](choice)
+                    # Wait for the user to press ENTER to continue
                     print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
                     x=input()
                     
-            except (KeyboardInterrupt, EOFError):
+            except KeyboardInterrupt:
+                # Cancel the current operation (input insertion by a user)
+                pass
+            except EOFError:
+                # Clear the screen
+                clear()
+                # Print the title
+                print(self._title_f.renderText(self._title))
+                print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
                 break
 
+        # Stop all the tasks
         DAEMONS_MANAGER.stop_all_tasks()
 
