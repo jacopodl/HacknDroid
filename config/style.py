@@ -4,6 +4,8 @@ STYLE = {
     'section2': 'bg:#dd5500 bold white',
     'section3': 'bg:#dd8800 bold white',
     'section4': 'bg:#80ea80 bold black',
+    'shell_user': 'bg:#dd0000 bold white',
+    'shell_pwd': 'bg:#ffffff bold black',
     'option': 'ansigreen bold',
     'descr': 'ansiyellow bold',
     'error':'bg:#ff0000 bold white',

@@ -1,5 +1,4 @@
 import argparse
-import os
 import sys
 from dnslib import DNSRecord, RR, QTYPE, A
 from dnslib.server import DNSServer

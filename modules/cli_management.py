@@ -1,8 +1,6 @@
 import config.menu as menu
 import config.style as tool_style
 
-from termcolor import cprint, colored
-
 from prompt_toolkit import prompt, print_formatted_text
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.styles import Style
@@ -10,10 +8,12 @@ from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit import Application
 from prompt_toolkit.shortcuts import clear
 from pyfiglet import Figlet
+from termcolor import colored
 
 # Function pointer in OPTIONS
-from modules import apk_analyzer, apk_install, app_logs, cli_management, file_transfer
 from modules.tasks_management import DAEMONS_MANAGER
+from modules.adb import select_device
+from modules.error import ADBConnectionException, OptionNotAvailable
 
 class CLI():
 
@@ -33,9 +33,6 @@ class CLI():
         
         # Set the CURRENT_OPTION to the root option
         CURRENT_OPTION = self._options[self._current_path[0]]
-
-        # Initialize the prompt completer with the children of the current option
-        self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
         
         # Load the CLI style from the tool_style configuration
         self._style = Style.from_dict(tool_style.STYLE)
@@ -72,6 +69,62 @@ class CLI():
         Display and handle CLI options.
         """
         global CURRENT_OPTION
+
+        while True:
+            try:
+                # Clear the screen
+                clear()
+                # Print the title
+                print(self._title_f.renderText(self._title))
+                # Print the shortcut keys
+                print_formatted_text(HTML("<option> > TAB to see options</option>"), style=self._style)
+                print_formatted_text(HTML("<option> > Ctrl+C to stop the program</option>"), style=self._style)
+
+                print("")
+                print_formatted_text(HTML(f"<descr>Select the device you want to use</descr>"), style=self._style)
+                print("")
+
+                select_device("")
+                break
+            
+            except OptionNotAvailable:
+                print(colored("Invalid choice. Please select a valid device.", 'red'))
+                print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+                
+                try:
+                    x= input()
+                except (KeyboardInterrupt,EOFError) as e:
+                    # Clear the screen
+                    clear()
+                    # Print the title
+                    print(self._title_f.renderText(self._title))
+                    print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+                    exit(0)
+
+            except KeyboardInterrupt as e:
+                # Clear the screen
+                clear()
+                # Print the title
+                print(self._title_f.renderText(self._title))
+                print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+                exit(0)
+
+            except ADBConnectionException as e:
+                print(colored("No device connected to ADB.", 'red'))
+                print_formatted_text(HTML("<option>Plug in the device and press ENTER to continue</option>"), style=self._style)
+
+                try:
+                    x= input()
+                except KeyboardInterrupt as e:
+                    # Clear the screen
+                    clear()
+                    # Print the title
+                    print(self._title_f.renderText(self._title))
+                    print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+                    exit(0)
+
+        # Initialize the prompt completer with the children of the current option
+        self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
 
         while True:        
             try:
@@ -138,6 +191,11 @@ class CLI():
                     print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
                     x=input()
                     
+            except OptionNotAvailable:
+                print(colored("Invalid choice. Please select a valid device.", 'red'))
+                print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+                x= input()
+                
             except KeyboardInterrupt:
                 # Cancel the current operation (input insertion by a user)
                 pass

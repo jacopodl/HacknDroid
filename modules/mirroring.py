@@ -1,10 +1,8 @@
-import subprocess
 import os
-import signal
-import threading
 from modules.tasks_management import DAEMONS_MANAGER, Task
 from modules.file_transfer import download
 from modules.utility import sd_path
+from modules.adb import get_session_device_id
 
 MIRRORING_TASK_ID = -1
 VIDEO_TASK_ID = -1
@@ -49,7 +47,7 @@ def screenshot(user_input):
 
     print(mobile_path)
     dest_path = './'
-    command = ['adb','shell','screencap','-p',mobile_path]
+    command = ['adb', '-s', get_session_device_id(), 'shell','screencap','-p',mobile_path]
     output, error = Task().run(command)
 
     download(mobile_path, dest_path)
@@ -70,7 +68,7 @@ def record_video(user_input):
         MOBILE_VIDEO_PATH = MOBILE_VIDEO_PATH.replace(os.sep, "/")
 
     print(MOBILE_VIDEO_PATH)
-    command = ['adb','shell','screenrecord',MOBILE_VIDEO_PATH]
+    command = ['adb','-s', get_session_device_id(), 'shell','screenrecord',MOBILE_VIDEO_PATH]
     VIDEO_TASK_ID = DAEMONS_MANAGER.add_task('video', command)
 
 def stop_recording(user_input):

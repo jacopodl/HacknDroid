@@ -1,4 +1,3 @@
-import config.menu as menu
 from modules.utility import app_id_from_user_input, valid_apk_file
 from modules.file_transfer import download
 from modules.merge_apks import merge_from_dir
@@ -7,6 +6,7 @@ import glob
 import shutil
 from modules.signature import sign_apk
 from modules.tasks_management import Task
+from modules.adb import get_session_device_id
 
 DATA_APP_FOLDER = "/data/app"
 
@@ -252,9 +252,9 @@ def transfer_apks_from_device(user_input):
     # Identify the subfolder of /data/app/ for the user-installed app
     # (a subfolder has the format '<app-id>-<uuid>')
     print("GET APKS: "+app_id)
-    command = ['adb', 'shell']
+    command = ['adb', '-s', get_session_device_id(), 'shell']
     shell_input = ["su root",f'ls {DATA_APP_FOLDER} | grep "{app_id}"', "exit"]
-
+    
     output, error = Task().run(command, input_to_cmd=shell_input)
     print(output)
 

@@ -1,5 +1,4 @@
 import sys
-import time
 import netifaces
 import ipaddress
 from modules.tasks_management import Task, DAEMONS_MANAGER
@@ -7,6 +6,7 @@ import platform
 import re
 from tabulate import tabulate
 from modules.utility import loading_animation
+from modules.adb import get_session_device_id
 
 DNS_TASK_ID = -1
 
@@ -63,7 +63,7 @@ def get_proxy():
     Returns:
         str: The current proxy settings.
     """
-    command = ['adb', 'shell', 'settings', 'get', 'global', 'http_proxy']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'get', 'global', 'http_proxy']
     output, error = Task().run(command)
 
     return output.strip()
@@ -75,7 +75,7 @@ def del_proxy(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', ':0']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'http_proxy', ':0']
     output, error = Task().run(command)
 
     print("Proxy removed on mobile device")
@@ -149,7 +149,7 @@ def set_proxy(ip, port):
         ip (str): The IP address to use for the proxy.
         port (str): The port number to use for the proxy.
     """
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', f'{ip}:{port}']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'http_proxy', f'{ip}:{port}']
     output, error = Task().run(command)
 
     print("Proxy set on mobile device:", end=" ")
@@ -230,7 +230,7 @@ def set_current_pc_dns_proxy(user_input):
     if current_os == "Windows":
         print("(Disable the Microsoft Windows firewall)")
 
-    command = ['adb', 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
 
     # Get the current Wi-Fi SSID
@@ -255,7 +255,7 @@ def set_current_pc_dns_proxy(user_input):
     if pc_ssid!=mobile_ssid:
         print("\nPlease connect the mobile device and the current PC to the same network!!!")
 
-    command = ['adb', 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
     x=input("Press ENTER to launch the DNS Server...\n")
 
@@ -287,7 +287,7 @@ def set_generic_dns_proxy(user_input):
         
     print("\nSet the DNS1 and DNS2 on mobile device at: "+remote_ip)
     print("(If on Windows, disable the firewall)")
-    command = ['adb', 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
 
     x=input("Press ENTER to launch the DNS Server (or CTRL+C to stop the operation)...\n")
@@ -381,7 +381,7 @@ def get_mobile_wifi_ssid():
     Returns:
         str: The current Wi-Fi SSID.
     """
-    command = ['adb', 'shell', 'dumpsys', 'netstats', '|', 'grep', '-E', 'iface=wlan.*networkId']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'netstats', '|', 'grep', '-E', 'iface=wlan.*networkId']
     output, error = Task().run(command)
 
     REGEX_SSID = r'networkId=\"(.*)\"'

@@ -1,6 +1,5 @@
 from modules.utility import valid_apk_file
 import os
-import subprocess
 from modules.tasks_management import Task
 
 def sign_apk(user_input):

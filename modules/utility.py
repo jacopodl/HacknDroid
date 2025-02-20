@@ -1,10 +1,10 @@
 import subprocess
 import re
-import config.menu as menu
 import os
 import sys
 import time
 import requests
+from modules.adb import get_session_device_id
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -36,7 +36,7 @@ def get_app_id(grep_string):
     keywords = split_user_input(grep_string)
     
     # List all the application IDs
-    command = ['adb', 'shell', 'pm', 'list', 'packages']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'pm', 'list', 'packages']
     result = subprocess.run(command, capture_output=True, text=True)
 
     packages = []
@@ -79,7 +79,7 @@ def is_app_id(user_input):
     Returns:
         bool: True if the input is a valid app ID, False otherwise.
     """
-    command = ['adb', 'shell', 'pm', 'list', 'packages']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'pm', 'list', 'packages']
     result = subprocess.run(command, capture_output=True, text=True)
 
     packages = []
@@ -138,8 +138,8 @@ def active_applications():
     Returns:
         list: A list of active application IDs.
     """
-    command = "adb shell \"ps -A | awk '{print $9}'\""
-    process = subprocess.Popen("adb shell \"ps -A | awk '{print $9}'\"", stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    command = "adb -s "+get_session_device_id()+" shell \"ps -A | awk '{print $9}'\""
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     output, error = process.communicate()
 
     lines = output.splitlines()
@@ -243,7 +243,7 @@ def sd_path():
         str: The path to the SD Card folder.
     """
     # Open ADB shell
-    command = ['adb', 'shell']
+    command = ['adb', '-s', get_session_device_id(), 'shell']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
 
     # Print the external storage path

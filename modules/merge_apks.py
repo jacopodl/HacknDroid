@@ -1,4 +1,3 @@
-import subprocess
 import os
 from modules import utility
 import shutil

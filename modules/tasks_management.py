@@ -2,12 +2,6 @@ import subprocess
 import threading
 from modules.utility import cmd_to_subprocess_string 
 from tabulate import tabulate
-from dnslib import DNSRecord, RR, QTYPE, A
-from dnslib.server import DNSServer
-import socket
-import sys
-import time
-import os
 import copy
 from termcolor import colored
 
@@ -214,8 +208,6 @@ class Task():
 
         return output, error
 
-DAEMONS_MANAGER = DaemonTaskManager()
-
 def list_daemons(user_input):
     """
     List all running daemon tasks.
@@ -260,3 +252,5 @@ def list_daemons(user_input):
     print(tabulate(row_list, headers=color_headers, tablefmt='fancy_grid'), end='\n\n')
 
     return row_list
+
+DAEMONS_MANAGER = DaemonTaskManager()

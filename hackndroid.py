@@ -1,6 +1,6 @@
 from modules.cli_management import CLI
 
-def main():
+def main():  
     cli_mgmt = CLI()
     cli_mgmt.cli_options()
 

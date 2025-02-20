@@ -1,8 +1,7 @@
-import config.menu as menu
 from modules import utility
-import subprocess
 import os
 from modules.tasks_management import Task
+from modules.adb import get_session_device_id
 
 def mobile_exists(paths : list):
     '''
@@ -21,7 +20,7 @@ def mobile_exists(paths : list):
     # Iterate over each mobile path in the list
     for mobile_path in paths:
         # Define the adb shell command to check if the mobile path is a file or directory
-        command = ['adb', 'shell']
+        command = ['adb', '-s', get_session_device_id(), 'shell']
         
         # Define the shell input commands to check if the path is a file or directory and echo "1" if true
         shell_input = ["su root", f"""(test -f "{mobile_path}" || test -d "{mobile_path}") && echo "1" """, "exit"]
@@ -52,7 +51,7 @@ def is_mobile_folder(mobile_path : str):
     '''
     
     # Define the adb shell command to check if the mobile path is a directory
-    command = ['adb', 'shell']
+    command = ['adb', '-s', get_session_device_id(), 'shell']
     # Define the shell input commands to check if the path is a directory and echo "1" if true
     shell_input = ["su root",f"""(test -d "{mobile_path}") && echo "1" """, "exit"]
     # Run the shell commands and capture the output and error
@@ -74,7 +73,7 @@ def is_mobile_file(mobile_path : str):
     '''
 
     # Define the adb shell command to check if the mobile path is a file
-    command = ['adb', 'shell']
+    command = ['adb', '-s', get_session_device_id(), 'shell']
     
     # Define the shell input commands to check if the path is a file and echo "1" if true
     shell_input = ["su root", f"""(test -f "{mobile_path}") && echo "1" """, "exit"]
@@ -143,14 +142,14 @@ def upload_to_dest(file_folder, dest_folder="/data/tmp"):
     sdcard = utility.sd_path()
     
     # Push the file/folder from PC to the SD card on the mobile device
-    command = ['adb', 'push', file_folder, sdcard]
+    command = ['adb', '-s', get_session_device_id(), 'push', file_folder, sdcard]
     output, error = Task().run(command)
     
     # Get the resource name from the file/folder path
     rsc_name = utility.rsc_from_path(file_folder)
     
     # Move the file/folder from the SD card to the desired destination folder on the mobile device
-    command = ['adb', 'shell']
+    command = ['adb', '-s', get_session_device_id(), 'shell']
     shell_input = ["su root", f"mv {sdcard}/{rsc_name} {dest_folder}", "exit"]
     output, error = Task().run(command, input_to_cmd=shell_input)
 
@@ -198,7 +197,7 @@ def download(mobile_path, dest_path, permissions_check=True):
     """
 
     # Construct the adb pull command to download the file/folder from the mobile device to the PC
-    command = ['adb', 'pull', mobile_path, dest_path]
+    command = ['adb', '-s', get_session_device_id(), 'pull', mobile_path, dest_path]
     output, error = Task().run(command)
 
     # Check if permissions check is enabled
@@ -228,7 +227,7 @@ def su_download(mobile_path, dest_path):
 
 
     # Define the adb shell command
-    command = ['adb', 'shell']
+    command = ['adb', '-s', get_session_device_id(), 'shell']
     
     # Get the SD card path on the mobile device
     sdcard = utility.sd_path()

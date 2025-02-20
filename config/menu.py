@@ -1,4 +1,4 @@
-from modules import apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, merge_apks, mirroring, proxy, signature, useful_stuff, utility
+from modules import adb, apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
 import modules.tasks_management
 
 OPTIONS =   {
@@ -244,6 +244,29 @@ OPTIONS =   {
                                         "home" : dict()
                                     }
                                 },
+                                "dump_mem_info" : {
+                                    'description': ['Dump the memory information for an application',],
+                                    'children': {
+                                        "run_app_meminfo" : { 
+                                            'description': ["Run and dump the memory information for an application"],
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            'function' : mem_info.run_app_meminfo
+                                        },
+                                        "running_app_meminfo" : { 
+                                            'description': ["Dump the memory information for a running application"],
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            'function': mem_info.running_app_meminfo
+                                        },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    }
+                                },
                                 "force_app_stop" :  { 
                                     'description': ["Write the app id of the mobile app or some keywords to identify it"],
                                     'children': {
@@ -397,6 +420,15 @@ OPTIONS =   {
                                 "home" : dict()
                             },
                         },
+                        'devices':{
+                            'description': ["Select one of the available mobile devices"],
+                            'children': {
+                                "back" : dict(),
+                                "home" : dict()
+                            },
+                            'function': adb.select_device
+
+                        },
                         'file_transfer' : {
                             'description' : ['Transfer files from/to mobile devices'],
                             'children': {
@@ -454,6 +486,14 @@ OPTIONS =   {
                                 "back" : dict(),
                                 "home" : dict()
                             }
+                        },
+                        "interactive_shell" :{
+                            'description': ['Interactive shell for the mobile device',],
+                            'children': {
+                                "back" : dict(),
+                                "home" : dict()
+                            },
+                            'function': shell.interactive_adb_shell
                         },
                         "mirroring" : {
                             'description': ['Launch scrcpy for mobile device mirroring (Press any key to continue)',],
