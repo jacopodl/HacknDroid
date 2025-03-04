@@ -14,6 +14,7 @@ from termcolor import colored
 from modules.tasks_management import DAEMONS_MANAGER
 from modules.adb import select_device
 from modules.error import ADBConnectionException, OptionNotAvailable
+import os
 
 class CLI():
 
@@ -99,6 +100,10 @@ class CLI():
                     # Print the title
                     print(self._title_f.renderText(self._title))
                     print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+    
+                    if os.path.exists("config.ini"):
+                        os.remove("config.ini")
+    
                     exit(0)
 
             except KeyboardInterrupt as e:
@@ -107,7 +112,12 @@ class CLI():
                 # Print the title
                 print(self._title_f.renderText(self._title))
                 print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+
+                if os.path.exists("config.ini"):
+                    os.remove("config.ini")
+
                 exit(0)
+
 
             except ADBConnectionException as e:
                 print(colored("No device connected to ADB.", 'red'))
@@ -121,7 +131,12 @@ class CLI():
                     # Print the title
                     print(self._title_f.renderText(self._title))
                     print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+    
+                    if os.path.exists("config.ini"):
+                        os.remove("config.ini")
+
                     exit(0)
+
 
         # Initialize the prompt completer with the children of the current option
         self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
@@ -205,6 +220,9 @@ class CLI():
                 # Print the title
                 print(self._title_f.renderText(self._title))
                 print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+                
+                if os.path.exists("config.ini"):
+                    os.remove("config.ini")
                 break
 
         # Stop all the tasks

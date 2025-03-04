@@ -10,18 +10,14 @@ The script is used for the automation of some MAPT activities and the interactio
 ## Pre-requisites
 Install the following programs and add their folder with binary files in the `PATH` environment variable:
 - [***ADB***](https://developer.android.com/tools/adb) for interaction with the mobile device in Developer Mode;
-- [***scrcpy***](https://github.com/Genymobile/scrcpy) for mirroring and remote control of the mobile device over ADB connection;
-- [***JADX***](https://github.com/skylot/jadx) to explore source obtained from the decompiled code from the APK;
-- [**Apktool**](https://apktool.org/) to compile and decompile APKs;
 - [**APKEditor**]() to merge APKs.
-- [**ABE**](https://github.com/nelenkov/android-backup-extractor) Android Backup Extractor to create TAR from Android Backup.
 
 ### APKEditor and Apktool
 For the following programs, create the wrapper to call the program without writing `java -jar`.
 As described for Apktool [here](https://apktool.org/docs/install), rename the tools JAR files as:
-- `apktool.jar`
 - `APKEditor.jar`
-- `abe.jar`
+- `APKsigner`
+- `zipalign`
 
 Create a wrapper for both the JAR files.
 For APKEditor and ABE, you can create one of the following wrappers depending on the Operating System:
@@ -76,19 +72,14 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 
 
 ## Script features
-- [ ] ***Task Manager***
-  - [] Daemon tasks
+### Task Manager
+  - [x] Daemon tasks
     - [x] logcat
     - [x] mirroring
-    - [ ] proxy with dns spoofing
+    - [x] proxy with dns spoofing
   - [x] Sequential tasks
 
-- [ ] ***Functionalities***
-- [ ] `apk_analysis`<br>Analysis of the APKs (signature schema verifier, apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in smali files, etc.)
-  - [ ] `from_apk_on_pc`
-  - [ ] `from_mobile_device`
-    - [ ] Cordova
-    - [ ] Flutter
+### Functionalities
 - [x] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
   - [x] `compile`: Compile an apk file from the folder with decompiled and modified code
   - [x] `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
@@ -109,9 +100,6 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
   - [x] `backup_to_folder`: Convert the AB file to an unpacked folder
   - [x] `reset_app_data`: Reset App data
 - [x] `download_from_mobile`<br>Download file from the mobile device
-- [ ] `frida`: Use Frida for several functionalities
-  - [ ] `function_hooking`
-  - [ ] `script`
 - [x] `install_uninstall`<br>Install/Uninstall an app on the mobile device
   - [x] `install_from_apk`
   - [x] `install_from_playstore`
@@ -136,21 +124,10 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
       - [x] `get_current_proxy`
       - [x] `dns_server_with_current_ip`
       - [x] `dns_server_with_another_ip`
-  - [ ] `install_certificates`
-    - [ ] install depending on android
-      - [ ] Android <=10
-      - [ ] Android 10+
-    - [ ] Install without Rooted device
-      - [ ] MDM install 
-      - [ ] install certificates on user land and modify android manifest
-      - [ ] VPN certificate in userland 
 - [x] `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
-- [ ] `system_mount_for_root`: Device rooting
-  - [ ] Android <=10
-  - [ ] Android 10+
-- [ ] `track_logs`<br>Logs gathering
+- [x] `track_logs`<br>Logs gathering
   - [x] `all_logs`
-  - [ ] `all_crash_logs`
+  - [x] `all_crash_logs`
 - [x] `upload_to_mobile`<br>Upload a file from PC to mobile device
 - [x] `useful_staffs`
   - [x] `device_info`
@@ -166,11 +143,37 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
   - [x] `connectivity`: Connectivity options management
     - [x] `wifi`: Wifi option Management (ON/OFF)
     - [x] `airplane`: Airplane mode Management (ON/OFF)
-  - [ ] `screenshot_video`: Screenshot/Video on the mobile device
-    - [ ] `screenshot`
-    - [ ] `video`
+  - [x] `screenshot_video`: Screenshot/Video on the mobile device
+    - [x] `screenshot`
+    - [x] `video`
   - [x] `shutdown`<br>Shutdown/Reboot the device with several options
     - [x] `shutdown`: Shutdown the mobile device
     - [x] `reboot`: Reboot the mobile device
     - [x] `reboot_recovery`: Reboot the mobile device in recovery mode
     - [x] `reboot_bootloader`: Reboot the mobile device in bootloader mode
+
+### Future functionalities
+- [ ] `apk_analysis`<br>Analysis of the APKs (signature schema verifier, apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in application files, etc.)
+  - [ ] `from_apk_on_pc`
+  - [ ] `from_mobile_device`
+  - [ ] `specific_technology`
+    - [ ] Cordova
+    - [ ] Flutter
+- [ ] `system_mount_for_root`: Device rooting
+  - [ ] Android <=10
+  - [ ] Android 10+
+- [ ] `install_certificates`
+    - [ ] install depending on android
+      - [ ] Android <=10
+      - [ ] Android 10+
+    - [ ] Install without Rooted device
+      - [ ] MDM install 
+      - [ ] install certificates on user land and modify android manifest
+      - [ ] VPN certificate in userland
+- [ ] `frida`: Use Frida for several functionalities
+  - [ ] `function_hooking`
+  - [ ] `script`
+
+
+***Daemon tasks***
+  - [ ] video recoding

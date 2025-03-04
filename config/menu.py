@@ -17,10 +17,9 @@ OPTIONS =   {
                                 "apk_analysis": { 
                                     'description': [
                                         'Analysis of the APKs related to the application:', 
-                                        ' > signature schema verifier', 
-                                        ' > apk decompiled with apktool',
                                         ' > search for common Root Detection strings in smali files', 
-                                        ' > search for common Certificate Pinning strings or SHA1-SHA256 hash string in smali files'
+                                        ' > search for common Certificate Pinning strings or SHA1-SHA256 hash string in smali files',
+                                        ' > signature schema verifier'
                                         ],
                                     'children': {
                                         "from_apk_on_pc" : { 
@@ -421,7 +420,7 @@ OPTIONS =   {
                             },
                         },
                         'devices':{
-                            'description': ["Select one of the available mobile devices"],
+                            'description': ["Select one of the available mobile devices (the current one is highlighted with red/white background)"],
                             'children': {
                                 "back" : dict(),
                                 "home" : dict()

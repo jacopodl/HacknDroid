@@ -5,8 +5,6 @@ from modules.error import ADBConnectionException, OptionNotAvailable
 import subprocess
 import configparser
 
-SESSION_DEVICE = ""
-
 def check_connection(adb_shell_output):
     """
     Check if the device is connected to ADB.
@@ -18,8 +16,17 @@ def check_connection(adb_shell_output):
     if "no devices/emulators found" in adb_shell_output:
         raise ADBConnectionException("No device connected", code=1)
     
+def get_current_device():
+    """
+    Get the current device ID.
+
+    Returns:
+        str: The device ID.
+    """
+    
+
+
 def select_device(user_input):
-    global SESSION_DEVICE
     """
     List the devices connected to ADB.
 
@@ -67,6 +74,8 @@ def adb_devices_list():
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
         output, error = process.communicate()
 
+        headers = ["Device ID", "Device Name", "Status", "Model"]
+
         row_list = []
         table_rows = []
         id = 0
@@ -77,16 +86,25 @@ def adb_devices_list():
                 if info.startswith('model:'):
                     model = info.replace('model:', '').replace('_',' ')
 
-                    table_rows.append([colored(id, 'red'), colored(device_row[0], 'yellow'), device_row[1], model])
+                    if get_session_device_id() == device_row[0]:
+                        selected_id = f" {id} ".center(len(headers[0]))
+                        table_rows.append([colored(f" {id} ".center(len(headers[0])), 'black', 'on_red'), 
+                                           colored(f" {device_row[0]} ".center(len(headers[1])), 'black', 'on_white'), 
+                                           colored(f" {device_row[1]} ".center(len(headers[2])), 'black', 'on_white'), 
+                                           colored(f" {model} ".center(len(headers[2])), 'black', 'on_white')])
+                    else:
+                        table_rows.append([colored(f" {id} ", 'red'), colored(f" {device_row[0]} ", 'yellow'), f" {device_row[1]} ", f" {model} "])
+
                     row_list.append([id, device_row[0], device_row[1], model])
 
             id += 1
 
-        headers = ["Device ID", "Device Name", "Status", "Model"]
-
         color_headers = [colored(h, 'blue') for h in headers]
-        print(tabulate(table_rows, headers=color_headers, tablefmt='fancy_grid'), end='\n\n')
 
+        if len(row_list)>0:
+            print(tabulate(table_rows, headers=color_headers, tablefmt='fancy_grid', colalign=('center', 'center', 'center', 'center')), end='\n\n')
+        else:
+            print(tabulate(table_rows, headers=color_headers, tablefmt='fancy_grid'), end='\n\n')
         
         print(colored("device\t\t", "cyan")+"Connected and ready")
         print(colored("offline\t\t", "cyan")+"Device not responsive")
@@ -105,6 +123,9 @@ def get_session_device_id():
     Returns:
         str: The device ID.
     """
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    return config.get('General', 'adb_session_device')
+    if os.path.exists('config.ini'):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        return config.get('General', 'adb_session_device')
+    else:
+        return None
