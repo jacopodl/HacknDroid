@@ -9,3 +9,5 @@
 backup_*/
 merged_*/
 *.jar
+*.txt
+dependencies/

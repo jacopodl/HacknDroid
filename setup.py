@@ -1,4 +1,6 @@
 import json
+import shutil
+import subprocess
 import urllib3
 import requests
 from bs4 import BeautifulSoup
@@ -6,6 +8,7 @@ import os
 import zipfile
 import platform
 import tarfile
+import sys
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -189,5 +192,41 @@ def android_dependencies():
     get_latest_commandlinetools()
     get_latest_platformtools()
 
-github_dependencies()
-android_dependencies()
+
+def set_android_home_env_var():
+    os.environ['ANDROID_HOME'] = os.path.abspath('dependencies/sdk')
+    
+    """
+    sdkmanager_path = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest', 'bin', 'sdkmanager.bat')
+    shutil.move(os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools'), os.path.join(os.environ['ANDROID_HOME'], 'latest'))
+    
+    cmdline_tools_path = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest')
+    shutil.move(os.path.join(os.environ['ANDROID_HOME'], 'latest'), cmdline_tools_path)
+    sdkmanager_path = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest', 'bin', 'sdkmanager.bat')
+
+    process = subprocess.Popen([sdkmanager_path, '--list'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,text=True)
+    output, error = process.communicate()
+
+    build_tools_versions = [ line.split("|")[0] for line in output.split('\n') if line.strip().startswith('build-tools') and "-rc" not in line]
+
+    print(build_tools_versions[-1].strip())
+
+    process = subprocess.Popen([sdkmanager_path, build_tools_versions[-1].strip()], stdin=subprocess.PIPE, stdout=sys.stdout, stderr=subprocess.PIPE, text=True)
+    process.communicate('y')
+
+    os.environ['PATH'] =  os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest', 'bin') + os.pathsep + \
+                        os.path.join(os.environ['ANDROID_HOME'], 'platform-tools') + os.pathsep + \
+                        os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tools_versions[-1].strip().split(";")[1]) + os.pathsep + \
+                        os.path.join(os.environ['JAVA_HOME'], 'bin')
+    """
+    os.environ['PATH'] =  os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest', 'bin') + os.pathsep + \
+                        os.path.join(os.environ['ANDROID_HOME'], 'platform-tools') + os.pathsep + \
+                        os.path.join(os.environ['ANDROID_HOME'], 'build-tools', '35.0.1') + os.pathsep + \
+                        os.path.join(os.environ['JAVA_HOME'], 'bin')
+    print(os.environ['PATH'])
+
+    process = subprocess.Popen(['adb', ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,text=True, env={'PATH': os.environ['PATH'],})
+    output, error = process.communicate()
+    
+    print(output)
+    print(error)
