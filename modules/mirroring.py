@@ -1,4 +1,5 @@
 import os
+import time
 from modules.tasks_management import DAEMONS_MANAGER, Task
 from modules.file_transfer import download
 from modules.utility import sd_path
@@ -79,7 +80,11 @@ def stop_recording(user_input):
         user_input (str): User input (not used in this function).
     """
     global VIDEO_TASK_ID, MOBILE_VIDEO_PATH 
-    dest_path = './'
+    
+    dest_path = 'results/screen_recordings'
+    os.makedirs(dest_path, exist_ok=True)
+
     if MOBILE_VIDEO_PATH != '':
         DAEMONS_MANAGER.stop_task('video', VIDEO_TASK_ID)
+        time.sleep(10)
         download(MOBILE_VIDEO_PATH, dest_path)

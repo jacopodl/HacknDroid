@@ -5,6 +5,8 @@ import sys
 import time
 import requests
 from modules.adb import get_session_device_id
+from datetime import datetime
+
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -374,3 +376,13 @@ def loading_animation(loading_str, gap, max_time):
         time.sleep(gap)  # Delay between dots
 
     sys.stdout.write(f"\r{loading_str}{len(dots)*'.'}")
+
+
+def current_date():
+    # Current date and time
+    now = datetime.now()
+
+    # Format the date and time as a string
+    formatted_date = now.strftime("%Y-%m-%d_%H-%M-%S")
+
+    return formatted_date

@@ -22,7 +22,7 @@ def merge_from_dir(user_input):
 
     # Command to merge APK files
     # -f: force overwrite of output APK file
-    command = [f'APKEditor.bat','m',"-f","-i", user_input, "-o", apk_name]
+    command = [f'APKEditor','m',"-f","-i", user_input, "-o", apk_name]
     print(command)
     output, error = Task().run(command, is_shell=True)
 
@@ -50,8 +50,7 @@ def merge_from_list(user_input):
         check = utility.is_apk_on_system(apks)
 
     # Create a temporary directory for merging APK files
-    if not os.path.exists(".tmp_merge_apks"):
-        os.mkdir(".tmp_merge_apks")
+    os.makedirs(".tmp_merge_apks", exist_ok=True)
 
     # Copy APK files to the temporary directory
     for f in apks:

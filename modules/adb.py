@@ -15,15 +15,6 @@ def check_connection(adb_shell_output):
 
     if "no devices/emulators found" in adb_shell_output:
         raise ADBConnectionException("No device connected", code=1)
-    
-def get_current_device():
-    """
-    Get the current device ID.
-
-    Returns:
-        str: The device ID.
-    """
-    
 
 
 def select_device(user_input):
@@ -48,8 +39,11 @@ def select_device(user_input):
         if choice >= 0 and choice < len(adb_devices):
             config = configparser.ConfigParser()
     
-            if not os.path.exists('config.ini'):
-                config.read('config.ini')
+            script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+            config_file_path = os.path.join(script_folder, "config.ini")
+
+            if os.path.exists(config_file_path):
+                config.read(config_file_path)
 
             # Add a new section if it doesn't exist
             if not config.has_section('General'):
@@ -58,7 +52,7 @@ def select_device(user_input):
             config.set('General', 'adb_session_device', adb_devices[choice][1])
 
             # Write the configuration to a file
-            with open('config.ini', 'w') as configfile:
+            with open(config_file_path, 'w') as configfile:
                 config.write(configfile)
 
         else:
@@ -70,8 +64,21 @@ def select_device(user_input):
 
 def adb_devices_list():
     while True:
+        env = None
+
+        script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+        config_file_path = os.path.join(script_folder, "config.ini")
+
+        if os.path.exists(config_file_path):
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+        
+            if config.has_section('Environment') and config.has_option('Environment', 'android_home') and config.has_option('Environment', 'path'):
+                os.environ['PATH'] = config.get('Environment', 'path')
+                os.environ['ANDROID_HOME'] = config.get('Environment', 'android_home')
+
         command = ['adb', 'devices', '-l']
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
         output, error = process.communicate()
 
         headers = ["Device ID", "Device Name", "Status", "Model"]
@@ -123,9 +130,49 @@ def get_session_device_id():
     Returns:
         str: The device ID.
     """
-    if os.path.exists('config.ini'):
+    device_id = None
+
+    script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    config_file_path = os.path.join(script_folder, "config.ini")
+
+    if os.path.exists(config_file_path):
         config = configparser.ConfigParser()
-        config.read('config.ini')
-        return config.get('General', 'adb_session_device')
-    else:
-        return None
+        config.read(config_file_path)
+
+        if config.has_section('General') and config.has_option('General', 'adb_session_device'):
+            device_id = config.get('General', 'adb_session_device')
+
+    return device_id
+    
+def del_session_device_id():
+    script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    config_file_path = os.path.join(script_folder, "config.ini")
+
+    if os.path.exists(config_file_path):
+        config = configparser.ConfigParser()
+        config.read(config_file_path)
+            
+        if config.has_section('General') and config.has_option('General','adb_session_device'):
+            return config.remove_option('General', 'adb_session_device')
+        
+def start_adb_server():
+    env = None
+    script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    config_file_path = os.path.join(script_folder, "config.ini")
+
+    if os.path.exists(config_file_path):
+        config = configparser.ConfigParser()
+        config.read(config_file_path)
+    
+        if config.has_section('Environment') and config.has_option('Environment', 'android_home') and config.has_option('Environment', 'path'):
+            os.environ['PATH'] = config.get('Environment', 'path')
+            os.environ['ANDROID_HOME'] = config.get('Environment', 'android_home')
+
+    command = ['adb', 'kill-server']
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
+    output, error = process.communicate()
+
+    command = ['adb','start-server']
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
+    output, error = process.communicate()
+    print(output, error)

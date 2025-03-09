@@ -1,9 +1,10 @@
+import os
 import subprocess
-from modules.utility import app_id_from_user_input, active_app_id_from_user_input
+from modules.utility import app_id_from_user_input, active_app_id_from_user_input, current_date
 import time
 from modules.tasks_management import Task, DAEMONS_MANAGER, list_daemons
 from modules.adb import get_session_device_id
-        
+
 def logs_from_running_process(user_input):
     """
     Logs all types of logs from a running process.
@@ -67,15 +68,21 @@ def track_running_logs(app_id, pid, crash_logs, id):
         crash_logs (bool): Whether to log only crash logs.
         id (int): The task ID.
     """
+
+    logs_folder = os.path.join('results', app_id, 'logs')
+    os.makedirs(logs_folder, exist_ok=True)
+
     # Default log file name
-    file_name = f"{app_id}_{id}_all.log"
+    file_name = f"{current_date()}_{id}_all.log"
     
     # Log file name for crash logs
     if crash_logs:
-        file_name = f"{app_id}_{id}_crash.log"
+        file_name = f"{current_date()}_{id}_crash.log"
 
+    file_path = os.path.join(logs_folder, file_name)
+    
     # Collect logs and write to the file
-    with open(file_name, "w") as f:
+    with open(file_path, "w") as f:
         # Default adb logcat command
         command = ['adb', '-s', get_session_device_id(), 'logcat', f'--pid={pid}']
 
@@ -169,13 +176,20 @@ def track_logs(app_id, crash_logs, id):
     """
     pid=-1
 
-    file_name = f"{app_id}_{id}_all.log"
-    
-    if crash_logs:
-        file_name = f"{app_id}_{id}_crash.log"
+    logs_folder = os.path.join('results', app_id, 'logs')
+    os.makedirs(logs_folder, exist_ok=True)
 
-    # Collect logs
-    with open(file_name, "w") as f:
+    # Default log file name
+    file_name = f"{current_date()}_{id}_all.log"
+    
+    # Log file name for crash logs
+    if crash_logs:
+        file_name = f"{current_date()}_{id}_crash.log"
+
+    file_path = os.path.join(logs_folder, file_name)
+
+    # Collect logs and write to the file
+    with open(file_path, "w") as f:
         command = ['adb', '-s', get_session_device_id(), 'logcat']
 
         if crash_logs:
@@ -192,10 +206,10 @@ def track_logs(app_id, crash_logs, id):
     lines = []
 
     # Filter logs by PID
-    with open(file_name, "r") as fd:
+    with open(file_path, "r") as fd:
         lines = fd.readlines()
 
-    with open(file_name, "w") as fd:
+    with open(file_path, "w") as fd:
         for l in lines:
             if pid in l:
                 fd.write(l)

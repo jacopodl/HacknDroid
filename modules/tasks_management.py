@@ -4,6 +4,8 @@ from modules.utility import cmd_to_subprocess_string
 from tabulate import tabulate
 import copy
 from termcolor import colored
+import configparser
+import os
 
 class DaemonTask():
     def __init__(self, command, args=tuple()):
@@ -14,7 +16,7 @@ class DaemonTask():
         self._THREAD = None
         self._command = command
         self._args = args
-
+        
     def run(self):
         """
         Run the daemon task.
@@ -39,7 +41,7 @@ class DaemonTask():
         Args:
             command (list): The command to run.
         """
-        self._PROCESS = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL ,text=True)
+        self._PROCESS = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL ,text=True, env=os.environ)
         output, error = self._PROCESS.communicate()
         # Process stoped before by the user
         self._PROCESS = None
@@ -197,9 +199,9 @@ class Task():
             tuple: The output and error of the command.
         """
         if is_shell:
-            self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,shell=True)
+            self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,shell=True, env = os.environ)
         else:
-            self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,text=True)
+            self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,text=True, env = os.environ)
         
         if input_to_cmd:
             output, error = self._PROCESS.communicate(cmd_to_subprocess_string(input_to_cmd))

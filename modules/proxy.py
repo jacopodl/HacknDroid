@@ -311,32 +311,86 @@ def del_dns_proxy(user_input):
 
 
 def get_current_invisible_proxy(user_input):
-    # output dnat
-    #iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination $IP:443
-    #iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination $IP:80
+    command = ['adb', '-s', get_session_device_id(), 'shell']
+    shell_input = [ "su root",
+                   """iptables -t nat -L OUTPUT -v -n | grep 'DNAT' | awk '{print $NF}' | cut -d: -f2"""]
+    
+    output, error = Task().run(command, input_to_cmd=shell_input)
+    print(output)
 
-    # postrouting masquerade
-    # iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE
-    #iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE
-    pass
 
 def set_current_pc_invisible_proxy(user_input):
-    # output dnat
-    #iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination $IP:443
-    #iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination $IP:80
+    # Get the current Wi-Fi SSID
+    pc_ssid = get_current_pc_wifi_ssid()
+    mobile_ssid = get_mobile_wifi_ssid()
 
-    # postrouting masquerade
-    # iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE
-    #iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE
-    pass
+    print("\nWi-Fi SSIDs")
+    row_list = []
+    
+    if pc_ssid:
+        row_list.append(["Current PC",pc_ssid])
+    else:
+        row_list.append(["Current PC","Undetectable"])
+
+    if pc_ssid:
+        row_list.append(["Mobile Device",mobile_ssid])
+    else:
+        row_list.append(["Mobile Device","Undetectable"])
+
+    print(tabulate(row_list, headers=['Device', 'Wi-Fi SSID'], tablefmt='fancy_grid'))
+
+    if pc_ssid!=mobile_ssid:
+        print("\nPlease connect the mobile device and the current PC to the same network!!!")
+
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    output, error = Task().run(command)
+    x=input("Press ENTER to launch the DNS Server...\n")
+
+    set_invisible_proxy(pc_wifi_ip())
 
 def set_generic_invisible_proxy(user_input):
-    pass
+    remote_ip = ''
+
+    try:
+        remote_ip = ipaddress.ip_address(user_input)
+    except ValueError:
+        remote_ip = ''
+        print('Address is invalid')
+    
+    while remote_ip == '':
+        try:
+            user_input = input("Enter adress: ")
+            remote_ip = ipaddress.ip_address(user_input)
+        except ValueError:
+            remote_ip = ''
+            print('Address is invalid')
+
+    set_invisible_proxy(remote_ip)
+
+
+def set_invisible_proxy(target_ip):
+    command = ['adb', '-s', get_session_device_id(), 'shell']
+    shell_input = [ "su root",
+                   f"iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination {target_ip}:443",
+                   f"iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination {target_ip}:80",
+                   "iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE",
+                   "iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE"
+                ]
+    
+    output, error = Task().run(command, input_to_cmd=shell_input)
+    print(output)
+
 
 def del_invisible_proxy(user_input):
     # flush previous configuration
     #iptables -t nat -F
-    pass
+    command = ['adb', '-s', get_session_device_id(), 'shell']
+    shell_input = [ "su root",
+                   "iptables -t nat -F"
+                ]
+    
+    output, error = Task().run(command, input_to_cmd=shell_input)
+    print(output)
 
 
 def get_current_pc_wifi_ssid():
@@ -384,8 +438,13 @@ def get_mobile_wifi_ssid():
     command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'netstats', '|', 'grep', '-E', 'iface=wlan.*networkId']
     output, error = Task().run(command)
 
-    REGEX_SSID = r'networkId=\"(.*)\"'
-    x = re.search(REGEX_SSID, output.splitlines()[0])
+    x = None 
+    
+    if output:
+        REGEX_SSID = r'networkId=\"(.*)\"'
+        x = re.search(REGEX_SSID, output.splitlines()[0])
+    else:
+        return None
 
     if x:
         return x.group(1)

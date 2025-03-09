@@ -665,7 +665,7 @@ OPTIONS =   {
                             'function': modules.tasks_management.list_daemons
                         },
                         "proxy" : {
-                            'description': ['Set global proxy on the mobile device:',
+                            'description': ['Set proxy on the mobile device:',
                                             ' > using the current PC IP',
                                             ' > using another IP'],
                             'children': {
@@ -710,7 +710,7 @@ OPTIONS =   {
                                         "home" : dict()
                                     },
                                 },
-                                "system_proxy" : {
+                                "invisible_proxy" : {
                                     'description': ['Set global proxy on the mobile device:',
                                                     ' > using the current PC IP',
                                                     ' > using another IP'],

@@ -483,8 +483,7 @@ def transfer_apks_from_device(user_input):
     print(app_folder)
 
     # Create a .tmp folder on the current PC
-    if not os.path.exists('.tmp'):
-        os.mkdir(".tmp")
+    os.makedirs(".tmp", exist_ok=True)
 
     # Remove the folder with APKs of the specified App
     if os.path.exists(f".tmp/{app_folder}"):

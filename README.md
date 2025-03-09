@@ -7,54 +7,21 @@ The script is used for the automation of some MAPT activities and the interactio
 
 ---
 
-## Pre-requisites
-Install the following programs and add their folder with binary files in the `PATH` environment variable:
-- [***ADB***](https://developer.android.com/tools/adb) for interaction with the mobile device in Developer Mode;
-- [**APKEditor**]() to merge APKs.
-
-### APKEditor and Apktool
-For the following programs, create the wrapper to call the program without writing `java -jar`.
-As described for Apktool [here](https://apktool.org/docs/install), rename the tools JAR files as:
-- `APKEditor.jar`
-- `APKsigner`
-- `zipalign`
-
-Create a wrapper for both the JAR files.
-For APKEditor and ABE, you can create one of the following wrappers depending on the Operating System:
-- Windows (`APKEditor.bat`)
-```bash
-@echo off
-setlocal
-
-REM Set the path to your APKEditor.jar
-set APKEDITOR_P="C:/Windows/APKEditor.jar"
-
-REM Run APKEditor.jar
-java -jar %APKEDITOR_P% %*
-
-endlocal
-```
-
-Insert the wrapper and the JAR in one of the paths registered in the `PATH` environment variable (e.g. `C:\Windows\`).
-
-- UNIX-based systems (`APKEditor`)
-```bash
-$APKEDITOR_PATH = "./APKEditor.jar"
-java -jar $APKEDITOR_PATH "$@"
-```
-Insert the wrapper and the JAR in `/usr/local/bin`.
-
 ## Install
 Install python requirements using the following command:
 ```bash
 pip install -r requirements.txt
+```
+Install other binary requirements:
+```bash
+python3 hackndroid.py --install
 ```
 
 ---
 
 ## Run the program
 ```bash
-python main.py
+python hackndroid.py
 ```
 ![Run Example](.img/run_example_0.png)
 ![Run Example](.img/run_example_1.png)
@@ -73,11 +40,12 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 
 ## Script features
 ### Task Manager
-  - [x] Daemon tasks
+  - [x] *Daemon tasks*
     - [x] logcat
     - [x] mirroring
     - [x] proxy with dns spoofing
-  - [x] Sequential tasks
+    - [x] video recoding
+  - [x] *Sequential tasks*
 
 ### Functionalities
 - [x] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
@@ -114,12 +82,12 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
     - [x] `set_proxy_with_current_ip`
     - [x] `set_proxy_with_other_ip`
     - [x] `del_proxy`
-  - [ ] `invisible_proxy`
-    - [ ] `ip_tables`
-      - [ ] `get_current_proxy`
-      - [ ] `set_proxy_with_current_ip`
-      - [ ] `set_proxy_with_other_ip`
-      - [ ] `del_proxy`
+  - [x] `invisible_proxy`
+    - [x] `ip_tables`
+      - [x] `get_current_proxy`
+      - [x] `set_proxy_with_current_ip`
+      - [x] `set_proxy_with_other_ip`
+      - [x] `del_proxy`
     - [x] `dns`
       - [x] `get_current_proxy`
       - [x] `dns_server_with_current_ip`
@@ -173,7 +141,3 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 - [ ] `frida`: Use Frida for several functionalities
   - [ ] `function_hooking`
   - [ ] `script`
-
-
-***Daemon tasks***
-  - [ ] video recoding

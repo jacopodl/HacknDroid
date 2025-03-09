@@ -12,7 +12,7 @@ from termcolor import colored
 
 # Function pointer in OPTIONS
 from modules.tasks_management import DAEMONS_MANAGER
-from modules.adb import select_device
+from modules.adb import del_session_device_id, select_device, start_adb_server
 from modules.error import ADBConnectionException, OptionNotAvailable
 import os
 
@@ -22,6 +22,7 @@ class CLI():
         """
         Initialize the CLI with options and styles.
         """
+        start_adb_server()
         # Initialize the global variable CURRENT_OPTION
         global CURRENT_OPTION
         
@@ -101,8 +102,7 @@ class CLI():
                     print(self._title_f.renderText(self._title))
                     print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
     
-                    if os.path.exists("config.ini"):
-                        os.remove("config.ini")
+                    del_session_device_id()
     
                     exit(0)
 
@@ -113,8 +113,7 @@ class CLI():
                 print(self._title_f.renderText(self._title))
                 print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
 
-                if os.path.exists("config.ini"):
-                    os.remove("config.ini")
+                del_session_device_id()
 
                 exit(0)
 
@@ -132,9 +131,7 @@ class CLI():
                     print(self._title_f.renderText(self._title))
                     print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
     
-                    if os.path.exists("config.ini"):
-                        os.remove("config.ini")
-
+                    del_session_device_id()
                     exit(0)
 
 
@@ -221,8 +218,7 @@ class CLI():
                 print(self._title_f.renderText(self._title))
                 print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
                 
-                if os.path.exists("config.ini"):
-                    os.remove("config.ini")
+                del_session_device_id()
                 break
 
         # Stop all the tasks

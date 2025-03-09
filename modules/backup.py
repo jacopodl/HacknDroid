@@ -18,8 +18,11 @@ def app_backup(user_input : str):
     # adb backup -apk -f backup_<app_id>.ab <app_id>
     backup_name = "backup_"+app_id
     command = ['adb', '-s', get_session_device_id(), 'backup',"-apk","-f", backup_name+".ab", app_id]
-    print(command)
+    print(" ".join(command))
     output, error = Task().run(command, is_shell=True)
+
+    print(error)
+
 
     # Convert backup file (compressed file) as TAR file backup_<app_id>.tar 
     # and unpack it to a folder with name backup_<app_id>
@@ -62,10 +65,12 @@ def tar_extract(user_input : str):
     print(command)
     output, error = Task().run(command, is_shell=True)
 
+    print(error)
+
     # Create the directory for the unpacked TAR file
     folder = user_input.replace(".ab", "")
-    if not os.path.exists(folder):
-        os.mkdir(folder)
+
+    os.makedirs(folder, exist_ok=True)
 
     # Extract the TAR file in the destination folder 
     with tarfile.open(tar_file, "r") as tar:
@@ -88,8 +93,7 @@ def ab_to_tar_extract(backup_name):
     output, error = Task().run(command, is_shell=True)
 
     # Create the directory for the unpacked TAR file
-    if not os.path.exists(backup_name):
-        os.mkdir(backup_name)
+    os.makedirs(backup_name, exist_ok=True)
 
     # Extract the TAR file in the destination folder 
     with tarfile.open(backup_name+".tar", "r") as tar:

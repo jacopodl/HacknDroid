@@ -176,7 +176,7 @@ def download_from_user_input(user_input):
         # Prompt the user to input paths again if the conditions are not met
         user_input = input("""Insert at least two paths separated by spaces:\n > list of the paths of mobile files/folders to be downloaded\n > pc folder where the files will be downloaded\n\n""")
         paths = user_input.split(" ")
-
+   
     # Iterate over each mobile path (excluding the last path which is the PC destination folder)
     for mobile_path in paths[:-1]:
         print(mobile_path)

@@ -11,3 +11,5 @@ merged_*/
 *.jar
 *.txt
 dependencies/
+config.ini
+results
