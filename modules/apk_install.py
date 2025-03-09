@@ -1,8 +1,6 @@
-import subprocess
-import re
-import os
 from modules import utility
 from modules.tasks_management import Task
+from modules.adb import get_session_device_id
 
 def install_from_apk(user_input):
     """
@@ -15,7 +13,7 @@ def install_from_apk(user_input):
     apk_path = utility.valid_apk_file(user_input)
 
     # Install the APK on the mobile device
-    command = ['adb' ,'install' , user_input]
+    command = ['adb', '-s', get_session_device_id(), 'install' , user_input]
     output, error = Task().run(command)
     print(output)
 
@@ -31,7 +29,7 @@ def install_from_playstore(user_input):
     app_id = utility.get_valid_playstore_app_id(user_input)
 
     # Create intent to open Play Store
-    command = ['adb' ,'shell' ,'am' ,'start' ,'-a' ,'android.intent.action.VIEW' ,'-d' , f"market://details?id={app_id}"]
+    command = ['adb', '-s', get_session_device_id(), 'shell' ,'am' ,'start' ,'-a' ,'android.intent.action.VIEW' ,'-d' , f"market://details?id={app_id}"]
     output, error = Task().run(command)
 
 
@@ -46,5 +44,5 @@ def uninstall_app(user_input):
     app_id = utility.app_id_from_user_input(user_input)
 
     # Uninstall the application on the mobile device
-    command = ['adb' ,'uninstall' , app_id]
+    command = ['adb', '-s', get_session_device_id(), 'uninstall' , app_id]
     output, error = Task().run(command)

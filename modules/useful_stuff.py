@@ -1,12 +1,14 @@
 from modules import utility
 import subprocess
-from prompt_toolkit import prompt, print_formatted_text
+from prompt_toolkit import print_formatted_text
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
-import config.menu as menu
 import config.style as tool_style
 from tabulate import tabulate
 from modules.tasks_management import Task
+import re
+from termcolor import colored
+from modules.adb import get_session_device_id
 
 def reboot(user_input):
     """
@@ -24,7 +26,7 @@ def reboot(user_input):
 
     if choice == 'y':
         # Reboot using ADB
-        command = ['adb', 'shell', 'reboot']
+        command = ['adb', '-s', get_session_device_id(), 'shell', 'reboot']
         output, error = Task().run(command, is_shell=True)
         print(output)        
 
@@ -45,7 +47,7 @@ def reboot_recovery(user_input):
 
     if choice == 'y':
         # Reboot in recovery mode using ADB
-        command = ['adb', 'reboot', 'recovery']
+        command = ['adb', '-s', get_session_device_id(), 'reboot', 'recovery']
         output, error = Task().run(command, is_shell=True)
         print(output)
 
@@ -65,7 +67,7 @@ def reboot_bootloader(user_input):
         choice = input("Are you sure you want to reboot the mobile device (y/n)? ")
 
     if choice == 'y':
-        command = ['adb', 'reboot', 'bootloader']
+        command = ['adb', '-s', get_session_device_id(), 'reboot', 'bootloader']
         output, error = Task().run(command, is_shell=True)
         print(output)
 
@@ -84,7 +86,7 @@ def shutdown(user_input):
         choice = input("Are you sure you want to shutdown the mobile device (y/n)? ")
 
     if choice == 'y':
-        command = ['adb', 'shell', 'reboot', '-p']
+        command = ['adb', '-s', get_session_device_id(), 'shell', 'reboot', '-p']
         output, error = Task().run(command, is_shell=True)
         print(output)
 
@@ -97,7 +99,7 @@ def screen_lock_enabled(user_input):
         user_input (str): User input (not used in this function).
     """
     # Click LOCK button (26) (Specific for Motorola with PIN unlock)
-    command = ['adb', 'shell', 'input', 'keyevent','26']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'keyevent','26']
     output, error = Task().run(command, is_shell=True)
     print(output)
 
@@ -117,28 +119,28 @@ def screen_lock_disabled(user_input):
             pass
 
     # Click LOCK button (26)
-    command = ['adb', 'shell', 'input', 'keyevent','26']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'keyevent','26']
     print(command)
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
     stdout, stderr = process.communicate()
     print(stdout)
 
     # Swipe from bottom to top
-    command = ['adb', 'shell', 'input', 'swipe','500','1500', '500', '100']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'swipe','500','1500', '500', '100']
     print(command)
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
     stdout, stderr = process.communicate()
     print(stdout)
 
     # Insert the PIN of the user
-    command = ['adb', 'shell', 'input', 'text', pin]
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'text', pin]
     print(command)
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
     stdout, stderr = process.communicate()
     print(stdout)
 
     # Click ENTER button (66)
-    command = ['adb', 'shell', 'input', 'keyevent','66']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'keyevent','66']
     print(command)
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
     stdout, stderr = process.communicate()
@@ -164,42 +166,42 @@ def general_info(user_input):
     print('')
     print_formatted_text(HTML(f"<option>Device Information</option>"), style=style)
     # Get model via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.product.model']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.product.model']
     output, error = Task().run(command)
     print(f"Device Model: {output.strip()}")
 
     # Get brand information via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.product.brand']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.product.brand']
     output, error = Task().run(command)
     print(f"Brand: {output.strip()}")
 
     # Get brand information via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.product.manufacturer']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.product.manufacturer']
     output, error = Task().run(command)
     print(f"Manufacturer: {output.strip()}")
 
     # Get brand information via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.build.version.release']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.version.release']
     output, error = Task().run(command)
     print(f"Android Version: {output.strip()}")
 
     # Get brand information via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.build.id']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.id']
     output, error = Task().run(command)
     print(f"Build ID: {output.strip()}")
 
     # Get brand information via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.build.version.sdk']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.version.sdk']
     output, error = Task().run(command)
     print(f"SDK Version: {output.strip()}")
 
     # Get brand information via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.build.date']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.date']
     output, error = Task().run(command)
     print(f"Build Date: {output.strip()}")
 
     # Get brand information via ADB shell
-    command = ['adb', 'shell', 'getprop', 'ro.serialno']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.serialno']
     output, error = Task().run(command)
     print(f"Device Serial Number: {output.strip()}", end='\n\n')
 
@@ -212,7 +214,7 @@ def cpu_info(user_input):
         user_input (str): User input (not used in this function).
     """
     # Get CPU information via ADB shell
-    command = ['adb', 'shell', 'cat', '/proc/cpuinfo']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'cat', '/proc/cpuinfo']
     output, error = Task().run(command)
     print(output.strip(), end='\n\n')
 
@@ -225,7 +227,7 @@ def network_info(user_input):
         user_input (str): User input (not used in this function).
     """
     # Get network information via ADB shell
-    command = ['adb', 'shell', 'dumpsys', 'connectivity']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'connectivity']
     output, error = Task().run(command)
     print(output.strip(), end='\n\n')
 
@@ -237,8 +239,16 @@ def ram_info(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    pass
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'cat', '/proc/meminfo']
+    output, error = Task().run(command)
+    rows = output.strip().split("\n")
+    
+    rows = [re.split(r'\s{2,}', r) for r in rows]
 
+    for r in rows:
+        r[0] = colored(r[0], 'blue')
+
+    print(tabulate(rows, tablefmt='fancy_grid'))
 
 def storage_info(user_input):
     """
@@ -248,7 +258,7 @@ def storage_info(user_input):
         user_input (str): User input (not used in this function).
     """
     # Get brand information via df command
-    command = ['adb', 'shell', 'df']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'df']
     print(command)
     output, error = Task().run(command)
     print(output.strip(), end='\n\n')
@@ -262,7 +272,7 @@ def system_apps(user_input):
         user_input (str): User input (not used in this function).
     """
     # Get the list of system apps
-    command = ['adb', 'shell', 'pm', 'list', 'packages', '-s']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'pm', 'list', 'packages', '-s']
     print(command)
     output, error = Task().run(command)
 
@@ -277,7 +287,7 @@ def third_party_apps(user_input):
         user_input (str): User input (not used in this function).
     """
     # Get the list of 3rd-party apps
-    command = ['adb', 'shell', 'pm', 'list', 'packages', '-3']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'pm', 'list', 'packages', '-3']
     print(command)
     output, error = Task().run(command)
 
@@ -330,7 +340,7 @@ def force_app_stop(user_input):
     app_id = utility.active_app_id_from_user_input(user_input)
 
     # Force the stop of the app with identified app ID
-    command = ['adb', 'shell', 'am', 'force-stop', app_id]
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'force-stop', app_id]
     print(command)
     output, error = Task().run(command)
     print(f"{app_id} STOPPED")

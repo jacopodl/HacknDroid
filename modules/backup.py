@@ -1,9 +1,8 @@
 from modules import utility
-import subprocess
 import os
-import zlib
 import tarfile
 from modules.tasks_management import Task
+from modules.adb import get_session_device_id
 
 def app_backup(user_input : str):
     """
@@ -18,11 +17,14 @@ def app_backup(user_input : str):
     # Create Backup file for the App ID specified as user input
     # adb backup -apk -f backup_<app_id>.ab <app_id>
     backup_name = "backup_"+app_id
-    command = ['adb','backup',"-apk","-f", backup_name+".ab", app_id]
-    print(command)
+    command = ['adb', '-s', get_session_device_id(), 'backup',"-apk","-f", backup_name+".ab", app_id]
+    print(" ".join(command))
     output, error = Task().run(command, is_shell=True)
 
-    # Convert backup file (comppressed file) as TAR file backup_<app_id>.tar 
+    print(error)
+
+
+    # Convert backup file (compressed file) as TAR file backup_<app_id>.tar 
     # and unpack it to a folder with name backup_<app_id>
     ab_to_tar_extract(backup_name)
 
@@ -36,7 +38,7 @@ def device_backup(user_input : str):
     """
     # Backup of the device, including all data and apps
     backup_name = "backup_device"
-    command = ['adb','backup',"-apk","-shared", "-all", "-f", backup_name+".ab"]
+    command = ['adb','-s', get_session_device_id(), 'backup',"-apk","-shared", "-all", "-f", backup_name+".ab"]
     print(command)
     output, error = Task().run(command, is_shell=True)
 
@@ -63,10 +65,12 @@ def tar_extract(user_input : str):
     print(command)
     output, error = Task().run(command, is_shell=True)
 
+    print(error)
+
     # Create the directory for the unpacked TAR file
     folder = user_input.replace(".ab", "")
-    if not os.path.exists(folder):
-        os.mkdir(folder)
+
+    os.makedirs(folder, exist_ok=True)
 
     # Extract the TAR file in the destination folder 
     with tarfile.open(tar_file, "r") as tar:
@@ -89,8 +93,7 @@ def ab_to_tar_extract(backup_name):
     output, error = Task().run(command, is_shell=True)
 
     # Create the directory for the unpacked TAR file
-    if not os.path.exists(backup_name):
-        os.mkdir(backup_name)
+    os.makedirs(backup_name, exist_ok=True)
 
     # Extract the TAR file in the destination folder 
     with tarfile.open(backup_name+".tar", "r") as tar:
@@ -110,7 +113,7 @@ def restore_backup(user_input):
         user_input = input("Write the path of a valida Android Backup on your PC to be restored:\n")
     
     # Restore the AB file specified from the user 
-    command = ['adb','restore',user_input]
+    command = ['adb', '-s', get_session_device_id(), 'restore',user_input]
     print(command)
     output, error = Task().run(command, is_shell=True)
 
@@ -126,6 +129,6 @@ def app_data_reset(user_input):
     app_id = utility.app_id_from_user_input(user_input)
     
     # Reset App data for the application with App ID <app_id>
-    command = ['adb','shell',"pm","clear",app_id]
+    command = ['adb','-s', get_session_device_id(), 'shell',"pm","clear",app_id]
     print(command)
     output, error = Task().run(command, is_shell=True)

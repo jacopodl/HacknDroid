@@ -1,5 +1,5 @@
-import subprocess
 from modules.tasks_management import Task 
+from modules.adb import get_session_device_id
 
 def enable_wifi(user_input):
     """
@@ -9,7 +9,7 @@ def enable_wifi(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb', 'shell', 'svc', 'wifi', 'enable']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'svc', 'wifi', 'enable']
     output, error = Task().run(command)
     print(output)
 
@@ -21,7 +21,7 @@ def enable_wifi(user_input):
 
     if choice == 'y':
         # Open ADB shell
-        command = ['adb', 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+        command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
         output, error = Task().run(command)
         print(output)
 
@@ -34,7 +34,7 @@ def disable_wifi(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb', 'shell', 'svc', 'wifi', 'disable']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'svc', 'wifi', 'disable']
     output, error = Task().run(command)
     print(output)
 
@@ -46,7 +46,7 @@ def enable_airplane_mode(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb','shell','settings','put','global','airplane_mode_on','1']
+    command = ['adb', '-s', get_session_device_id(), 'shell','settings','put','global','airplane_mode_on','1']
     output, error = Task().run(command)
     print(output)
 
@@ -59,7 +59,7 @@ def disable_airplane_mode(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb','shell','settings','put','global','airplane_mode_on','0']
+    command = ['adb', '-s', get_session_device_id(), 'shell','settings','put','global','airplane_mode_on','0']
     output, error = Task().run(command)
     print(output)
 
@@ -71,7 +71,7 @@ def donotdisturb_total_silence(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'zen_mode', '3']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '3']
     output, error = Task().run(command)
     print(output)
 
@@ -84,7 +84,7 @@ def donotdisturb_alarms_only(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'zen_mode', '2']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '2']
     output, error = Task().run(command)
     print(output)
 
@@ -97,7 +97,7 @@ def donotdisturb_priority_only(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'zen_mode', '1']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '1']
     output, error = Task().run(command)
     print(output)
 
@@ -110,6 +110,6 @@ def donotdisturb_disabled(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'zen_mode', '0']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '0']
     output, error = Task().run(command)
     print(output)

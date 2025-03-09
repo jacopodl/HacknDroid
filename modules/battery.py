@@ -1,10 +1,10 @@
 import subprocess
-from prompt_toolkit import prompt, print_formatted_text
+from prompt_toolkit import print_formatted_text
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
-import config.menu as menu
 import config.style as tool_style
 from modules.tasks_management import Task
+from modules.adb import get_session_device_id
 
 def battery_saver_on(user_input):
     """
@@ -14,7 +14,7 @@ def battery_saver_on(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb' ,'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'true']
+    command = ['adb' , '-s', get_session_device_id(), 'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'true']
     output, error = Task().run(command)
     print(output)
 
@@ -27,7 +27,7 @@ def battery_saver_off(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb' ,'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'false']
+    command = ['adb' , '-s', get_session_device_id(), 'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'false']
     output, error = Task().run(command)
     print(output)
 
@@ -39,7 +39,7 @@ def check_battery_status(user_input):
         user_input (str): User input (not used in this function).
     """
     # Open ADB shell
-    command = ['adb' ,'shell', 'dumpsys', 'battery']
+    command = ['adb' , '-s', get_session_device_id(), 'shell', 'dumpsys', 'battery']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     output, error = process.communicate()
 

@@ -1,8 +1,12 @@
 import subprocess
 import re
-import config.menu as menu
 import os
+import sys
+import time
 import requests
+from modules.adb import get_session_device_id
+from datetime import datetime
+
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -34,7 +38,7 @@ def get_app_id(grep_string):
     keywords = split_user_input(grep_string)
     
     # List all the application IDs
-    command = ['adb', 'shell', 'pm', 'list', 'packages']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'pm', 'list', 'packages']
     result = subprocess.run(command, capture_output=True, text=True)
 
     packages = []
@@ -77,7 +81,7 @@ def is_app_id(user_input):
     Returns:
         bool: True if the input is a valid app ID, False otherwise.
     """
-    command = ['adb', 'shell', 'pm', 'list', 'packages']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'pm', 'list', 'packages']
     result = subprocess.run(command, capture_output=True, text=True)
 
     packages = []
@@ -136,8 +140,8 @@ def active_applications():
     Returns:
         list: A list of active application IDs.
     """
-    command = "adb shell \"ps -A | awk '{print $9}'\""
-    process = subprocess.Popen("adb shell \"ps -A | awk '{print $9}'\"", stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    command = "adb -s "+get_session_device_id()+" shell \"ps -A | awk '{print $9}'\""
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     output, error = process.communicate()
 
     lines = output.splitlines()
@@ -241,7 +245,7 @@ def sd_path():
         str: The path to the SD Card folder.
     """
     # Open ADB shell
-    command = ['adb', 'shell']
+    command = ['adb', '-s', get_session_device_id(), 'shell']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
 
     # Print the external storage path
@@ -361,3 +365,24 @@ def is_app_on_store(app_id):
     response = requests.get(store_url)
 
     return response.status_code == 200
+
+def loading_animation(loading_str, gap, max_time):
+    dots = ['.', '..', '...']
+    time_steps = int(max_time // gap)
+    for i in range(time_steps):
+        sys.stdout.write(f"\r{loading_str}{len(dots)*' '}")  # Carriage return to overwrite the line
+        sys.stdout.write(f'\r{loading_str}{dots[(i%len(dots))]}')  # Carriage return to overwrite the line
+        sys.stdout.flush()  # Ensure it prints immediately
+        time.sleep(gap)  # Delay between dots
+
+    sys.stdout.write(f"\r{loading_str}{len(dots)*'.'}")
+
+
+def current_date():
+    # Current date and time
+    now = datetime.now()
+
+    # Format the date and time as a string
+    formatted_date = now.strftime("%Y-%m-%d_%H-%M-%S")
+
+    return formatted_date

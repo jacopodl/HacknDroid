@@ -1,18 +1,16 @@
+import argparse
+import sys
 from dnslib import DNSRecord, RR, QTYPE, A
 from dnslib.server import DNSServer
 import socket
-import sys
-import os
-from modules.tasks_management import DaemonTask
 
 # Burp Suite IP address 
-OVERRIDE_IP = '192.168.1.53'
+OVERRIDE_IP = '192.168.1.46'
 # Domain to be excluded from the interception 
 # (The . at the end is mandatory because the DNS records are stored in this way)
 DOMAIN_TO_EXCLUDE = "example.com."
 # Forward to Google's public DNS server
 FORWARD_DNS = "8.8.8.8"  
-
 
 class OverrideDNSResolver:
     def resolve(self, request, handler):
@@ -26,7 +24,7 @@ class OverrideDNSResolver:
         Returns:
             DNSRecord: The DNS response with the overridden IP address.
         """
-        sys.stdout = open(os.devnull, 'w')  # Redirect stdout to null
+        #sys.stdout = open(os.devnull, 'w')  # Redirect stdout to null
         # Parse the DNS request
         reply = request.reply()
         qname = str(request.q.qname)
@@ -48,7 +46,7 @@ class OverrideDNSResolver:
         Returns:
             DNSRecord: The DNS response from the upstream DNS server.
         """
-        sys.stdout = open(os.devnull, 'w')  # Redirect stdout to null
+        #sys.stdout = open(os.devnull, 'w')  # Redirect stdout to null
         # Send the request to the forward DNS server
         try:
             # Convert the request to bytes
@@ -67,32 +65,51 @@ class OverrideDNSResolver:
             return request.reply()  # Return an empty reply on failure
 
 
-def dns_proxy(fake_ip, stop_flag):
+def args_parser():
     """
+    Parse the command-line arguments.
+
+    Returns:
+        tuple: The parsed command-line arguments.
+    """
+    # Create the argument parser
+    parser = argparse.ArgumentParser(description="DNS Spoofing Tool")
+    # Add the fake IP argument
+    parser.add_argument("fake_ip", type=str, help="The fake IP address to use for DNS responses")
+    # Parse the command-line arguments
+    args = parser.parse_args()
+    
+    return args.fake_ip
+
+def main():
+    global OVERRIDE_IP
+    '''
     Start a DNS proxy server that overrides DNS responses with a fake IP.
 
     Args:
         fake_ip (str): The IP address to use for overriding DNS responses.
         stop_flag (threading.Event): A flag to stop the DNS server.
-    """
-    global OVERRIDE_IP
+    '''
 
-    OVERRIDE_IP = fake_ip
-
+    OVERRIDE_IP = args_parser()
     original_stdout = sys.stdout  # Save the original stdout
-    sys.stdout = open(os.devnull, 'w')  # Redirect stdout to null
-    
+
     # Create a resolver instance
     resolver = OverrideDNSResolver()
-    
+
     # Bind the DNS server to the localhost and port 53
     server = DNSServer(resolver, port=53, address="0.0.0.0", tcp=False)
-    
+
     # Start the server
     print("Starting DNS server on 0.0.0.0:53...")
     server.start_thread()
-    
-    while not stop_flag.is_set():
-        pass
 
-    server.stop()
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        server.stop()
+
+
+if __name__ == "__main__":
+    main()

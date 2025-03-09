@@ -1,10 +1,9 @@
-import subprocess
 import os
-import signal
-import threading
+import time
 from modules.tasks_management import DAEMONS_MANAGER, Task
 from modules.file_transfer import download
 from modules.utility import sd_path
+from modules.adb import get_session_device_id
 
 MIRRORING_TASK_ID = -1
 VIDEO_TASK_ID = -1
@@ -30,8 +29,10 @@ def stop_mirroring(user_input):
         user_input (str): User input (not used in this function).
     """
     global MIRRORING_TASK_ID
-    DAEMONS_MANAGER.stop_task('mirroring', MIRRORING_TASK_ID)
-    MIRRORING_TASK_ID = -1
+    
+    if MIRRORING_TASK_ID != -1:
+        DAEMONS_MANAGER.stop_task('mirroring', MIRRORING_TASK_ID)
+        MIRRORING_TASK_ID = -1
 
 def screenshot(user_input):
     """
@@ -47,7 +48,7 @@ def screenshot(user_input):
 
     print(mobile_path)
     dest_path = './'
-    command = ['adb','shell','screencap','-p',mobile_path]
+    command = ['adb', '-s', get_session_device_id(), 'shell','screencap','-p',mobile_path]
     output, error = Task().run(command)
 
     download(mobile_path, dest_path)
@@ -68,7 +69,7 @@ def record_video(user_input):
         MOBILE_VIDEO_PATH = MOBILE_VIDEO_PATH.replace(os.sep, "/")
 
     print(MOBILE_VIDEO_PATH)
-    command = ['adb','shell','screenrecord',MOBILE_VIDEO_PATH]
+    command = ['adb','-s', get_session_device_id(), 'shell','screenrecord',MOBILE_VIDEO_PATH]
     VIDEO_TASK_ID = DAEMONS_MANAGER.add_task('video', command)
 
 def stop_recording(user_input):
@@ -79,7 +80,11 @@ def stop_recording(user_input):
         user_input (str): User input (not used in this function).
     """
     global VIDEO_TASK_ID, MOBILE_VIDEO_PATH 
-    dest_path = './'
+    
+    dest_path = 'results/screen_recordings'
+    os.makedirs(dest_path, exist_ok=True)
+
     if MOBILE_VIDEO_PATH != '':
         DAEMONS_MANAGER.stop_task('video', VIDEO_TASK_ID)
+        time.sleep(10)
         download(MOBILE_VIDEO_PATH, dest_path)

@@ -1,19 +1,14 @@
-import config.menu as menu
-import subprocess
-import netifaces
-import ipaddress
-import threading
-import time
-import socket
-from modules import dns_spoofing
 import sys
+import netifaces
 import ipaddress
 from modules.tasks_management import Task, DAEMONS_MANAGER
 import platform
 import re
 from tabulate import tabulate
+from modules.utility import loading_animation
+from modules.adb import get_session_device_id
 
-DNS_END = False
+DNS_TASK_ID = -1
 
 def pc_wifi_ip():
     """
@@ -68,7 +63,7 @@ def get_proxy():
     Returns:
         str: The current proxy settings.
     """
-    command = ['adb', 'shell', 'settings', 'get', 'global', 'http_proxy']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'get', 'global', 'http_proxy']
     output, error = Task().run(command)
 
     return output.strip()
@@ -80,7 +75,7 @@ def del_proxy(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', ':0']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'http_proxy', ':0']
     output, error = Task().run(command)
 
     print("Proxy removed on mobile device")
@@ -154,75 +149,12 @@ def set_proxy(ip, port):
         ip (str): The IP address to use for the proxy.
         port (str): The port number to use for the proxy.
     """
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', f'{ip}:{port}']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'http_proxy', f'{ip}:{port}']
     output, error = Task().run(command)
 
     print("Proxy set on mobile device:", end=" ")
     print(get_proxy())
 
-class thread_with_trace(threading.Thread):
-    def __init__(self, *args, **keywords):
-        """
-        Initialize a thread_with_trace instance.
-        """
-        threading.Thread.__init__(self, *args, **keywords)
-        self.killed = False
-
-    def start(self):
-        """
-        Start the thread.
-        """
-        self.__run_backup = self.run
-        self.run = self.__run      
-        threading.Thread.start(self)
-
-    def __run(self):
-        """
-        Run the thread with trace.
-        """
-        sys.settrace(self.globaltrace)
-        self.__run_backup()
-        self.run = self.__run_backup
-
-    def globaltrace(self, frame, event, arg):
-        """
-        Global trace function for the thread.
-
-        Args:
-            frame: The current stack frame.
-            event: The event type.
-            arg: The event argument.
-
-        Returns:
-            function: The local trace function.
-        """
-        if event == 'call':
-            return self.localtrace
-        else:
-            return None
-
-    def localtrace(self, frame, event, arg):
-        """
-        Local trace function for the thread.
-
-        Args:
-            frame: The current stack frame.
-            event: The event type.
-            arg: The event argument.
-
-        Returns:
-            function: The local trace function.
-        """
-        if self.killed:
-            if event == 'line':
-                raise SystemExit()
-        return self.localtrace
-
-    def kill(self):
-        """
-        Kill the thread.
-        """
-        self.killed = True
 
 # Main function
 def dns_proxy(target_ip):
@@ -232,14 +164,17 @@ def dns_proxy(target_ip):
     Args:
         target_ip (str): The target IP address for DNS spoofing.
     """
-    global dns_thread, stop_flag
-    # Start DNSChef in a separate thread
-    stop_flag = threading.Event()
-    dns_thread = thread_with_trace(target=dns_spoofing.dns_proxy, args=(target_ip,stop_flag))
-    dns_thread.start()
+    global DNS_TASK_ID, DAEMONS_MANAGER
 
-    # Here you can perform other tasks in the main thread
-    print("DNS Server is running...")
+    if DNS_TASK_ID == -1:
+        # Get the next available ID from the DAEMONS_MANAGER
+        DNS_TASK_ID = DAEMONS_MANAGER.get_next_id()
+        # Add a new DNS task to the DAEMONS_MANAGER
+        DAEMONS_MANAGER.add_task('dns', [sys.executable, 'modules/dns_spoofing.py', target_ip])
+
+        additional_info = {'Fake DNS IP':target_ip,}
+        DAEMONS_MANAGER.add_info('dns', DNS_TASK_ID, additional_info)
+
 
 def get_current_dns_proxy(user_input):
     """
@@ -295,7 +230,7 @@ def set_current_pc_dns_proxy(user_input):
     if current_os == "Windows":
         print("(Disable the Microsoft Windows firewall)")
 
-    command = ['adb', 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
 
     # Get the current Wi-Fi SSID
@@ -320,7 +255,7 @@ def set_current_pc_dns_proxy(user_input):
     if pc_ssid!=mobile_ssid:
         print("\nPlease connect the mobile device and the current PC to the same network!!!")
 
-    command = ['adb', 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
     x=input("Press ENTER to launch the DNS Server...\n")
 
@@ -352,11 +287,12 @@ def set_generic_dns_proxy(user_input):
         
     print("\nSet the DNS1 and DNS2 on mobile device at: "+remote_ip)
     print("(If on Windows, disable the firewall)")
-    command = ['adb', 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
 
     x=input("Press ENTER to launch the DNS Server (or CTRL+C to stop the operation)...\n")
     dns_proxy(remote_ip)
+
 
 def del_dns_proxy(user_input):
     """
@@ -365,22 +301,97 @@ def del_dns_proxy(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    global dns_thread, stop_flag
-    stop_flag.set()
-    dns_thread.join()
-    
+    global DNS_TASK_ID, DAEMONS_MANAGER
+
+    if DNS_TASK_ID != -1:
+        DAEMONS_MANAGER.stop_task('dns', DNS_TASK_ID)
+        DNS_TASK_ID = -1
+        loading_animation("Stopping DNS Server", 3, 30)
+        print("DNS Server STOPPED!!!\n")
+
 
 def get_current_invisible_proxy(user_input):
-    pass
+    command = ['adb', '-s', get_session_device_id(), 'shell']
+    shell_input = [ "su root",
+                   """iptables -t nat -L OUTPUT -v -n | grep 'DNAT' | awk '{print $NF}' | cut -d: -f2"""]
+    
+    output, error = Task().run(command, input_to_cmd=shell_input)
+    print(output)
+
 
 def set_current_pc_invisible_proxy(user_input):
-    pass
+    # Get the current Wi-Fi SSID
+    pc_ssid = get_current_pc_wifi_ssid()
+    mobile_ssid = get_mobile_wifi_ssid()
+
+    print("\nWi-Fi SSIDs")
+    row_list = []
+    
+    if pc_ssid:
+        row_list.append(["Current PC",pc_ssid])
+    else:
+        row_list.append(["Current PC","Undetectable"])
+
+    if pc_ssid:
+        row_list.append(["Mobile Device",mobile_ssid])
+    else:
+        row_list.append(["Mobile Device","Undetectable"])
+
+    print(tabulate(row_list, headers=['Device', 'Wi-Fi SSID'], tablefmt='fancy_grid'))
+
+    if pc_ssid!=mobile_ssid:
+        print("\nPlease connect the mobile device and the current PC to the same network!!!")
+
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+    output, error = Task().run(command)
+    x=input("Press ENTER to launch the DNS Server...\n")
+
+    set_invisible_proxy(pc_wifi_ip())
 
 def set_generic_invisible_proxy(user_input):
-    pass
+    remote_ip = ''
+
+    try:
+        remote_ip = ipaddress.ip_address(user_input)
+    except ValueError:
+        remote_ip = ''
+        print('Address is invalid')
+    
+    while remote_ip == '':
+        try:
+            user_input = input("Enter adress: ")
+            remote_ip = ipaddress.ip_address(user_input)
+        except ValueError:
+            remote_ip = ''
+            print('Address is invalid')
+
+    set_invisible_proxy(remote_ip)
+
+
+def set_invisible_proxy(target_ip):
+    command = ['adb', '-s', get_session_device_id(), 'shell']
+    shell_input = [ "su root",
+                   f"iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination {target_ip}:443",
+                   f"iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination {target_ip}:80",
+                   "iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE",
+                   "iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE"
+                ]
+    
+    output, error = Task().run(command, input_to_cmd=shell_input)
+    print(output)
+
 
 def del_invisible_proxy(user_input):
-    pass
+    # flush previous configuration
+    #iptables -t nat -F
+    command = ['adb', '-s', get_session_device_id(), 'shell']
+    shell_input = [ "su root",
+                   "iptables -t nat -F"
+                ]
+    
+    output, error = Task().run(command, input_to_cmd=shell_input)
+    print(output)
+
 
 def get_current_pc_wifi_ssid():
     """
@@ -424,11 +435,16 @@ def get_mobile_wifi_ssid():
     Returns:
         str: The current Wi-Fi SSID.
     """
-    command = ['adb', 'shell', 'dumpsys', 'netstats', '|', 'grep', '-E', 'iface=wlan.*networkId']
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'netstats', '|', 'grep', '-E', 'iface=wlan.*networkId']
     output, error = Task().run(command)
 
-    REGEX_SSID = r'networkId=\"(.*)\"'
-    x = re.search(REGEX_SSID, output.splitlines()[0])
+    x = None 
+    
+    if output:
+        REGEX_SSID = r'networkId=\"(.*)\"'
+        x = re.search(REGEX_SSID, output.splitlines()[0])
+    else:
+        return None
 
     if x:
         return x.group(1)
