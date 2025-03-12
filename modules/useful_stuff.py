@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 from modules import utility
 import subprocess
 from prompt_toolkit import print_formatted_text
@@ -103,49 +109,6 @@ def screen_lock_enabled(user_input):
     output, error = Task().run(command, is_shell=True)
     print(output)
 
-
-def screen_lock_disabled(user_input):
-    """
-    Disable screen lock on the mobile device by entering the PIN.
-
-    Args:
-        user_input (str): User input (not used in this function).
-    """
-    while True:
-        try:
-            pin = int(input("Write the pin to unlock the device"))
-            break
-        except ValueError:
-            pass
-
-    # Click LOCK button (26)
-    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'keyevent','26']
-    print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-    print(stdout)
-
-    # Swipe from bottom to top
-    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'swipe','500','1500', '500', '100']
-    print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-    print(stdout)
-
-    # Insert the PIN of the user
-    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'text', pin]
-    print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-    print(stdout)
-
-    # Click ENTER button (66)
-    command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'keyevent','66']
-    print(command)
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    stdout, stderr = process.communicate()
-
-    print(stdout)
 
 def general_info(user_input):
     """

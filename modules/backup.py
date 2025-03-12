@@ -1,4 +1,10 @@
-from modules import utility
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
+from modules.utility import app_id_from_user_input, current_date
 import os
 import tarfile
 from modules.tasks_management import Task
@@ -12,11 +18,14 @@ def app_backup(user_input : str):
         user_input (str): The App ID of the application to backup.
     """
     # Retrieve App ID from user input
-    app_id = utility.app_id_from_user_input(user_input)
+    app_id = app_id_from_user_input(user_input)
 
     # Create Backup file for the App ID specified as user input
     # adb backup -apk -f backup_<app_id>.ab <app_id>
-    backup_name = "backup_"+app_id
+    backup_folder = os.path.join("results",app_id, "backup")
+    os.makedirs(backup_folder, exist_ok=True)
+    now = current_date()
+    backup_name = os.path.join(backup_folder,f"{now}_backup")
     command = ['adb', '-s', get_session_device_id(), 'backup',"-apk","-f", backup_name+".ab", app_id]
     print(" ".join(command))
     output, error = Task().run(command, is_shell=True)
@@ -37,7 +46,11 @@ def device_backup(user_input : str):
         user_input (str): User input (not used in this function).
     """
     # Backup of the device, including all data and apps
-    backup_name = "backup_device"
+    backup_folder = os.path.join("results", "device", "backup")
+    os.makedirs(backup_folder, exist_ok=True)
+    now = current_date()
+
+    backup_name = os.path.join(backup_folder, f"{now}_device_backup")
     command = ['adb','-s', get_session_device_id(), 'backup',"-apk","-shared", "-all", "-f", backup_name+".ab"]
     print(command)
     output, error = Task().run(command, is_shell=True)
@@ -60,23 +73,26 @@ def tar_extract(user_input : str):
     # Collect the password of the Android Backup file from stdin
     password = input("Insert the password used on the mobile device for the backup:\n")
     # Unpack the Android Backup file using ABE and save it to <backup_name>.tar file
-    tar_file = user_input.replace(".ab", ".tar")
+    now = current_date()
+    backup_name = user_input.replace(".ab", "")
+    tar_from_ab_folder = os.path.join("results", backup_name, "tar_from_ab")
+    tar_file = os.path.join(tar_from_ab_folder, f"{now}_{backup_name}.tar")
+
+    os.makedirs(tar_from_ab_folder,exist_ok=True)
     command = ['abe', 'unpack', user_input, tar_file, password]
     print(command)
     output, error = Task().run(command, is_shell=True)
 
     print(error)
 
-    # Create the directory for the unpacked TAR file
-    folder = user_input.replace(".ab", "")
-
-    os.makedirs(folder, exist_ok=True)
+    extract_folder = os.path.join(tar_from_ab_folder, f"{now}_{backup_name}")
+    os.makedirs(extract_folder, exist_ok=True)
 
     # Extract the TAR file in the destination folder 
     with tarfile.open(tar_file, "r") as tar:
-        tar.extractall(path=folder)
+        tar.extractall(path=extract_folder)
 
-    print(f"\nTAR Extracted in: {folder}")
+    print(f"\nTAR Extracted in: {extract_folder}")
 
 def ab_to_tar_extract(backup_name):
     """
@@ -126,7 +142,7 @@ def app_data_reset(user_input):
         user_input (str): The App ID of the application to reset.
     """
     # Retrieve App ID from user input
-    app_id = utility.app_id_from_user_input(user_input)
+    app_id = app_id_from_user_input(user_input)
     
     # Reset App data for the application with App ID <app_id>
     command = ['adb','-s', get_session_device_id(), 'shell',"pm","clear",app_id]

@@ -1,10 +1,15 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import subprocess
 import threading
 from modules.utility import cmd_to_subprocess_string 
 from tabulate import tabulate
 import copy
 from termcolor import colored
-import configparser
 import os
 
 class DaemonTask():

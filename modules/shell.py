@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import subprocess
 from modules.adb import get_session_device_id
 import config.style as tool_style

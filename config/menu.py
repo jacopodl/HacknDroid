@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 from modules import adb, apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
 import modules.tasks_management
 

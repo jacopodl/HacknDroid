@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 STYLE = {
     'section': 'bg:#ffffff bold black',
     'section1': 'bg:#dd0000 bold white',

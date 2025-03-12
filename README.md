@@ -5,6 +5,8 @@ The script is used for the automation of some MAPT activities and the interactio
 - the retrieving of the application data (APKs, Shared preferences, Stored data) needs to be found and retrieved with several commands;
 - the unpacking process of the application APK need a merge phase for application with multiple APKs in `/data/app/{app_id}_{base64_unique_id}` for efficency purpouses
 
+Detailed list of available functionalities can be found [here](#script-features).
+
 ---
 
 ## Install
@@ -48,6 +50,9 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
   - [x] *Sequential tasks*
 
 ### Functionalities
+- [x] `apk_analysis`<br>Analysis of the APKs (apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in the files)
+  - [x] `from_apk_on_pc`
+  - [x] `from_mobile_device`
 - [x] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
   - [x] `compile`: Compile an apk file from the folder with decompiled and modified code
   - [x] `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
@@ -121,9 +126,8 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
     - [x] `reboot_bootloader`: Reboot the mobile device in bootloader mode
 
 ### Future functionalities
-- [ ] `apk_analysis`<br>Analysis of the APKs (signature schema verifier, apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in application files, etc.)
-  - [ ] `from_apk_on_pc`
-  - [ ] `from_mobile_device`
+- [ ] `apk_analysis`
+  - [ ] `signature_scheme_analysis`
   - [ ] `specific_technology`
     - [ ] Cordova
     - [ ] Flutter
@@ -141,3 +145,8 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 - [ ] `frida`: Use Frida for several functionalities
   - [ ] `function_hooking`
   - [ ] `script`
+
+### Tested on
+- [x] Windows
+- [ ] Linux
+- [ ] MacOS

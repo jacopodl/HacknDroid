@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import subprocess
 import re
 import os
@@ -386,3 +392,16 @@ def current_date():
     formatted_date = now.strftime("%Y-%m-%d_%H-%M-%S")
 
     return formatted_date
+
+
+def get_app_id_from_manifest(manifest_path):
+    import xml.etree.ElementTree as ET
+
+    # Parse the XML file
+    tree = ET.parse(manifest_path)
+    root = tree.getroot()
+
+    # Access the package name from the root element's attribute
+    package_name = root.attrib.get('package')
+
+    return package_name

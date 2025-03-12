@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import os
 import time
 from modules.tasks_management import DAEMONS_MANAGER, Task
@@ -81,7 +87,7 @@ def stop_recording(user_input):
     """
     global VIDEO_TASK_ID, MOBILE_VIDEO_PATH 
     
-    dest_path = 'results/screen_recordings'
+    dest_path = os.path.join("results","device","screen_recordings")
     os.makedirs(dest_path, exist_ok=True)
 
     if MOBILE_VIDEO_PATH != '':

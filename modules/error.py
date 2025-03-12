@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 class ADBConnectionException(Exception):
     """Custom exception for a specific error condition."""
     def __init__(self, message, code=None):

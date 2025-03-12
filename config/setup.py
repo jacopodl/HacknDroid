@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import configparser
 import json
 import shutil
@@ -9,7 +15,6 @@ import os
 import zipfile
 import platform
 import tarfile
-import sys
 from alive_progress import alive_bar
 from termcolor import colored
 
@@ -106,7 +111,7 @@ def download_file(url, destination):
     total_size_in_bytes = int(response.headers.get('Content-Length', 0))
     
     # Set up the progress bar with alive_bar
-    with alive_bar(total_size_in_bytes, bar='smooth', spinner='dots', unit=colored(' B', 'yellow')) as bar:
+    with alive_bar(total_size_in_bytes, bar='smooth', spinner='dots', unit=' B') as bar:
         # Open the file in write-binary mode
         with open(destination, 'wb') as file:
             # Iterate over the content in chunks
@@ -216,21 +221,22 @@ def github_dependencies():
                                         "@echo off\n",
                                         "setlocal\n",
                                         "REM Set the path to your JAR file\n",
-                                        f"""set JAR_FILE="{os.path.abspath("dependencies/JAR/"+GITHUB_DEPENDECIES[software]['final_name'])}"\n""",
+                                        f"""set JAR_FILE="{os.path.abspath(os.path.join(jar_folder, GITHUB_DEPENDECIES[software]['final_name']))}"\n""",
                                         "REM Run JAR file\n",
                                         "java -jar %JAR_FILE% %*\n",
                                         "endlocal"
                                     ]
+                            
+                            f.writelines(lines)
                         
                         else:
                             lines = [
-                                        f"""$JAR_FILE = "{os.path.abspath("dependencies/JAR/"+GITHUB_DEPENDECIES[software]['final_name'])}" """,
+                                        f"""$JAR_FILE = "{os.path.abspath(os.path.join(jar_folder, GITHUB_DEPENDECIES[software]['final_name']))}" """,
                                         """java -jar $JAR_FILE "$@" """
                                     ]
                             
+                            f.writelines(lines)
                             os.chmod(wrapper_path, 0o755) # 0o755 is the octal value for rwxr-xr-x
-                            
-                        f.writelines(lines)
 
 
 def get_latest_platformtools(sdk_path):

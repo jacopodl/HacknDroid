@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import config.menu as menu
 import config.style as tool_style
 
@@ -14,7 +20,6 @@ from termcolor import colored
 from modules.tasks_management import DAEMONS_MANAGER
 from modules.adb import del_session_device_id, select_device, start_adb_server
 from modules.error import ADBConnectionException, OptionNotAvailable
-import os
 
 class CLI():
 
@@ -211,6 +216,7 @@ class CLI():
             except KeyboardInterrupt:
                 # Cancel the current operation (input insertion by a user)
                 pass
+
             except EOFError:
                 # Clear the screen
                 clear()
@@ -220,6 +226,16 @@ class CLI():
                 
                 del_session_device_id()
                 break
+            
+            except Exception:
+                # Clear the screen
+                clear()
+                # Print the title
+                print(self._title_f.renderText(self._title))
+                print_formatted_text(HTML(f"An unexpected error was raised!!!"), style=self._style, end='\n\n')
+                
+                del_session_device_id()
+
 
         # Stop all the tasks
         DAEMONS_MANAGER.stop_all_tasks()

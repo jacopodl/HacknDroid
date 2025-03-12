@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import os
 import subprocess
 from modules.utility import app_id_from_user_input, active_app_id_from_user_input, current_date

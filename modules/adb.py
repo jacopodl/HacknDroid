@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import os
 from tabulate import tabulate
 from termcolor import colored
@@ -153,7 +159,11 @@ def del_session_device_id():
         config.read(config_file_path)
             
         if config.has_section('General') and config.has_option('General','adb_session_device'):
-            return config.remove_option('General', 'adb_session_device')
+            config.remove_option('General', 'adb_session_device')
+        
+        # Write the changes back to the config file
+        with open(config_file_path, 'w') as configfile:
+            config.write(configfile)
         
 def start_adb_server():
     env = None

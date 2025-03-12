@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 from modules.tasks_management import Task 
 from modules.adb import get_session_device_id
 

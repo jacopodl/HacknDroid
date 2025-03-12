@@ -1,5 +1,11 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import re
-from modules.utility import app_id_from_user_input, valid_apk_file
+from modules.utility import app_id_from_user_input, current_date, get_app_id_from_manifest, valid_apk_file
 from modules.file_transfer import download
 from modules.merge_apks import merge_from_dir
 import os
@@ -119,6 +125,9 @@ APK_ANALYSIS_DICT = {
     }
 }
 
+def signature_scheme_verifier():
+    """pm list packages -f"""
+
 def apk_analysis_from_device(user_input):
     """
     Analyze an APK from the device.
@@ -127,9 +136,9 @@ def apk_analysis_from_device(user_input):
         user_input (str): The App ID or keywords to identify the application.
     """
     # Get the APK from the device
-    apk_filepath = get_apk_from_device(user_input)
+    apk_filepath, app_id = get_apk_from_device(user_input)
     # Perform analysis on the APK file
-    perform_apk_analysis(apk_filepath)
+    perform_apk_analysis(apk_filepath, app_id)
 
 def apk_analysis_from_file(user_input):
     """
@@ -143,7 +152,7 @@ def apk_analysis_from_file(user_input):
     # Perform analysis on the APK file
     perform_apk_analysis(apk_filepath)
 
-def perform_apk_analysis(apk_filepath):
+def perform_apk_analysis(apk_filepath, app_id=None):
     """
     Perform analysis on an APK file.
 
@@ -153,9 +162,22 @@ def perform_apk_analysis(apk_filepath):
     global APK_ANALYSIS_DICT
     # Example analysis: Print the APK file path
     print(f"Analyzing APK: {apk_filepath}")
-    folder_path = apk_decompiler_from_file(apk_filepath)
     
-    output_files = {"Certificate Pinning Hints": "certificate_pinning_hints.csv" , "Root Detection Hints":"root_detection_hints.csv"}
+    now = current_date()
+    folder_path = apk_decompiler_from_file(apk_filepath, app_id)
+    
+    if app_id:
+        results_folder = os.path.join("results", app_id, "apk_analysis", now)
+    else:
+        results_folder = os.path.join("results", os.path.basename(apk_filepath).replace(".apk", ""), "apk_analysis", now)
+    
+    os.makedirs(results_folder, exist_ok = True)
+
+    output_files = {
+        "Certificate Pinning Hints": os.path.join(results_folder, "certificate_pinning_hints.csv"), 
+        "Root Detection Hints": os.path.join(results_folder, "root_detection_hints.csv")
+    }
+
     results = analyse_apk(folder_path, APK_ANALYSIS_DICT, output_files)
 
     choice = 'x'
@@ -251,7 +273,7 @@ def get_apk_from_device(user_input, check_for_merge=False):
         java -jar 
     '''
     # Transfer APKs of the app with info provided in the user input (App ID or words belonging to the App ID)
-    num_apks, app_folder = transfer_apks_from_device(user_input)
+    num_apks, app_folder, app_id = transfer_apks_from_device(user_input)
 
     apk_name = ''
     if num_apks > 1:
@@ -272,7 +294,7 @@ def get_apk_from_device(user_input, check_for_merge=False):
         apk_files = [os.path.join(app_folder,f) for f in os.listdir(app_folder) if f.endswith('.apk')]
         apk_name = apk_files[0]
 
-    return apk_name
+    return apk_name, app_id
 
 
 def apk_decompiler_from_device(user_input):
@@ -284,15 +306,15 @@ def apk_decompiler_from_device(user_input):
     """
 
     # Get the APK from the device
-    apk_filepath = get_apk_from_device(user_input)
+    apk_filepath, app_id = get_apk_from_device(user_input)
     print(apk_filepath)
 
     # Decompile the program
     # apktool d APP.apk -o <dir>
-    apk_decompiler_from_file(apk_filepath)
+    apk_decompiler_from_file(apk_filepath, app_id)
     
 
-def apk_decompiler_from_file(user_input):
+def apk_decompiler_from_file(user_input, app_id=None):
     """
     Decompile an APK file
 
@@ -302,18 +324,27 @@ def apk_decompiler_from_file(user_input):
     
     # Check if the path is valid for an APK file
     apk_path = valid_apk_file(user_input)
+
     # Folder name for the decompiled APK is the name of the APK without extension 
-    dest_folder = os.path.basename(user_input).replace(".apk", "")
+    if app_id:
+        dest_folder = os.path.join("results", app_id, "decompiled")
+    else:
+        dest_folder = os.path.join("results", os.path.basename(apk_path).replace(".apk", ""), "decompiled")
+
+    os.makedirs(dest_folder, exist_ok=True)
+
+    now = current_date()
+    decompiled_folder = os.path.join(dest_folder, now)
 
     # Decompile the program
     # apktool d APP.apk -o <dir>
-    command = ['apktool','d', user_input, "-o", dest_folder]
-    print(command)
+    command = ['apktool','d', user_input, "-o", decompiled_folder]
 
+    print("Decompiling the APK...", end=" ")
     output, error = Task().run(command, is_shell=True)
-    print(output)
+    print("DONE")
 
-    return dest_folder
+    return decompiled_folder
 
 
 def jar_from_device(user_input):
@@ -325,9 +356,9 @@ def jar_from_device(user_input):
     """
 
     # Get the APKs of the App from the device
-    apk_filepath = get_apk_from_device(user_input)
+    apk_filepath, app_id = get_apk_from_device(user_input)
     # Create the JAR file from the APKs
-    create_jar_from_apk_path(apk_filepath)
+    create_jar_from_apk_path(apk_filepath, app_id)
 
 
 def jar_from_file(user_input):
@@ -343,7 +374,7 @@ def jar_from_file(user_input):
     create_jar_from_apk_path(apk_path)
 
 
-def create_jar_from_apk_path(apk_filepath):
+def create_jar_from_apk_path(apk_filepath, app_id=None):
     """
     Create the JAR file from an APK file
 
@@ -354,7 +385,23 @@ def create_jar_from_apk_path(apk_filepath):
     # Create the JAR file with the following command
     # d2j-dex2jar <apk-path> --force <jar-filename>
     # --force to overwrite current JAR file
-    command = ['d2j-dex2jar', apk_filepath, "--force", "-o", os.path.basename(apk_filepath).replace(".apk",".jar")]
+    
+    now = current_date()
+
+    if app_id:
+        jar_folder = os.path.join("results", app_id, "jar")
+    else:
+        jar_folder = os.path.join("results", os.path.basename(apk_filepath).replace(".apk",""), "jar")
+    
+    os.makedirs(jar_folder, exist_ok=True)
+
+    print(app_id)
+    if app_id:
+        jar_path = os.path.join(jar_folder,f"{now}_{app_id}.jar")
+    else:
+        jar_path = os.path.join(jar_folder, f"{now}_"+os.path.basename(apk_filepath).replace(".apk",".jar"))
+
+    command = ['d2j-dex2jar', apk_filepath, "--force", "-o", jar_path]
     print(command)
     output, error = Task().run(command, is_shell=True)
     print(output)
@@ -369,7 +416,7 @@ def jadx_from_device(user_input):
     """
 
     # Get the APK from the device
-    apk_filepath = get_apk_from_device(user_input)    
+    apk_filepath, app_id = get_apk_from_device(user_input)    
     # Open JADX on the APK file specified by the user
     jadx_run_on_apk_file(apk_filepath)
     
@@ -415,25 +462,33 @@ def apk_compile_from_folder(user_input):
     """
 
     # Check that the user input is a valid folder
-    while not os.path.exists(user_input):
+    while (not os.path.exists(user_input)) or \
+          (not os.path.exists(os.path.join(user_input, "AndroidManifest.xml"))) or \
+           (not os.path.exists(os.path.join(user_input, "apktool.yml"))):
         user_input = input("Write the path of the folder with code to be compiled:\n")
+
+    app_id = get_app_id_from_manifest(os.path.join(user_input, "AndroidManifest.xml"))
 
     # Compile the program
     # apktool b <folder> -o <folder>.apk
-    command = ['apktool','b', user_input, "-o", f"{user_input}.apk"]
-    print(command)
+    now = current_date()
+    compiled_folder = os.path.join("results", app_id, "compiled", now)
+    os.makedirs(compiled_folder, exist_ok=True)
+
+    print("Compiling the APK file...", end=" ")
+    command = ['apktool','b', user_input, "-o", os.path.join(compiled_folder, f"{app_id}.apk")]
     output, error = Task().run(command, is_shell=True)
-    print(output)
+    print("DONE")
 
     # Zipalign is a zip archive alignment tool that helps ensure that all uncompressed files in the archive are aligned
     # relative to the start of the file. Zipalign tool can be found in the “Build Tools” folder within the Android SDK path.
     # zipalign -v 4 <recompiled_apk.apk> <zipaligned_apk.apk>
-    command = ['zipalign', '-v', '4', f"{user_input}.apk", f"zipaligned_{user_input}.apk"]
-    print(command)
+    print("ZIP-aligning the APK file...", end=" ")
+    command = ['zipalign', '-v', '4', os.path.join(compiled_folder, f"{app_id}.apk"), os.path.join(compiled_folder, f"zipaligned_{app_id}.apk")]
     output, error = Task().run(command, is_shell=True)
-    print(output)
+    print("DONE")
 
-    return f"zipaligned_{user_input}.apk"
+    return os.path.join(compiled_folder, f"zipaligned_{app_id}.apk")
 
 def apk_compile_and_sign_from_folder(user_input):
     """
@@ -450,8 +505,13 @@ def apk_compile_and_sign_from_folder(user_input):
 
     # Compile and zip-align a source folder
     apk_file = apk_compile_from_folder(user_input)
+    
+    dir_name, file_name = os.path.split(apk_file)
+    signed_file = os.path.join(dir_name, file_name.replace("zipaligned_", "signed_"))
+    shutil.copy(apk_file, signed_file)
+    
     # Sign the APK file created
-    sign_apk(apk_file)
+    sign_apk(apk_file, signed_file)
 
 
 def transfer_apks_from_device(user_input):
@@ -471,6 +531,9 @@ def transfer_apks_from_device(user_input):
 
     # Identify the subfolder of /data/app/ for the user-installed app
     # (a subfolder has the format '<app-id>-<uuid>')
+    # Note: the apk folder can be also downloaded without root permission 
+    # pm list packages -f (to print the path of the apks for each package)
+    # adb pull <apk_package_path> <pc_path>
     print("GET APKS: "+app_id)
     command = ['adb', '-s', get_session_device_id(), 'shell']
     shell_input = ["su root",f'ls {DATA_APP_FOLDER} | grep "{app_id}"', "exit"]
@@ -482,21 +545,16 @@ def transfer_apks_from_device(user_input):
     app_folder = output.strip()
     print(app_folder)
 
+    results_folder = os.path.join('results', app_id, "data_folder")
+
     # Create a .tmp folder on the current PC
-    os.makedirs(".tmp", exist_ok=True)
-
-    # Remove the folder with APKs of the specified App
-    if os.path.exists(f".tmp/{app_folder}"):
-        shutil.rmtree(f".tmp/{app_folder}")
-
-    # Remove the folder with name <app-id> if already exists in .tmp
-    if os.path.exists(f".tmp/{app_id}"):
-        shutil.rmtree(f".tmp/{app_id}")
+    os.makedirs(results_folder, exist_ok=True)
+    now = current_date()
 
     # Download the App folder to the .tmp
-    download(f"{DATA_APP_FOLDER}/{app_folder}", ".tmp")
+    download(f"{DATA_APP_FOLDER}/{app_folder}", results_folder)
     # Rename the folder .tmp/<app-id>-<uuid> to .tmp/<app-id>
-    os.rename(f".tmp/{app_folder}", f".tmp/{app_id}")
+    os.rename(os.path.join(results_folder, app_folder), os.path.join(results_folder, f"{now}_data_apk_folder"))
 
     
-    return len(glob.glob(f'.tmp/{app_id}/*.apk', )), f".tmp/{app_id}"
+    return len(glob.glob(os.path.join(results_folder, f"{now}_data_apk_folder")+'/*.apk', )), os.path.join(os.path.join(results_folder, f"{now}_data_apk_folder")), app_id
