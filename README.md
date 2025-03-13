@@ -39,95 +39,116 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 
 ---
 
-
 ## Script features
 ### Task Manager
-  - [x] *Daemon tasks*
-    - [x] logcat
-    - [x] mirroring
-    - [x] proxy with dns spoofing
-    - [x] video recoding
-  - [x] *Sequential tasks*
+- ***Daemon tasks***
+  - logcat
+  - mirroring
+  - proxy with dns spoofing
+  - video recoding
+- ***Sequential tasks***
 
 ### Functionalities
-- [x] `apk_analysis`<br>Analysis of the APKs (apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in the files)
-  - [x] `from_apk_on_pc`
-  - [x] `from_mobile_device`
-- [x] `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
-  - [x] `compile`: Compile an apk file from the folder with decompiled and modified code
-  - [x] `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
-- [x] `apk_decompiling`<br>Decompile an APK file
-  - [x] `from_apk_on_pc`: 
-  - [x] `from_mobile_device`: 
-- [x] `apk_to_jar`<br>Convert the apk to a jar file
-  - [x] `from_apk_on_pc`: 
-    - [x] `create_jar_file`: 
-    - [x] `jadx_create_and_open_file`: 
-  - [x] `from_mobile_device`: 
-    - [x] `create_jar_file`: 
-    - [x] `jadx_create_and_open_file`: 
-- [x] `backup_and_data`<br>Backup the mobile device or an application
-  - [x] `backup_device`: Backup the mobile device
-  - [x] `backup_specific_app`: Backup a specific app specifing its app ID
-  - [x] `backup_restore`: Specify the backup file path on your system
-  - [x] `backup_to_folder`: Convert the AB file to an unpacked folder
-  - [x] `reset_app_data`: Reset App data
-- [x] `download_from_mobile`<br>Download file from the mobile device
-- [x] `install_uninstall`<br>Install/Uninstall an app on the mobile device
-  - [x] `install_from_apk`
-  - [x] `install_from_playstore`
-  - [x] `uninstall`
-- [x] `merge_apks`<br>Merge several APKs using APKEditor
-  - [x] `from_directory`
-  - [x] `from_list`
-- [x] `mirroring`<br>Launch scrcpy for mobile device mirroring
-- [x] `proxy`<br>Set global proxy on the mobile device
-  - [x] `system_proxy`
-    - [x] `get_current_proxy`
-    - [x] `set_proxy_with_current_ip`
-    - [x] `set_proxy_with_other_ip`
-    - [x] `del_proxy`
-  - [x] `invisible_proxy`
-    - [x] `ip_tables`
-      - [x] `get_current_proxy`
-      - [x] `set_proxy_with_current_ip`
-      - [x] `set_proxy_with_other_ip`
-      - [x] `del_proxy`
-    - [x] `dns`
-      - [x] `get_current_proxy`
-      - [x] `dns_server_with_current_ip`
-      - [x] `dns_server_with_another_ip`
-- [x] `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
-- [x] `track_logs`<br>Logs gathering
-  - [x] `all_logs`
-  - [x] `all_crash_logs`
-- [x] `upload_to_mobile`<br>Upload a file from PC to mobile device
-- [x] `useful_staffs`
-  - [x] `device_info`
-    - [x] `apps_list`
-      - [x] `3rd_party_apps`: Get list of all the installed 3rd-party apps
-      - [x] `system_apps`: Get list of all the installed system apps
-    - [x] `cpu_info`: Get CPU information
-    - [x] `general_info`: Get mobile device general information
-    - [x] `ram_info`: Get RAM information
-    - [x] `storage_info`: Get Storage information
-  - [x] `battery_saver`: Battery Saver mode (ON/OFF)
-  - [x] `do_not_disturb_mode`: Do Not Disturb mode (ON/OFF)
-  - [x] `connectivity`: Connectivity options management
-    - [x] `wifi`: Wifi option Management (ON/OFF)
-    - [x] `airplane`: Airplane mode Management (ON/OFF)
-  - [x] `screenshot_video`: Screenshot/Video on the mobile device
-    - [x] `screenshot`
-    - [x] `video`
-  - [x] `shutdown`<br>Shutdown/Reboot the device with several options
-    - [x] `shutdown`: Shutdown the mobile device
-    - [x] `reboot`: Reboot the mobile device
-    - [x] `reboot_recovery`: Reboot the mobile device in recovery mode
-    - [x] `reboot_bootloader`: Reboot the mobile device in bootloader mode
+- `apk_analysis`<br>Analysis of the APKs (apk decompiling, search for common Root Detection, Certificate Pinning, SHA1-SHA256 strings in the files)
+  - `from_apk_on_pc`
+  - `from_mobile_device`
+- `app_info`
+  - `from_apk_on_pc`
+  - `from_mobile_device`
+- `apk_compiling`<br>Compile an APK file from the folder with decompiled and modified code
+  - `compile`: Compile an apk file from the folder with decompiled and modified code
+  - `compile_and_sign`: Compile and sign an apk file from the folder with decompiled and modified code
+- `apk_decompiling`<br>Decompile an APK file
+  - `from_apk_on_pc`: 
+  - `from_mobile_device`: 
+- `apk_to_jar`<br>Convert the apk to a jar file
+  - `from_apk_on_pc`: 
+    - `create_jar_file`: 
+    - `jadx_create_and_open_file`: 
+  - `from_mobile_device`: 
+    - `create_jar_file`: 
+    - `jadx_create_and_open_file`: 
+- `backup_and_data`<br>Backup the mobile device or an application
+  - `backup_device`: Backup the mobile device
+  - `backup_specific_app`: Backup a specific app specifing its app ID
+  - `backup_restore`: Specify the backup file path on your system
+  - `backup_to_folder`: Convert the AB file to an unpacked folder
+  - `reset_app_data`: Reset App data
+- `download_from_mobile`<br>Download file from the mobile device
+- `install_uninstall`<br>Install/Uninstall an app on the mobile device
+  - `install_from_apk`
+  - `install_from_playstore`
+  - `uninstall`
+- `merge_apks`<br>Merge several APKs using APKEditor
+  - `from_directory`
+  - `from_list`
+- `mirroring`<br>Launch scrcpy for mobile device mirroring
+- `proxy`<br>Set global proxy on the mobile device
+  - `system_proxy`
+    - `get_current_proxy`
+    - `set_proxy_with_current_ip`
+    - `set_proxy_with_other_ip`
+    - `del_proxy`
+  - `invisible_proxy`
+    - `ip_tables`
+      - `get_current_proxy`
+      - `set_proxy_with_current_ip`
+      - `set_proxy_with_other_ip`
+      - `del_proxy`
+    - `dns`
+      - `get_current_proxy`
+      - `dns_server_with_current_ip`
+      - `dns_server_with_another_ip`
+- `sign_apk`<br>Sign an apk on your PC. Write the path of the apk you want to test
+- `track_logs`<br>Logs gathering
+  - `all_logs`
+  - `all_crash_logs`
+- `upload_to_mobile`<br>Upload a file from PC to mobile device
+- `useful_staffs`
+  - `device_info`
+    - `apps_list`
+      - `3rd_party_apps`: Get list of all the installed 3rd-party apps
+      - `system_apps`: Get list of all the installed system apps
+    - `cpu_info`: Get CPU information
+    - `general_info`: Get mobile device general information
+    - `ram_info`: Get RAM information
+    - `storage_info`: Get Storage information
+  - `battery_saver`: Battery Saver mode (ON/OFF)
+  - `do_not_disturb_mode`: Do Not Disturb mode (ON/OFF)
+  - `connectivity`: Connectivity options management
+    - `wifi`: Wifi option Management (ON/OFF)
+    - `airplane`: Airplane mode Management (ON/OFF)
+  - `screenshot_video`: Screenshot/Video on the mobile device
+    - `screenshot`
+    - `video`
+  - `shutdown`<br>Shutdown/Reboot the device with several options
+    - `shutdown`: Shutdown the mobile device
+    - `reboot`: Reboot the mobile device
+    - `reboot_recovery`: Reboot the mobile device in recovery mode
+    - `reboot_bootloader`: Reboot the mobile device in bootloader mode
+
+---
+
+### Tested on
+- [x] Windows
+- [ ] Linux
+- [ ] MacOS
+
+---
 
 ### Future functionalities
+***Task management***
+- [ ] Modular selection of paths where operations are performed
+- [ ] Executable creation
+- [ ] Run the script even if the mobile device is not connected (enable only functionalities that doesn't need the device)
+- [ ] Not interactive execution
+- [ ] Web interface (Flask)
+- [ ] GUI
+- [ ] Emulator Management
+
+***Functionalities***
 - [ ] `apk_analysis`
-  - [ ] `signature_scheme_analysis`
+  - [ ] Signature scheme analysis, exported properties
   - [ ] `specific_technology`
     - [ ] Cordova
     - [ ] Flutter
@@ -145,8 +166,3 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 - [ ] `frida`: Use Frida for several functionalities
   - [ ] `function_hooking`
   - [ ] `script`
-
-### Tested on
-- [x] Windows
-- [ ] Linux
-- [ ] MacOS

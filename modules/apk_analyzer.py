@@ -5,7 +5,7 @@ Licensed under the Apache License v2.0
 """
 
 import re
-from modules.utility import app_id_from_user_input, current_date, get_app_id_from_manifest, valid_apk_file
+from modules.utility import app_id_from_user_input, current_date, valid_apk_file
 from modules.file_transfer import download
 from modules.merge_apks import merge_from_dir
 import os
@@ -136,9 +136,9 @@ def apk_analysis_from_device(user_input):
         user_input (str): The App ID or keywords to identify the application.
     """
     # Get the APK from the device
-    apk_filepath, app_id = get_apk_from_device(user_input)
+    apk_filepath = get_apk_from_device(user_input)
     # Perform analysis on the APK file
-    perform_apk_analysis(apk_filepath, app_id)
+    perform_apk_analysis(apk_filepath)
 
 def apk_analysis_from_file(user_input):
     """
@@ -152,7 +152,7 @@ def apk_analysis_from_file(user_input):
     # Perform analysis on the APK file
     perform_apk_analysis(apk_filepath)
 
-def perform_apk_analysis(apk_filepath, app_id=None):
+def perform_apk_analysis(apk_filepath):
     """
     Perform analysis on an APK file.
 
@@ -164,12 +164,10 @@ def perform_apk_analysis(apk_filepath, app_id=None):
     print(f"Analyzing APK: {apk_filepath}")
     
     now = current_date()
-    folder_path = apk_decompiler_from_file(apk_filepath, app_id)
+    folder_path = apk_decompiler_from_file(apk_filepath)
     
-    if app_id:
-        results_folder = os.path.join("results", app_id, "apk_analysis", now)
-    else:
-        results_folder = os.path.join("results", os.path.basename(apk_filepath).replace(".apk", ""), "apk_analysis", now)
+    app_id = app_info_from_apk(apk_filepath)["name"]
+    results_folder = os.path.join("results", app_id, "apk_analysis", now)
     
     os.makedirs(results_folder, exist_ok = True)
 
@@ -294,7 +292,7 @@ def get_apk_from_device(user_input, check_for_merge=False):
         apk_files = [os.path.join(app_folder,f) for f in os.listdir(app_folder) if f.endswith('.apk')]
         apk_name = apk_files[0]
 
-    return apk_name, app_id
+    return apk_name
 
 
 def apk_decompiler_from_device(user_input):
@@ -314,7 +312,7 @@ def apk_decompiler_from_device(user_input):
     apk_decompiler_from_file(apk_filepath, app_id)
     
 
-def apk_decompiler_from_file(user_input, app_id=None):
+def apk_decompiler_from_file(user_input):
     """
     Decompile an APK file
 
@@ -322,14 +320,14 @@ def apk_decompiler_from_file(user_input, app_id=None):
     user_input (str): Path of the APK file on the PC 
     """
     
+    print("Decompiling the APK...", end=" ")
     # Check if the path is valid for an APK file
     apk_path = valid_apk_file(user_input)
 
     # Folder name for the decompiled APK is the name of the APK without extension 
-    if app_id:
-        dest_folder = os.path.join("results", app_id, "decompiled")
-    else:
-        dest_folder = os.path.join("results", os.path.basename(apk_path).replace(".apk", ""), "decompiled")
+    app_id = app_info_from_apk(user_input)["name"]
+
+    dest_folder = os.path.join("results", app_id, "decompiled")
 
     os.makedirs(dest_folder, exist_ok=True)
 
@@ -340,7 +338,6 @@ def apk_decompiler_from_file(user_input, app_id=None):
     # apktool d APP.apk -o <dir>
     command = ['apktool','d', user_input, "-o", decompiled_folder]
 
-    print("Decompiling the APK...", end=" ")
     output, error = Task().run(command, is_shell=True)
     print("DONE")
 
@@ -358,7 +355,7 @@ def jar_from_device(user_input):
     # Get the APKs of the App from the device
     apk_filepath, app_id = get_apk_from_device(user_input)
     # Create the JAR file from the APKs
-    create_jar_from_apk_path(apk_filepath, app_id)
+    create_jar_from_apk_path(apk_filepath)
 
 
 def jar_from_file(user_input):
@@ -374,7 +371,7 @@ def jar_from_file(user_input):
     create_jar_from_apk_path(apk_path)
 
 
-def create_jar_from_apk_path(apk_filepath, app_id=None):
+def create_jar_from_apk_path(apk_filepath):
     """
     Create the JAR file from an APK file
 
@@ -388,18 +385,13 @@ def create_jar_from_apk_path(apk_filepath, app_id=None):
     
     now = current_date()
 
-    if app_id:
-        jar_folder = os.path.join("results", app_id, "jar")
-    else:
-        jar_folder = os.path.join("results", os.path.basename(apk_filepath).replace(".apk",""), "jar")
+    app_id = app_info_from_apk(apk_filepath)["name"]
+    jar_folder = os.path.join("results", app_id, "jar")
     
     os.makedirs(jar_folder, exist_ok=True)
 
     print(app_id)
-    if app_id:
-        jar_path = os.path.join(jar_folder,f"{now}_{app_id}.jar")
-    else:
-        jar_path = os.path.join(jar_folder, f"{now}_"+os.path.basename(apk_filepath).replace(".apk",".jar"))
+    jar_path = os.path.join(jar_folder,f"{now}_{app_id}.jar")
 
     command = ['d2j-dex2jar', apk_filepath, "--force", "-o", jar_path]
     print(command)
@@ -558,3 +550,87 @@ def transfer_apks_from_device(user_input):
 
     
     return len(glob.glob(os.path.join(results_folder, f"{now}_data_apk_folder")+'/*.apk', )), os.path.join(os.path.join(results_folder, f"{now}_data_apk_folder")), app_id
+
+
+def get_app_id_from_manifest(manifest_path):
+    import xml.etree.ElementTree as ET
+
+    # Parse the XML file
+    tree = ET.parse(manifest_path)
+    root = tree.getroot()
+
+    # Access the package name from the root element's attribute
+    package_name = root.attrib.get('package')
+
+    return package_name
+
+def print_app_info_from_device(user_input):
+
+    # Get the APK from the device
+    apk_filepath = get_apk_from_device(user_input)
+    info = app_info_from_apk(apk_filepath)
+
+    for k in info:
+        print(colored(f"{k}:", 'cyan'), end=" ")
+
+        if k == "permissions":
+            print("")
+            print('\n'.join(info[k]))
+        else:
+            print(info[k])
+
+    print("")
+
+def print_app_info_from_pc(user_input):
+
+    apk_filepath = valid_apk_file(user_input)
+    info = app_info_from_apk(apk_filepath)
+
+    for k in info:
+        print(colored(f"{k}:", 'cyan'), end=" ")
+
+        if k == "permissions":
+            print("")
+            print('\n'.join(info[k]))
+        else:
+            print(info[k])
+
+    print("")
+
+def app_info_from_apk(apk_filepath):
+    command = ['aapt','dump','badging',apk_filepath]
+    output, error = Task().run(command)
+
+    info =  {}
+
+    for line in output.splitlines():
+        if line.startswith("package: "):
+            package_values = line.replace("package:", "").strip()
+            
+            matches = re.findall(r"(\w+)='([\w\.]*)'", package_values)
+            
+            for match in matches:
+                info[match[0]] = match[1]
+
+        elif line.startswith("sdkVersion:"):
+            result = re.match(r"sdkVersion: '(.*)'", line)
+
+            if result:
+                print(result.group(1))
+
+        elif line.startswith("targetSdkVersion:"):
+            result = re.match(r"targetSdkVersion: '(.*)'", line)
+
+            if result:
+                print(result.group(1))
+
+        else:
+            result = re.match(r"uses-permission: name='(.*)'", line)
+
+            if result:
+                if 'permissions' not in info:
+                    info['permissions'] = []
+
+                info['permissions'].append(result.group(1))
+
+    return info

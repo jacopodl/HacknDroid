@@ -13,7 +13,6 @@ import requests
 from modules.adb import get_session_device_id
 from datetime import datetime
 
-
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
 def split_user_input(user_input):
@@ -392,16 +391,3 @@ def current_date():
     formatted_date = now.strftime("%Y-%m-%d_%H-%M-%S")
 
     return formatted_date
-
-
-def get_app_id_from_manifest(manifest_path):
-    import xml.etree.ElementTree as ET
-
-    # Parse the XML file
-    tree = ET.parse(manifest_path)
-    root = tree.getroot()
-
-    # Access the package name from the root element's attribute
-    package_name = root.attrib.get('package')
-
-    return package_name

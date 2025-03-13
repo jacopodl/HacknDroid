@@ -12,9 +12,6 @@ import socket
 
 # Burp Suite IP address 
 OVERRIDE_IP = '192.168.1.46'
-# Domain to be excluded from the interception 
-# (The . at the end is mandatory because the DNS records are stored in this way)
-DOMAIN_TO_EXCLUDE = "example.com."
 # Forward to Google's public DNS server
 FORWARD_DNS = "8.8.8.8"  
 

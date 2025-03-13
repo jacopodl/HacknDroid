@@ -6,6 +6,7 @@ Licensed under the Apache License v2.0
 
 from modules import adb, apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
 import modules.tasks_management
+from modules import utility
 
 OPTIONS =   {
                 'home': { 
@@ -14,6 +15,7 @@ OPTIONS =   {
                         "apk": {
                             'description': ['Several APKs related operations:',
                                             ' > Analysis',
+                                            ' > APP info from APK/Android Manifest'
                                             ' > APK to JAR',
                                             ' > Compiling',
                                             ' > Decompiling',
@@ -53,6 +55,29 @@ OPTIONS =   {
                                         "back" : dict(),
                                         "home" : dict()
                                     }
+                                },
+                                "app_info": { 
+                                    'description': ['App info from the APK',],
+                                    'children': {
+                                        "from_apk_on_pc": { 
+                                            'description': ['Write the path of the APK file on the PC to be analysed',],
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            'function' : apk_analyzer.print_app_info_from_pc
+                                        },
+                                        "from_mobile_device": { 
+                                            'description': ['Write the app id or a part of the app name to be analysed',],
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            'function' : apk_analyzer.print_app_info_from_device
+                                        },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
                                 },
                                 "compiling": { 
                                     'description': ['Compile an apk file from the folder with decompiled and modified code',],

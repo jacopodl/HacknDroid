@@ -226,7 +226,7 @@ class CLI():
                 
                 del_session_device_id()
                 break
-            
+
             except Exception:
                 # Clear the screen
                 clear()
@@ -235,7 +235,7 @@ class CLI():
                 print_formatted_text(HTML(f"An unexpected error was raised!!!"), style=self._style, end='\n\n')
                 
                 del_session_device_id()
-
+                break
 
         # Stop all the tasks
         DAEMONS_MANAGER.stop_all_tasks()
