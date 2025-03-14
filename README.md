@@ -18,6 +18,7 @@ Install other binary requirements:
 ```bash
 python3 hackndroid.py --install
 ```
+![Run Example](.img/run_install.png)
 
 ---
 
@@ -27,15 +28,16 @@ python hackndroid.py
 ```
 ![Run Example](.img/run_example_0.png)
 ![Run Example](.img/run_example_1.png)
-![Run Example](.img/run_example_2.png)
 
-### Proxy via DNS Spoofing (on Windows)
-To run DNS Server using the tool, ensure that the Windows Firewall is disabled on the PC where the script will be run:
-![Run Example](.img/disable_windows_firewall_0.png)
-![Run Example](.img/disable_windows_firewall_1.png)
+<details>
+<summary><i><b>Proxy via DNS Spoofing (on Windows)</b></i></summary>
+<p>To run DNS Server using the tool, ensure that the Windows Firewall is disabled on the PC where the script will be run:</p><br>
+<img src=".img/disable_windows_firewall_0.png"><br>
+<img src=".img/disable_windows_firewall_1.png"><br>
 
 If everything was set successfully, you can intercept the traffic on ports 80, 443 in Burp Suite as follows:
-![Run Example](.img/dns_proxy_intercept.png)
+<img src=".img/dns_proxy_intercept.png"><br>
+</details>
 
 ---
 
