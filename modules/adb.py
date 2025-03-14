@@ -39,12 +39,11 @@ def select_device(user_input):
     adb_devices = adb_devices_list()
 
     try:
-        choice = int(input(colored("Select the device ID you want to use:\n", 'green')))
-        print("")
-        
-        if choice >= 0 and choice < len(adb_devices):
+        choice = input(colored("Select the device ID you want to use (or 'none' to deselect devices):\n", 'green'))
+            
+        if choice.lower() == 'none':
             config = configparser.ConfigParser()
-    
+
             script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
             config_file_path = os.path.join(script_folder, "config.ini")
 
@@ -53,16 +52,40 @@ def select_device(user_input):
 
             # Add a new section if it doesn't exist
             if not config.has_section('General'):
-                config.add_section('General')
+                return
             
-            config.set('General', 'adb_session_device', adb_devices[choice][1])
+            config.remove_section('General')
 
             # Write the configuration to a file
             with open(config_file_path, 'w') as configfile:
                 config.write(configfile)
-
+        
         else:
-            raise ValueError("")
+            choice = int(choice)
+            print("")
+            
+            if choice >= 0 and choice < len(adb_devices):
+                config = configparser.ConfigParser()
+        
+                script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+                config_file_path = os.path.join(script_folder, "config.ini")
+
+                if os.path.exists(config_file_path):
+                    config.read(config_file_path)
+
+                # Add a new section if it doesn't exist
+                if not config.has_section('General'):
+                    config.add_section('General')
+                
+                config.set('General', 'adb_session_device', adb_devices[choice][1])
+                config.set('General', 'adb_session_model', adb_devices[choice][3])
+
+                # Write the configuration to a file
+                with open(config_file_path, 'w') as configfile:
+                    config.write(configfile)
+
+            else:
+                raise ValueError("")
 
     except ValueError:
         raise OptionNotAvailable("")
@@ -149,6 +172,27 @@ def get_session_device_id():
             device_id = config.get('General', 'adb_session_device')
 
     return device_id
+
+def get_session_device_model():
+    """
+    Get the device ID from the configuration file.
+
+    Returns:
+        str: The device ID.
+    """
+    device_id = None
+
+    script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    config_file_path = os.path.join(script_folder, "config.ini")
+
+    if os.path.exists(config_file_path):
+        config = configparser.ConfigParser()
+        config.read(config_file_path)
+
+        if config.has_section('General') and config.has_option('General', 'adb_session_model'):
+            device_id = config.get('General', 'adb_session_model')
+
+    return device_id
     
 def del_session_device_id():
     script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -160,7 +204,10 @@ def del_session_device_id():
             
         if config.has_section('General') and config.has_option('General','adb_session_device'):
             config.remove_option('General', 'adb_session_device')
-        
+
+        if config.has_section('General') and config.has_option('General','adb_session_model'):
+            config.remove_option('General', 'adb_session_model')
+
         # Write the changes back to the config file
         with open(config_file_path, 'w') as configfile:
             config.write(configfile)

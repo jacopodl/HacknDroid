@@ -4,6 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
+import time
 import config.menu as menu
 import config.style as tool_style
 
@@ -18,8 +19,9 @@ from termcolor import colored
 
 # Function pointer in OPTIONS
 from modules.tasks_management import DAEMONS_MANAGER
-from modules.adb import del_session_device_id, select_device, start_adb_server
+from modules.adb import del_session_device_id, get_session_device_model, select_device, start_adb_server
 from modules.error import ADBConnectionException, OptionNotAvailable
+from modules.adb import get_session_device_id
 
 class CLI():
 
@@ -48,7 +50,7 @@ class CLI():
         self._title = "HacknDroid"
         
         # Initialize the Figlet object for rendering the title
-        self._title_f = Figlet(font='slant')
+        self._title_f = colored(Figlet(font='slant').renderText(self._title), 'red')
 
     def completer(text, state):
         """
@@ -82,74 +84,64 @@ class CLI():
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f.renderText(self._title))
+                print(self._title_f)
                 # Print the shortcut keys
                 print_formatted_text(HTML("<option> > TAB to see options</option>"), style=self._style)
-                print_formatted_text(HTML("<option> > Ctrl+C to stop the program</option>"), style=self._style)
+                print_formatted_text(HTML("<option> > Ctrl+C to skip the device selection</option>"), style=self._style)
 
                 print("")
                 print_formatted_text(HTML(f"<descr>Select the device you want to use</descr>"), style=self._style)
                 print("")
 
                 select_device("")
+                print_formatted_text(HTML(f"<descr>Redirecting you to the homepage...</descr>"), style=self._style, end='\n\n')
                 break
             
             except OptionNotAvailable:
                 print(colored("Invalid choice. Please select a valid device.", 'red'))
                 print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
                 
-                try:
-                    x= input()
-                except (KeyboardInterrupt,EOFError) as e:
-                    # Clear the screen
-                    clear()
-                    # Print the title
-                    print(self._title_f.renderText(self._title))
-                    print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
-    
-                    del_session_device_id()
-    
-                    exit(0)
 
             except KeyboardInterrupt as e:
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f.renderText(self._title))
-                print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
+                print(self._title_f)
+                print_formatted_text(HTML(f"<descr>Redirecting you to the homepage...</descr>"), style=self._style, end='\n\n')
 
                 del_session_device_id()
-
-                exit(0)
-
+                break
 
             except ADBConnectionException as e:
                 print(colored("No device connected to ADB.", 'red'))
-                print_formatted_text(HTML("<option>Plug in the device and press ENTER to continue</option>"), style=self._style)
+                break
 
-                try:
-                    x= input()
-                except KeyboardInterrupt as e:
-                    # Clear the screen
-                    clear()
-                    # Print the title
-                    print(self._title_f.renderText(self._title))
-                    print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
-    
-                    del_session_device_id()
-                    exit(0)
-
-
-        # Initialize the prompt completer with the children of the current option
-        self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
+        time.sleep(5)
 
         while True:        
             try:
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f.renderText(self._title))
+                print(self._title_f)
                 # Print the shortcut keys
+                device_id = get_session_device_id()
+                device_model = get_session_device_model()
+
+                device_info = ""
+                options_list = list(CURRENT_OPTION['children'].keys())
+
+                if device_id:
+                    device_info = f"\U0001F4F1 {device_model} ({device_id}) "
+                    # Initialize the prompt completer with the children of the current option
+                else:
+                    device_info = f"\u274C NO DEVICE "
+                    options_list = [k for k in options_list if (k in ['back','home'] or not CURRENT_OPTION['children'][k]['device_needed'])]
+
+            
+                # Initialize the prompt completer with the children of the current option
+                self._prompt_completer = WordCompleter(options_list)
+
                 print_formatted_text(HTML("<option> > TAB to see options</option>"), style=self._style)
                 print_formatted_text(HTML("<option> > Ctrl+D to stop the program</option>"), style=self._style)
                 
@@ -176,7 +168,7 @@ class CLI():
                     path = f"<section> {self._current_path[-1]} </section>"
 
                 # Prompt the user for input (tab completion enabled)
-                choice = prompt(HTML(path+" "), completer=self._prompt_completer, style=self._style, multiline=False)
+                choice = prompt(HTML(path+" "), completer=self._prompt_completer, style=self._style, multiline=False, bottom_toolbar=device_info)
                 
                 if choice in CURRENT_OPTION['children']:
                     # If the input (choice) is a valid option, navigate to the selected level
@@ -213,6 +205,12 @@ class CLI():
                 print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
                 x= input()
                 
+            except ADBConnectionException:
+                print(colored("No mobile device available.", 'red'))
+                print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+                
+                x = input()
+                
             except KeyboardInterrupt:
                 # Cancel the current operation (input insertion by a user)
                 pass
@@ -221,7 +219,7 @@ class CLI():
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f.renderText(self._title))
+                print(self._title_f)
                 print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
                 
                 del_session_device_id()
@@ -231,7 +229,7 @@ class CLI():
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f.renderText(self._title))
+                print(self._title_f)
                 print_formatted_text(HTML(f"An unexpected error was raised!!!"), style=self._style, end='\n\n')
                 
                 del_session_device_id()
