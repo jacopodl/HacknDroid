@@ -140,7 +140,6 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 ***Task management***
 - [ ] Modular selection of paths where operations are performed
 - [ ] Executable creation
-- [ ] Run the script even if the mobile device is not connected (enable only functionalities that doesn't need the device)
 - [ ] Not interactive execution
 - [ ] Web interface (Flask)
 - [ ] GUI
