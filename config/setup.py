@@ -240,8 +240,8 @@ def github_dependencies():
                         
                         else:
                             lines = [
-                                        f"""$JAR_FILE = "{os.path.abspath(os.path.join(jar_folder, GITHUB_DEPENDECIES[software]['final_name']))}" \n""",
-                                        """java -jar $JAR_FILE "$@" """
+                                        f"""$JAR_FILE="{os.path.abspath(os.path.join(jar_folder, GITHUB_DEPENDECIES[software]['final_name']))}" \n""",
+                                        """java -jar "$JAR_FILE" "$@" """
                                     ]
                             
                             f.writelines(lines)
