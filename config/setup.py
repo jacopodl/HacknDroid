@@ -88,7 +88,7 @@ GITHUB_DEPENDECIES = {
             "Linux" : "",
             "Darwin" : ""
         },
-        "" : None
+        "chmod_x_dir" : None
     },    
 }
 
@@ -350,6 +350,10 @@ def android_dependencies():
     get_latest_platformtools(sdk_path)
 
     os.environ['ANDROID_HOME'] = sdk_path
+
+    if platform.system() == "Darwin" or platform.system() == "Linux":
+        chmode_executables_linux(os.environ['ANDROID_HOME'], None)
+
     shutil.move(os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools'), os.path.join(os.environ['ANDROID_HOME'], 'latest'))
     
     cmdline_tools_path = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest')
@@ -385,6 +389,9 @@ def android_dependencies():
                           os.path.abspath(os.path.join(dependencies_path, 'scrcpy')) + os.pathsep + \
                           os.path.abspath(os.path.join(dependencies_path, 'dex-tools')) + os.pathsep + \
                           os.path.abspath(os.path.join(dependencies_path, 'jadx', 'bin'))
+
+    if platform.system() == "Darwin" or platform.system() == "Linux":
+        chmode_executables_linux(os.environ['ANDROID_HOME'], None)
 
 
 def set_android_home_env_var():
