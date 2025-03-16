@@ -110,7 +110,7 @@ class CLI():
                 break
 
         print("")
-        loading_animation("Redirecting you to the homepage", 0.5, 3, 'grey', 'red')
+        loading_animation("Redirecting you to the homepage", 0.5, 3, 'white', 'red')
 
         while True:        
             try:
