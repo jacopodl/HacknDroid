@@ -22,6 +22,7 @@ from modules.tasks_management import DAEMONS_MANAGER
 from modules.adb import del_session_device_id, get_session_device_model, select_device, start_adb_server
 from modules.error import ADBConnectionException, OptionNotAvailable
 from modules.adb import get_session_device_id
+from modules.utility import loading_animation
 
 class CLI():
 
@@ -94,29 +95,22 @@ class CLI():
                 print("")
 
                 select_device("")
-                print_formatted_text(HTML(f"<descr>Redirecting you to the homepage...</descr>"), style=self._style, end='\n\n')
                 break
             
             except OptionNotAvailable:
                 print(colored("Invalid choice. Please select a valid device.", 'red'))
                 print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
-                
-
-            except KeyboardInterrupt as e:
-                # Clear the screen
-                clear()
-                # Print the title
-                print(self._title_f)
-                print_formatted_text(HTML(f"<descr>Redirecting you to the homepage...</descr>"), style=self._style, end='\n\n')
-
-                del_session_device_id()
-                break
 
             except ADBConnectionException as e:
                 print(colored("No device connected to ADB.", 'red'))
                 break
+        
+            except KeyboardInterrupt as e:
+                del_session_device_id()
+                break
 
-        time.sleep(5)
+        print("")
+        loading_animation("Redirecting you to the homepage", 0.5, 3, 'grey', 'red')
 
         while True:        
             try:
@@ -132,10 +126,10 @@ class CLI():
                 options_list = list(CURRENT_OPTION['children'].keys())
 
                 if device_id:
-                    device_info = f"\U0001F4F1 {device_model} ({device_id}) "
+                    device_info = f"\U0001F4F1 {device_model} ({device_id})"
                     # Initialize the prompt completer with the children of the current option
                 else:
-                    device_info = f"\u274C NO DEVICE "
+                    device_info = "\u274C 'NO DEVICE"
                     options_list = [k for k in options_list if (k in ['back','home'] or not CURRENT_OPTION['children'][k]['device_needed'])]
 
             
@@ -237,4 +231,3 @@ class CLI():
 
         # Stop all the tasks
         DAEMONS_MANAGER.stop_all_tasks()
-

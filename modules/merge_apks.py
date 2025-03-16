@@ -5,6 +5,8 @@ Licensed under the Apache License v2.0
 """
 
 import os
+
+from termcolor import colored
 from modules import utility
 import shutil
 from modules.tasks_management import Task
@@ -21,7 +23,7 @@ def merge_from_dir(user_input):
     """
     # Check if the directory exists
     while not os.path.exists(user_input):
-        user_input = input("Insert an existing folder path:\n")
+        user_input = input(colored("Insert an existing folder path:\n", "green"))
 
     # Generate the name for the merged APK file
     apk_name = "merged_"+utility.rsc_from_path(user_input)+".apk"
@@ -51,7 +53,7 @@ def merge_from_list(user_input):
     check = utility.is_apk_on_system(apks)
 
     while not check:
-        user_input = input("Provide a valid list of apks paths on your system:\n")
+        user_input = input(colored("Provide a valid list of apks paths on your system:\n", "green"))
         apks = user_input.split(" ")
         check = utility.is_apk_on_system(apks)
 

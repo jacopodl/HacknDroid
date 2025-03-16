@@ -22,7 +22,6 @@ def battery_saver_on(user_input):
     # Open ADB shell
     command = ['adb' , '-s', get_session_device_id(), 'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'true']
     output, error = Task().run(command)
-    print(output)
 
 
 def battery_saver_off(user_input):
@@ -35,7 +34,7 @@ def battery_saver_off(user_input):
     # Open ADB shell
     command = ['adb' , '-s', get_session_device_id(), 'shell' ,'am' ,'broadcast' ,'-a' ,'android.intent.action.ACTION_POWER_SAVE_MODE_CHANGED' ,'--ez' ,'"mode"' ,'false']
     output, error = Task().run(command)
-    print(output)
+
 
 def check_battery_status(user_input):
     """

@@ -24,17 +24,16 @@ def reboot(user_input):
         user_input (str): User input (not used in this function).
     """
     # Ask confirmation to the user
-    choice = input("Are you sure you want to reboot the mobile device (y/n)? ")
+    choice = input(colored("Are you sure you want to reboot the mobile device (y/n)? ", "green"))
 
     while choice != 'n' and choice != 'y':
         print('Please, select a valid option...')
-        choice = input("Are you sure you want to reboot the mobile device (y/n)? ")
+        choice = input(colored("Are you sure you want to reboot the mobile device (y/n)? ", "green"))
 
     if choice == 'y':
         # Reboot using ADB
         command = ['adb', '-s', get_session_device_id(), 'shell', 'reboot']
         output, error = Task().run(command, is_shell=True)
-        print(output)        
 
 
 def reboot_recovery(user_input):
@@ -45,17 +44,16 @@ def reboot_recovery(user_input):
         user_input (str): User input (not used in this function).
     """
     # Ask confirmation to the user
-    choice = input("Are you sure you want to reboot the mobile device (y/n)? ")
+    choice = input(colored("Are you sure you want to reboot the mobile device (y/n)? ", "green"))
 
     while choice != 'n' and choice != 'y':
         print('Please, select a valid option...')
-        choice = input("Are you sure you want to reboot the mobile device (y/n)? ")
+        choice = input(colored("Are you sure you want to reboot the mobile device (y/n)? ", "green"))
 
     if choice == 'y':
         # Reboot in recovery mode using ADB
         command = ['adb', '-s', get_session_device_id(), 'reboot', 'recovery']
         output, error = Task().run(command, is_shell=True)
-        print(output)
 
 
 def reboot_bootloader(user_input):
@@ -66,16 +64,15 @@ def reboot_bootloader(user_input):
         user_input (str): User input (not used in this function).
     """
     # Ask confirmation to the user
-    choice = input("Are you sure you want to reboot the mobile device (y/n)? ")
+    choice = input(colored("Are you sure you want to reboot the mobile device (y/n)? ", "green"))
 
     while choice != 'n' and choice != 'y':
         print('Please, select a valid option...')
-        choice = input("Are you sure you want to reboot the mobile device (y/n)? ")
+        choice = input(colored("Are you sure you want to reboot the mobile device (y/n)? ", "green"))
 
     if choice == 'y':
         command = ['adb', '-s', get_session_device_id(), 'reboot', 'bootloader']
         output, error = Task().run(command, is_shell=True)
-        print(output)
 
 
 def shutdown(user_input):
@@ -85,16 +82,15 @@ def shutdown(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    choice = input("Are you sure you want to shutdown the mobile device (y/n)? ")
+    choice = input(colored("Are you sure you want to shutdown the mobile device (y/n)? ", "green"))
 
     while choice != 'n' and choice != 'y':
         print('Please, select a valid option...')
-        choice = input("Are you sure you want to shutdown the mobile device (y/n)? ")
+        choice = input(colored("Are you sure you want to shutdown the mobile device (y/n)? ", "green"))
 
     if choice == 'y':
         command = ['adb', '-s', get_session_device_id(), 'shell', 'reboot', '-p']
         output, error = Task().run(command, is_shell=True)
-        print(output)
 
 
 def screen_lock_enabled(user_input):
@@ -107,7 +103,6 @@ def screen_lock_enabled(user_input):
     # Click LOCK button (26) (Specific for Motorola with PIN unlock)
     command = ['adb', '-s', get_session_device_id(), 'shell', 'input', 'keyevent','26']
     output, error = Task().run(command, is_shell=True)
-    print(output)
 
 
 def general_info(user_input):

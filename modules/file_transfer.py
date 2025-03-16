@@ -4,6 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
+from termcolor import colored
 from modules import utility
 import os
 from modules.tasks_management import Task
@@ -180,7 +181,7 @@ def download_from_user_input(user_input):
     # Loop until valid paths are provided
     while len(paths) < 2 or not (mobile_exists(paths[:-1]) and os.path.exists(paths[-1]) and os.path.isdir(paths[-1])):
         # Prompt the user to input paths again if the conditions are not met
-        user_input = input("""Insert at least two paths separated by spaces:\n > list of the paths of mobile files/folders to be downloaded\n > pc folder where the files will be downloaded\n\n""")
+        user_input = input(colored("""Insert at least two paths separated by spaces:\n > list of the paths of mobile files/folders to be downloaded\n > pc folder where the files will be downloaded\n\n""", "green"))
         paths = user_input.split(" ")
    
     # Iterate over each mobile path (excluding the last path which is the PC destination folder)
@@ -211,7 +212,7 @@ def download(mobile_path, dest_path, permissions_check=True):
         # If the output indicates a permission denied error or no files were pulled
         if "permission denied" in output.lower() or "0 files pulled" in output.lower():
             # Prompt the user to decide if they want to download the file/folder as Super User
-            x = input("[PERMISSION DENIED] Do you want to download the file/folder as Super User (y/n)? ")
+            x = input(colored("[PERMISSION DENIED] ", 'red')+colored("Do you want to download the file/folder as Super User (y/n)? ", "green"))
 
             # If the user chooses to proceed as Super User
             if x.lower() == "y":

@@ -4,6 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
+from termcolor import colored
 from modules.tasks_management import Task 
 from modules.adb import get_session_device_id
 
@@ -17,19 +18,16 @@ def enable_wifi(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'svc', 'wifi', 'enable']
     output, error = Task().run(command)
-    print(output)
 
     choice = 'x'
     while choice != 'y' and choice != 'n':
-        choice = input("Do you want to open Wifi settings (y/n)? ")
+        choice = input(colored("Do you want to open Wifi settings (y/n)? ", "green"))
         choice = choice.strip().lower()
-        print(choice)
 
     if choice == 'y':
         # Open ADB shell
         command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
         output, error = Task().run(command)
-        print(output)
 
 
 def disable_wifi(user_input):
@@ -42,7 +40,7 @@ def disable_wifi(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'svc', 'wifi', 'disable']
     output, error = Task().run(command)
-    print(output)
+
 
 def enable_airplane_mode(user_input):
     """
@@ -54,7 +52,6 @@ def enable_airplane_mode(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell','settings','put','global','airplane_mode_on','1']
     output, error = Task().run(command)
-    print(output)
 
 
 def disable_airplane_mode(user_input):
@@ -67,7 +64,7 @@ def disable_airplane_mode(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell','settings','put','global','airplane_mode_on','0']
     output, error = Task().run(command)
-    print(output)
+
 
 def donotdisturb_total_silence(user_input):
     """
@@ -79,7 +76,6 @@ def donotdisturb_total_silence(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '3']
     output, error = Task().run(command)
-    print(output)
 
 
 def donotdisturb_alarms_only(user_input):
@@ -92,7 +88,6 @@ def donotdisturb_alarms_only(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '2']
     output, error = Task().run(command)
-    print(output)
 
 
 def donotdisturb_priority_only(user_input):
@@ -105,7 +100,6 @@ def donotdisturb_priority_only(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '1']
     output, error = Task().run(command)
-    print(output)
 
 
 def donotdisturb_disabled(user_input):
@@ -118,4 +112,3 @@ def donotdisturb_disabled(user_input):
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'settings', 'put', 'global', 'zen_mode', '0']
     output, error = Task().run(command)
-    print(output)

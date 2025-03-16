@@ -48,7 +48,7 @@ def screenshot(user_input):
         user_input (str): User input (not used in this function).
     """
     mobile_path = os.path.join(sd_path(), 'screenshot.png')
-    print(os.sep)
+
     if os.sep == '\\':
         mobile_path = mobile_path.replace(os.sep, "/")
 

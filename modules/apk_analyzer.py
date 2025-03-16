@@ -11,7 +11,7 @@ from modules.merge_apks import merge_from_dir
 import os
 import glob
 import shutil
-from modules.signature import sign_apk
+from modules.signature import certificate_info, sign_apk, scheme_verify
 from modules.tasks_management import Task
 from modules.adb import get_session_device_id
 from pathlib import Path
@@ -125,9 +125,6 @@ APK_ANALYSIS_DICT = {
     }
 }
 
-def signature_scheme_verifier():
-    """pm list packages -f"""
-
 def apk_analysis_from_device(user_input):
     """
     Analyze an APK from the device.
@@ -136,7 +133,7 @@ def apk_analysis_from_device(user_input):
         user_input (str): The App ID or keywords to identify the application.
     """
     # Get the APK from the device
-    apk_filepath = get_apk_from_device(user_input)
+    apk_filepath, app_id = get_apk_from_device(user_input, False)
     # Perform analysis on the APK file
     perform_apk_analysis(apk_filepath)
 
@@ -152,7 +149,55 @@ def apk_analysis_from_file(user_input):
     # Perform analysis on the APK file
     perform_apk_analysis(apk_filepath)
 
-def perform_apk_analysis(apk_filepath):
+def root_detection_hints_from_device(user_input):
+    """
+    Analyze an APK from the device.
+
+    Args:
+        user_input (str): The App ID or keywords to identify the application.
+    """
+    # Get the APK from the device
+    apk_filepath, app_id = get_apk_from_device(user_input, False)
+    # Perform analysis on the APK file
+    perform_apk_analysis(apk_filepath, checks=["Root Detection Hints",], print_output=True)
+
+def root_detection_hints_from_file(user_input):
+    """
+    Analyze an APK file from the local filesystem.
+
+    Args:
+        user_input (str): The path to the APK file.
+    """
+    # Check if the path is valid for an APK file
+    apk_filepath = valid_apk_file(user_input)
+    # Perform analysis on the APK file
+    perform_apk_analysis(apk_filepath, checks=["Root Detection Hints",], print_output=True)
+
+def certificate_pinning_hints_from_device(user_input):
+    """
+    Analyze an APK from the device.
+
+    Args:
+        user_input (str): The App ID or keywords to identify the application.
+    """
+    # Get the APK from the device
+    apk_filepath, app_id = get_apk_from_device(user_input, False)
+    # Perform analysis on the APK file
+    perform_apk_analysis(apk_filepath, checks=["Certificate Pinning Hints",], print_output=True)
+
+def certificate_pinning_hints_from_file(user_input):
+    """
+    Analyze an APK file from the local filesystem.
+
+    Args:
+        user_input (str): The path to the APK file.
+    """
+    # Check if the path is valid for an APK file
+    apk_filepath = valid_apk_file(user_input)
+    # Perform analysis on the APK file
+    perform_apk_analysis(apk_filepath, checks=["Certificate Pinning Hints",], print_output=True)
+
+def perform_apk_analysis(apk_filepath, checks=["Certificate Pinning Hints", "Root Detection Hints"], print_output=False):
     """
     Perform analysis on an APK file.
 
@@ -161,7 +206,7 @@ def perform_apk_analysis(apk_filepath):
     """
     global APK_ANALYSIS_DICT
     # Example analysis: Print the APK file path
-    print(f"Analyzing APK: {apk_filepath}")
+    print(colored(f"Analyzing APK: ",'cyan')+apk_filepath)
     
     now = current_date()
     folder_path = apk_decompiler_from_file(apk_filepath)
@@ -176,37 +221,42 @@ def perform_apk_analysis(apk_filepath):
         "Root Detection Hints": os.path.join(results_folder, "root_detection_hints.csv")
     }
 
-    results = analyse_apk(folder_path, APK_ANALYSIS_DICT, output_files)
+    schemes = None
+    certificates = None
+    utc_time = None
+    results = analyse_apk(folder_path, APK_ANALYSIS_DICT, output_files, checks, print_output)
+    if len(checks) == 2:
+        schemes, certificates, utc_time = signature_verifier_from_apk(apk_filepath, print_output)
 
-    choice = 'x'
-    while choice!='y' and choice!='n':
-        choice = input(colored("\nDo you want to see results also on stdout? (y/n)\n", 'green')).lower()
+    if not print_output:
+        choice = 'x'
+        while choice!='y' and choice!='n':
+            choice = input(colored("\nDo you want to see results also on stdout? (y/n)\n", 'green')).lower()
+            
+        if choice=='y':
+            if len(checks) == 2:
+                print_scheme_info(schemes, certificates, utc_time)
         
-    if choice=='y':
-        for feature in results:
-            cprint(f"\n\n{feature}", 'red')
-
-            for check_type in results[feature]:
-                cprint(check_type, 'cyan')
-
-                for evidence in results[feature][check_type]:
-                    cprint(f"  - {evidence['file']}:{evidence['line_number']}:", 'yellow', end=" ") 
-                    print(evidence['line_content'])
-
-                print("")
-
-            for check_type in results[feature]:
-                cprint(check_type, 'cyan')
-
-                for evidence in results[feature][check_type]:
-                    cprint(f"  - {evidence['file']}:{evidence['line_number']}:", 'yellow', end=" ") 
-                    print(evidence['line_content'])
-
-        
-        print("")
+            print_pinning_root_hints(results)
 
 
-def analyse_apk(folder_path, re_apk_analysis_dict, output_files):
+def print_pinning_root_hints(results):
+    for feature in results:
+        cprint(f"\n\n{feature}", 'red')
+
+        for check_type in results[feature]:
+            cprint(check_type, 'cyan')
+
+            for evidence in results[feature][check_type]:
+                cprint(f"  - {evidence['file']}:{evidence['line_number']}:", 'yellow', end=" ") 
+                print(evidence['line_content'])
+
+            print("")
+    
+    print("")
+
+
+def analyse_apk(folder_path, re_apk_analysis_dict, output_files, checks, print_output):
     folder = Path(folder_path)
 
     results = {}
@@ -222,7 +272,9 @@ def analyse_apk(folder_path, re_apk_analysis_dict, output_files):
                 #print(target_file)
                 with open(target_file, 'r', encoding='utf-8') as f:
                     for line_number, line in enumerate(f, start=1):
-                        for feature in re_apk_analysis_dict[file_format]:
+                        features = [f for f in re_apk_analysis_dict[file_format] if f in checks]
+
+                        for feature in features:
                             for check_type in re_apk_analysis_dict[file_format][feature]:
                                 for check in re_apk_analysis_dict[file_format][feature][check_type]:
                                     try:
@@ -250,7 +302,7 @@ def analyse_apk(folder_path, re_apk_analysis_dict, output_files):
             bar.title(colored(file_format, 'green'))
 
     print("\n\nResults:")
-    for feature in output_files:
+    for feature in checks:
         with open(output_files[feature], 'w') as results_f:
             for check_type in results[feature]:            
                 # Iterate over the lines of the file
@@ -260,10 +312,13 @@ def analyse_apk(folder_path, re_apk_analysis_dict, output_files):
                 
             print("\nresults written to ",colored(output_files[feature], 'red'))
 
-    return results
     
+    if print_output:
+        print_pinning_root_hints(results)
 
-def get_apk_from_device(user_input, check_for_merge=False):
+    return results
+
+def get_apk_from_device(user_input, check_for_merge=True):
     '''
         APK Analysis
         - apk extraction from the mobile device or on the pc
@@ -292,7 +347,7 @@ def get_apk_from_device(user_input, check_for_merge=False):
         apk_files = [os.path.join(app_folder,f) for f in os.listdir(app_folder) if f.endswith('.apk')]
         apk_name = apk_files[0]
 
-    return apk_name
+    return apk_name, app_id
 
 
 def apk_decompiler_from_device(user_input):
@@ -304,7 +359,7 @@ def apk_decompiler_from_device(user_input):
     """
 
     # Get the APK from the device
-    apk_filepath, app_id = get_apk_from_device(user_input)
+    apk_filepath, app_id = get_apk_from_device(user_input, False)
     print(apk_filepath)
 
     # Decompile the program
@@ -353,7 +408,7 @@ def jar_from_device(user_input):
     """
 
     # Get the APKs of the App from the device
-    apk_filepath, app_id = get_apk_from_device(user_input)
+    apk_filepath, app_id = get_apk_from_device(user_input, False)
     # Create the JAR file from the APKs
     create_jar_from_apk_path(apk_filepath)
 
@@ -408,7 +463,7 @@ def jadx_from_device(user_input):
     """
 
     # Get the APK from the device
-    apk_filepath, app_id = get_apk_from_device(user_input)    
+    apk_filepath, app_id = get_apk_from_device(user_input, False)
     # Open JADX on the APK file specified by the user
     jadx_run_on_apk_file(apk_filepath)
     
@@ -440,7 +495,6 @@ def jadx_run_on_apk_file(apk_filepath):
     command = ['jadx-gui', apk_filepath]
     print(command)
     output, error = Task().run(command, is_shell=True)
-    print(output)
 
 def apk_compile_from_folder(user_input):
     """
@@ -457,7 +511,7 @@ def apk_compile_from_folder(user_input):
     while (not os.path.exists(user_input)) or \
           (not os.path.exists(os.path.join(user_input, "AndroidManifest.xml"))) or \
            (not os.path.exists(os.path.join(user_input, "apktool.yml"))):
-        user_input = input("Write the path of the folder with code to be compiled:\n")
+        user_input = input(colored("Write the path of the folder with code to be compiled:\n", "green"))
 
     app_id = get_app_id_from_manifest(os.path.join(user_input, "AndroidManifest.xml"))
 
@@ -526,16 +580,14 @@ def transfer_apks_from_device(user_input):
     # Note: the apk folder can be also downloaded without root permission 
     # pm list packages -f (to print the path of the apks for each package)
     # adb pull <apk_package_path> <pc_path>
-    print("GET APKS: "+app_id)
     command = ['adb', '-s', get_session_device_id(), 'shell']
     shell_input = ["su root",f'ls {DATA_APP_FOLDER} | grep "{app_id}"', "exit"]
     
     output, error = Task().run(command, input_to_cmd=shell_input)
-    print(output)
 
     # App folder with the APKs
     app_folder = output.strip()
-    print(app_folder)
+    print(colored("Mobile App folder: ", 'cyan')+app_folder)
 
     results_folder = os.path.join('results', app_id, "data_folder")
 
@@ -567,35 +619,29 @@ def get_app_id_from_manifest(manifest_path):
 def print_app_info_from_device(user_input):
 
     # Get the APK from the device
-    apk_filepath = get_apk_from_device(user_input)
+    apk_filepath, app_id = get_apk_from_device(user_input, False)
     info = app_info_from_apk(apk_filepath)
-
-    for k in info:
-        print(colored(f"{k}:", 'cyan'), end=" ")
-
-        if k == "permissions":
-            print("")
-            print('\n'.join(info[k]))
-        else:
-            print(info[k])
-
-    print("")
+    print_app_info(info)
 
 def print_app_info_from_pc(user_input):
-
+    # Check if the APK file path is valid 
     apk_filepath = valid_apk_file(user_input)
     info = app_info_from_apk(apk_filepath)
+    print_app_info(info)
 
+
+def print_app_info(info):
     for k in info:
         print(colored(f"{k}:", 'cyan'), end=" ")
 
-        if k == "permissions":
+        if isinstance(info[k], list):
             print("")
             print('\n'.join(info[k]))
         else:
             print(info[k])
 
     print("")
+
 
 def app_info_from_apk(apk_filepath):
     command = ['aapt','dump','badging',apk_filepath]
@@ -625,12 +671,104 @@ def app_info_from_apk(apk_filepath):
                 print(result.group(1))
 
         else:
-            result = re.match(r"uses-permission: name='(.*)'", line)
+            result = re.match(r"uses-permission: name='(\S*)'", line)
 
             if result:
-                if 'permissions' not in info:
-                    info['permissions'] = []
+                if 'Permissions' not in info:
+                    info['Permissions'] = []
 
-                info['permissions'].append(result.group(1))
+                info['Permissions'].append(result.group(1))
+            else:
+                system_result = re.match(r"uses-implied-permission: name='(\S*)'", line)
+
+                if system_result:
+                    if 'System auto permissions (implied)' not in info:
+                        info['System auto permissions (implied)'] = []
+
+                    info['System auto permissions (implied)'].append(system_result.group(1))
+
 
     return info
+
+
+def get_base_apk_from_device(app_id, now):
+    command = ["adb", "shell", "pm", "list", "packages", "-f"]
+    output, error = Task().run(command, is_shell=False)
+
+    base_apk_path = ''
+    for line in output.splitlines():
+        if app_id in line:
+            base_apk_path = line.replace("package:", "").replace(f"={app_id}", "")
+            print(base_apk_path)
+            break
+
+    results_folder = os.path.join("results", app_id, "apk_analysis", now)
+    os.makedirs(results_folder, exist_ok=True)
+    pc_apk_filepath = os.path.join(results_folder, os.path.basename(base_apk_path))
+    download(base_apk_path, pc_apk_filepath)
+
+    return pc_apk_filepath
+
+def signature_verifier_from_mobile(user_input):
+    now = current_date()
+    app_id = app_id_from_user_input(user_input)
+    apk_filepath = get_base_apk_from_device(app_id, now)
+    schemes, certificates, utc_time = signature_verifier_from_apk(apk_filepath, True, now)
+
+
+def signature_verifier_from_apk(user_input, print_output=True, now=current_date()):
+    """
+    Analyze an APK file from the local filesystem.
+
+    Args:
+        user_input (str): The path to the APK file.
+    """
+    # Check if the path is valid for an APK file
+    apk_filepath = valid_apk_file(user_input)
+    # Verify the signature scheme
+    schemes, utc_time = scheme_verify(apk_filepath)
+    certificates = certificate_info(apk_filepath)
+
+    app_id = app_info_from_apk(apk_filepath)["name"]
+    results_folder = os.path.join("results", app_id, "apk_analysis", now)
+    
+    os.makedirs(results_folder, exist_ok = True)
+
+    with open(os.path.join(results_folder, "signature_scheme_verifier.txt"), "w") as f:
+        f.write("Verified using:\n")
+        for s in schemes:
+            f.write(f"> {s} ({schemes[s]['type']}): {schemes[s]['check']}\n")
+
+        f.write(f"\nSignature time: {utc_time} UTC\n\n")
+
+        f.write("Certificates:\n")
+        for s in certificates:
+            f.write(s+'\n')
+
+            for field in certificates[s]:
+                f.write(f"> {field}: {certificates[s][field]}\n")
+
+        print("")
+
+    if print_output:
+        print_scheme_info(schemes, certificates, utc_time)
+
+    return schemes, certificates, utc_time
+    
+
+def print_scheme_info(schemes, certificates, utc_time):
+    print(colored("Signature information", 'red'))
+    print(colored("Verified using:", 'cyan'))
+    for s in schemes:
+        print(colored(f"> {s} (", 'yellow')+schemes[s]['type']+colored(f"): ", 'yellow')+colored(schemes[s]['check'], 'green'))
+
+    print(colored("\nSignature time: ", 'cyan')+f"{utc_time} UTC\n")
+
+    print(colored("Certificates:", 'cyan'))
+    for s in certificates:
+        print(colored(s, 'green'))
+
+        for field in certificates[s]:
+            print(colored(f"> {field}: ", 'yellow')+certificates[s][field])
+
+    print("")

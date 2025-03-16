@@ -18,6 +18,9 @@ import tarfile
 from alive_progress import alive_bar
 from termcolor import colored
 
+if platform.system() != "Windows":
+    import magic
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 GITHUB_DEPENDECIES = {
@@ -29,7 +32,8 @@ GITHUB_DEPENDECIES = {
             "Windows" : "",
             "Linux" : "",
             "Darwin" : ""
-        }
+        },
+        "chmod_x_dir" : "bin"
     },
     "apktool" : {
         "release_url":"https://api.github.com/repos/iBotPeaches/Apktool/releases/latest",
@@ -39,7 +43,8 @@ GITHUB_DEPENDECIES = {
             "Windows" : "",
             "Linux" : "",
             "Darwin" : ""
-        }
+        },
+        "chmod_x_dir" : None
     },
     "abe" : {
         "release_url" : "https://api.github.com/repos/nelenkov/android-backup-extractor/releases/latest",
@@ -49,7 +54,8 @@ GITHUB_DEPENDECIES = {
             "Windows" : "",
             "Linux" : "",
             "Darwin" : ""
-        }
+        },
+        "chmod_x_dir" : None
     },
     "apkeditor" : {
         "release_url" : "https://api.github.com/repos/REAndroid/APKEditor/releases/latest",
@@ -59,7 +65,8 @@ GITHUB_DEPENDECIES = {
             "Windows" : "",
             "Linux" : "",
             "Darwin" : ""
-        }
+        },
+        "chmod_x_dir" : None
     },
     "scrcpy" : {
         "release_url" : "https://api.github.com/repos/Genymobile/scrcpy/releases/latest",
@@ -69,7 +76,8 @@ GITHUB_DEPENDECIES = {
             "Windows" : "win64",
             "Linux" : "linux",
             "Darwin" : "macos"
-        }
+        },
+        "chmod_x_dir" : None
     },
     "dex-tools" : {
         "release_url" : "https://api.github.com/repos/pxb1988/dex2jar/releases/latest",
@@ -79,7 +87,8 @@ GITHUB_DEPENDECIES = {
             "Windows" : "",
             "Linux" : "",
             "Darwin" : ""
-        }
+        },
+        "" : None
     },    
 }
 
@@ -180,6 +189,9 @@ def github_dependencies():
                         os.rename(temp_folder, extraction_folder)
 
                     os.remove(file_path)
+
+                    if platform.system() == "Darwin" or platform.system() == "Linux":
+                        chmode_executables_linux(extraction_folder , GITHUB_DEPENDECIES[software]["chmod_x_dir"])
                 
                 elif asset['content_type'] == "application/gzip":
                     extraction_folder = os.path.join(dependencies_folder,GITHUB_DEPENDECIES[software]['final_name'])
@@ -205,7 +217,10 @@ def github_dependencies():
                         os.rename(temp_folder, extraction_folder)
 
                     os.remove(file_path)
-                
+
+                    if platform.system() == "Darwin" or platform.system() == "Linux":
+                        chmode_executables_linux(extraction_folder , GITHUB_DEPENDECIES[software]["chmod_x_dir"])
+
                 else:
                     jar_folder = os.path.join(dependencies_folder, 'JAR')
                     
@@ -231,12 +246,44 @@ def github_dependencies():
                         
                         else:
                             lines = [
-                                        f"""$JAR_FILE = "{os.path.abspath(os.path.join(jar_folder, GITHUB_DEPENDECIES[software]['final_name']))}" """,
+                                        f"""$JAR_FILE = "{os.path.abspath(os.path.join(jar_folder, GITHUB_DEPENDECIES[software]['final_name']))}" \n""",
                                         """java -jar $JAR_FILE "$@" """
                                     ]
                             
                             f.writelines(lines)
                             os.chmod(wrapper_path, 0o755) # 0o755 is the octal value for rwxr-xr-x
+
+def get_file_type(file_path):
+    try:
+        # Use python-magic to detect the file type
+        mime = magic.Magic(mime=True)
+        return mime.from_file(file_path)
+    except Exception as e:
+        return f"Error: {e}"
+
+def chmod_all_recursive(directory):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            
+            os.chmod(file_path, 0o755)
+
+
+def chmod_executable_recursive(directory):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            file_type = get_file_type(file_path)
+
+            if "executable" in file_type or "shellscript" in file_type:
+                os.chmod(file_path, 0o755)
+
+
+def chmode_executables_linux(folder, software):
+    if software:
+        chmod_all_recursive(folder)
+    else:
+        chmod_executable_recursive(folder)
 
 
 def get_latest_platformtools(sdk_path):

@@ -28,37 +28,135 @@ OPTIONS =   {
                                         'Analysis of the APKs related to the application:', 
                                         ' > search for common Root Detection strings in smali files', 
                                         ' > search for common Certificate Pinning strings or SHA1-SHA256 hash string in smali files',
-                                        ' > signature schema verifier'
+                                        ' > signature scheme verifier'
                                         ],
                                     'device_needed': False,
                                     'children': {
-                                        "from_apk_on_pc" : { 
-                                            'description': ["Write the following two strings (separated by space):",
-                                                            " > the path of the apk on your PC (or the folder with all the APKs related to the app)",
-                                                            " > the path of the folder where the apk will be decompiled"
+                                        "full_analysis" : { 
+                                            'description': [
+                                                            'Analysis of the APKs related to the application:', 
+                                                            ' > search for common Root Detection strings in smali files', 
+                                                            ' > search for common Certificate Pinning strings or SHA1-SHA256 hash string in smali files',
+                                                            ' > signature scheme verifier'
                                                             ],
                                             'device_needed': False,
                                             'children': {
+                                                "from_apk_on_pc" : { 
+                                                    'description': ["Write the path of the apk on your PC",],
+                                                    'device_needed': False,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function' : apk_analyzer.apk_analysis_from_file
+                                                },
+                                                "from_mobile_device" : { 
+                                                    'description': ["Write the app id or a part of the app name to be analysed",],
+                                                    'device_needed': True,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function': apk_analyzer.apk_analysis_from_device
+                                                },
                                                 "back" : dict(),
                                                 "home" : dict()
                                             },
-                                            'function' : apk_analyzer.apk_analysis_from_file
                                         },
-                                        "from_mobile_device" : { 
-                                            'description': ["Write the following two strings (separated by space):",
-                                                            " > the app id or a part of the app name to be extracted and analysed"
-                                                            " > the path of the folder where the apk will be decompiled"
-                                                            ],
-                                            'device_needed': True,
+                                        "certificate_pinning_hints" : { 
+                                            'description': ['Search for common Certificate Pinning strings or SHA1-SHA256 hash string in smali files',],
+                                            'device_needed': False,
                                             'children': {
+                                                "from_apk_on_pc" : { 
+                                                    'description': ["Write the path of the apk on your PC",],
+                                                    'device_needed': False,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function' : apk_analyzer.certificate_pinning_hints_from_file
+                                                },
+                                                "from_mobile_device" : { 
+                                                    'description': ["Write the app id or a part of the app name to be analysed",],
+                                                    'device_needed': True,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function': apk_analyzer.certificate_pinning_hints_from_device
+                                                },
                                                 "back" : dict(),
                                                 "home" : dict()
                                             },
-                                            'function': apk_analyzer.apk_analysis_from_device
+                                        },
+                                        "root_detection_hints" : { 
+                                            'description': ['Search for common Root Detection strings in smali files',],
+                                            'device_needed': False,
+                                            'children': {
+                                                "from_apk_on_pc" : { 
+                                                    'description': ["Write the path of the apk on your PC",],
+                                                    'device_needed': False,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function' : apk_analyzer.root_detection_hints_from_file
+                                                },
+                                                "from_mobile_device" : { 
+                                                    'description': ["Write the app id or a part of the app name to be analysed",],
+                                                    'device_needed': True,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function': apk_analyzer.root_detection_hints_from_device
+                                                },
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                        },
+                                        "signature_scheme" : { 
+                                            'description': ["Signature scheme verifier"
+                                                            ],
+                                            'device_needed': False,
+                                            'children': {
+                                                "from_apk_on_pc" : { 
+                                                    'description': ["Write the path of the apk on your PC"],
+                                                    'device_needed': False,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function' : apk_analyzer.signature_verifier_from_apk
+                                                },
+                                                "from_mobile_device" : { 
+                                                    'description': ["Write the app id or a part of the app name to be analysed"
+                                                                    ],
+                                                    'device_needed': True,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    'function' : apk_analyzer.signature_verifier_from_mobile
+                                                },
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            }
                                         },
                                         "back" : dict(),
-                                        "home" : dict()
+                                        "home" : dict()                                        
                                     }
+                                },
+                                "get_apk_from_mobile": { 
+                                    'description': [
+                                        'Write the app id or a part of the app name to be extracted and analysed'
+                                        ],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    'function': apk_analyzer.get_apk_from_device
                                 },
                                 "app_info": { 
                                     'description': ['App info from the APK',],

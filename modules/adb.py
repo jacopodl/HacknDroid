@@ -225,11 +225,12 @@ def start_adb_server():
             os.environ['PATH'] = config.get('Environment', 'path')
             os.environ['ANDROID_HOME'] = config.get('Environment', 'android_home')
 
+    print("Killing ADB servers running...")
     command = ['adb', 'kill-server']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
     output, error = process.communicate()
 
+    print("Starting a new ADB server...")
     command = ['adb','start-server']
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
     output, error = process.communicate()
-    print(output, error)

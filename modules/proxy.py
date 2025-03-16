@@ -7,6 +7,8 @@ Licensed under the Apache License v2.0
 import sys
 import netifaces
 import ipaddress
+
+from termcolor import colored
 from modules.tasks_management import Task, DAEMONS_MANAGER
 import platform
 import re
@@ -95,7 +97,7 @@ def set_current_pc_proxy(user_input):
     """
     # If the user input is not a port, ask the user to insert it again
     while not is_port(user_input):
-        user_input = input("Insert a valid port number")
+        user_input = input(colored("Insert a valid port number", "green"))
 
     # Retrieve current IP of the PC on the Wi-Fi network  
     ip = pc_wifi_ip()
@@ -138,7 +140,7 @@ def set_generic_proxy(user_input):
         check = (not is_ip(address[0])) or (not is_port(address[1]))
 
     while check:
-        user_input = input("Insert a valid port number")
+        user_input = input(colored("Insert a valid port number"), "green")
 
         if ":" in address:
             address = user_input.split(":")
@@ -263,7 +265,7 @@ def set_current_pc_dns_proxy(user_input):
 
     command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
-    x=input("Press ENTER to launch the DNS Server...\n")
+    x=input(colored("Press ENTER to launch the DNS Server...\n", "green"))
 
     dns_proxy(pc_wifi_ip())
 
@@ -284,7 +286,7 @@ def set_generic_dns_proxy(user_input):
     
     while remote_ip == '':
         try:
-            user_input = input("Enter adress: ")
+            user_input = input(colored("Enter the IP address: ", "green"))
             remote_ip = ipaddress.ip_address(user_input)
         except ValueError:
             remote_ip = ''
@@ -296,7 +298,7 @@ def set_generic_dns_proxy(user_input):
     command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
 
-    x=input("Press ENTER to launch the DNS Server (or CTRL+C to stop the operation)...\n")
+    x=input(colored("Press ENTER to launch the DNS Server (or CTRL+C to stop the operation)...\n", "green"))
     dns_proxy(remote_ip)
 
 
@@ -312,7 +314,7 @@ def del_dns_proxy(user_input):
     if DNS_TASK_ID != -1:
         DAEMONS_MANAGER.stop_task('dns', DNS_TASK_ID)
         DNS_TASK_ID = -1
-        loading_animation("Stopping DNS Server", 3, 30)
+        loading_animation("Stopping DNS Server", 0.5, 30, 'grey', 'red')
         print("DNS Server STOPPED!!!\n")
 
 
@@ -350,7 +352,7 @@ def set_current_pc_invisible_proxy(user_input):
 
     command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
     output, error = Task().run(command)
-    x=input("Press ENTER to launch the DNS Server...\n")
+    x=input(colored("Press ENTER to launch the DNS Server...\n", "green"))
 
     set_invisible_proxy(pc_wifi_ip())
 
@@ -365,7 +367,7 @@ def set_generic_invisible_proxy(user_input):
     
     while remote_ip == '':
         try:
-            user_input = input("Enter adress: ")
+            user_input = input(colored("Enter the IP address: ", "green"))
             remote_ip = ipaddress.ip_address(user_input)
         except ValueError:
             remote_ip = ''
@@ -384,7 +386,6 @@ def set_invisible_proxy(target_ip):
                 ]
     
     output, error = Task().run(command, input_to_cmd=shell_input)
-    print(output)
 
 
 def del_invisible_proxy(user_input):
@@ -396,7 +397,6 @@ def del_invisible_proxy(user_input):
                 ]
     
     output, error = Task().run(command, input_to_cmd=shell_input)
-    print(output)
 
 
 def get_current_pc_wifi_ssid():

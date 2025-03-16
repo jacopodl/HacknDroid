@@ -9,6 +9,8 @@ import os
 import tarfile
 from modules.tasks_management import Task
 from modules.adb import get_session_device_id
+from termcolor import colored
+import getpass
 
 def app_backup(user_input : str):
     """
@@ -29,8 +31,6 @@ def app_backup(user_input : str):
     command = ['adb', '-s', get_session_device_id(), 'backup',"-apk","-f", backup_name+".ab", app_id]
     print(" ".join(command))
     output, error = Task().run(command, is_shell=True)
-
-    print(error)
 
 
     # Convert backup file (compressed file) as TAR file backup_<app_id>.tar 
@@ -68,10 +68,11 @@ def tar_extract(user_input : str):
     """
     # Ask again the AB file path if it doesn't exist or it hasn't AB extension
     if (not os.path.isfile(user_input)) or (not user_input.endswith(".ab")):
-        user_input = input("Write the path of a valida Android Backup on your PC to be extracted:\n")
+        user_input = input(colored("Write the path of a valida Android Backup on your PC to be extracted:\n"), "green")
     
     # Collect the password of the Android Backup file from stdin
-    password = input("Insert the password used on the mobile device for the backup:\n")
+    password = getpass.getpass(colored("Insert the password used on the mobile device for the backup:\n", "green"))
+    print("*"*len(password))
     # Unpack the Android Backup file using ABE and save it to <backup_name>.tar file
     now = current_date()
     backup_name = user_input.replace(".ab", "")
@@ -102,10 +103,11 @@ def ab_to_tar_extract(backup_name):
         backup_name (str): The name of the backup file.
     """
     # Collect the password of the Android Backup file from stdin
-    password = input("Insert the password used on the mobile device for the backup:\n")
+    password = getpass.getpass(colored("Insert the password used on the mobile device for the backup:\n", "green"))
+    
     # Unpack the Android Backup file using ABE and save it to <backup_name>.tar file
     command = ['abe', 'unpack', backup_name+".ab", backup_name+".tar", password]
-    print(command)
+    print(" ".join(command[:-1])+" "+"*"*len(command[-1]))
     output, error = Task().run(command, is_shell=True)
 
     # Create the directory for the unpacked TAR file

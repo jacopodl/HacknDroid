@@ -12,6 +12,7 @@ import time
 import requests
 from modules.adb import get_session_device_id
 from datetime import datetime
+from termcolor import colored, cprint
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -118,23 +119,29 @@ def app_id_from_user_input(user_input):
 
         # If no possible match was found, ask keywords again to the user 
         while not possible_app_ids:
-            user_input=input("Write a valid app ID or a set of keyword to be searched\n")
+            user_input=input(colored("Write a valid app ID or a set of keyword to be searched\n", "green"))
             possible_app_ids = get_app_id(user_input)
 
         # If some app IDs related to the specified keywords are found
         # List the app IDs previously found
-        for (i,x) in enumerate(possible_app_ids):
-            print(f"{i:2d})  {x}")
 
+        num_digits = len(str(abs(len(possible_app_ids)-1)))
+        
+        cprint("\nAvailable applications:", 'cyan')
+        for (i,x) in enumerate(possible_app_ids):
+            print(colored(f"{i:{num_digits}d}) ", 'yellow')+x)
+
+        print("")
         # The user continues to choose the ID until a valid number is inserted by him
         choice = -1
         while choice<0 or choice>=len(possible_app_ids): 
             try:
                 # Number inserted by the user
-                choice = int(input("Select the app you want to test: "))
+                choice = int(input(colored("Select the app you want to test:\n", "green")))
             except ValueError:
                 choice = -1
 
+        print("")
         # Return the app ID related to the number chosen by the user
         return possible_app_ids[choice]
     
@@ -222,20 +229,25 @@ def active_app_id_from_user_input(user_input):
 
         # If no possible match was found, ask keywords again to the user 
         while not possible_app_ids:
-            user_input=input("Write a valid app ID or a set of keyword to be searched\n")
+            user_input=input(colored("Write a valid app ID or a set of keyword to be searched\n", "green"))
             possible_app_ids = get_active_app_id(user_input)
 
         # If some app IDs related to the specified keywords are found
         # List the app IDs previously found
+        num_digits = len(str(abs(len(possible_app_ids)-1)))
+        
+        cprint("\nAvailable applications:", 'cyan')
         for (i,x) in enumerate(possible_app_ids):
-            print(f"{i:2d})  {x}")
+            print(colored(f"{i:{num_digits}d}) ", 'yellow')+x)
+
+        print("")
 
         # The user continues to choose the ID until a valid number is inserted by him
         choice = -1
         while choice<0 or choice>=len(possible_app_ids): 
             try:
                 # Number inserted by the user
-                choice = int(input("Select the app you want to test: "))
+                choice = int(input(colored("Select the app you want to test: ", "green")))
             except ValueError:
                 choice = -1
 
@@ -321,7 +333,9 @@ def valid_apk_file(user_input):
         str: The valid APK file path.
     """
     while not os.path.exists(user_input) or not user_input.endswith(".apk"):
-        user_input = input("Write the path of an APK file to be installed: ")
+        user_input = input(colored("Write the path of an APK file on the PC:\n", "green"))
+
+    print("")
 
     return user_input
 
@@ -336,7 +350,7 @@ def get_valid_playstore_app_id(user_input):
         str: The valid Play Store app ID.
     """
     while not is_valid_app_id(user_input) or not is_app_on_store(user_input):
-        user_input = input("Write a valid and existing app ID to be searched on Play Store: ")
+        user_input = input(colored("Write a valid and existing app ID to be searched on Play Store: ", "green"))
 
     return user_input
 
@@ -371,8 +385,15 @@ def is_app_on_store(app_id):
 
     return response.status_code == 200
 
-def loading_animation(loading_str, gap, max_time):
+def loading_animation(loading_str, gap, max_time, color_str = None, color_dots = None):
     dots = ['.', '..', '...']
+    
+    if color_str:
+        loading_str = colored(loading_str, color=color_str)
+
+    if color_dots:
+        dots = [colored(d, color=color_dots) for d in dots]
+
     time_steps = int(max_time // gap)
     for i in range(time_steps):
         sys.stdout.write(f"\r{loading_str}{len(dots)*' '}")  # Carriage return to overwrite the line
