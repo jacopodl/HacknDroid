@@ -4,6 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
+import platform
 import re
 from modules.utility import app_id_from_user_input, current_date, valid_apk_file
 from modules.file_transfer import download
@@ -448,7 +449,12 @@ def create_jar_from_apk_path(apk_filepath):
     print(app_id)
     jar_path = os.path.join(jar_folder,f"{now}_{app_id}.jar")
 
-    command = ['d2j-dex2jar', apk_filepath, "--force", "-o", jar_path]
+    script = 'd2j-dex2jar'
+    
+    if platform.system() != "Windows":
+        script += ".sh"
+
+    command = [script, apk_filepath, "--force", "-o", jar_path]
     print(command)
     output, error = Task().run(command, is_shell=True)
     print(output)

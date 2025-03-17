@@ -4,6 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
+import platform
 import subprocess
 import threading
 from modules.utility import cmd_to_subprocess_string 
@@ -204,6 +205,9 @@ class Task():
             tuple: The output and error of the command.
         """
         if is_shell:
+            if platform.system() != "Windows":
+                command = " ".join(command)
+
             self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,shell=True, env = os.environ)
         else:
             self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,text=True, env = os.environ)
