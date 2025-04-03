@@ -24,9 +24,9 @@ def main():
         github_dependencies()
         android_dependencies()
         set_android_home_env_var()
-
-    cli_mgmt = CLI()
-    cli_mgmt.cli_options()
+    else:
+        cli_mgmt = CLI()
+        cli_mgmt.cli_options()
 
 if __name__=="__main__":
     main()

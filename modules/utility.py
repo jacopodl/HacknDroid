@@ -412,3 +412,7 @@ def current_date():
     formatted_date = now.strftime("%Y-%m-%d_%H-%M-%S")
 
     return formatted_date
+
+def get_terminal_size():
+    size = os.get_terminal_size()
+    return size.columns

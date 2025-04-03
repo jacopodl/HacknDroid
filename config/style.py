@@ -19,5 +19,6 @@ STYLE = {
     'completion-menu.completion.current': 'bg:#00aaaa #000000',
     'scrollbar.background': 'bg:#88aaaa',
     'scrollbar.button': 'bg:#222222',
-    'space':'white'
+    'space':'white',
+    'input': 'white bold'
 }

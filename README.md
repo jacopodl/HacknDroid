@@ -14,11 +14,17 @@ Install python requirements using the following command:
 ```bash
 pip install -r requirements.txt
 ```
-Install other binary requirements:
+
+Install all the binary requirements with the following command:
 ```bash
 python3 hackndroid.py --install
 ```
 ![Run Example](.img/run_install.png)
+
+> ***Note:***
+> Before installing, ensure that the latest version of the Java JDK is installed on your system.
+> 
+> Additionally, make sure to configure the `JAVA_HOME` environment variable to point to the *JDK installation directory*, and update the `PATH` variable to include the `<jdk-path>/bin` directory.
 
 ---
 
@@ -133,19 +139,19 @@ If everything was set successfully, you can intercept the traffic on ports 80, 4
 
 ### Tested on
 - [x] Windows
-- [ ] Linux
+- [x] Linux
 - [ ] MacOS
 
 ---
 
 ### Future functionalities
 ***Task management***
+- [ ] Kill any process from process list page
 - [ ] Modular selection of paths where operations are performed
-- [ ] Executable creation
+- [ ] Executable creation (?)
 - [ ] Not interactive execution
 - [ ] Web interface (Flask)
 - [ ] GUI
-- [ ] Emulator Management
 
 ***Functionalities***
 - [ ] `apk_analysis`

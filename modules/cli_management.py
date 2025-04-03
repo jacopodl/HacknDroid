@@ -22,7 +22,7 @@ from modules.tasks_management import DAEMONS_MANAGER
 from modules.adb import del_session_device_id, get_session_device_model, select_device, start_adb_server
 from modules.error import ADBConnectionException, OptionNotAvailable
 from modules.adb import get_session_device_id
-from modules.utility import loading_animation
+from modules.utility import loading_animation, get_terminal_size
 
 class CLI():
 
@@ -143,12 +143,25 @@ class CLI():
                 if len(CURRENT_OPTION['children']) == 2:
                     print_formatted_text(HTML("<option> > Ctrl+C to cancel the action</option>"), style=self._style)    
 
-                print("")
+                # Get terminal width
+                terminal_width = get_terminal_size()
+    
+                # Create a line that spans the full terminal width
+                line = '━' * terminal_width
+                print(f"\n{line}\n")
                 
                 # Print the description of the current option
-                for x in CURRENT_OPTION['description']:
-                    print_formatted_text(HTML(f"<descr>{x}</descr>"), style=self._style)
+                if len(CURRENT_OPTION['children']) == 2:
+                    
+                    print_formatted_text(HTML(f"<descr>{CURRENT_OPTION['description'][0]}</descr>"), style=self._style)
                 
+                    for x in CURRENT_OPTION['description'][1:]:
+                        print_formatted_text(HTML(f"<input>{x}</input>"), style=self._style)
+                
+                else:
+                    for x in CURRENT_OPTION['description']:
+                        print_formatted_text(HTML(f"<descr>{x}</descr>"), style=self._style)
+
                 if len(self._current_path)>1:
                     # Print the current path between functionality
                     print("")

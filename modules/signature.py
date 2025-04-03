@@ -5,7 +5,8 @@ Licensed under the Apache License v2.0
 """
 
 from datetime import datetime
-from modules.utility import valid_apk_file
+from modules.utility import current_date, valid_apk_file
+from modules.app_info import app_id_from_apk
 import os
 from modules.tasks_management import Task
 import shutil
@@ -23,9 +24,10 @@ def sign_apk(user_input, signed_file=None):
     apk_path = valid_apk_file(user_input)
     
     if not signed_file:
-        dest_folder = os.path.join("results", os.path.basename(apk_path).replace(".apk", ""),"signed")
+        now = current_date()
+        dest_folder = os.path.join("results", app_id_from_apk(apk_path),"signed", now)
         os.makedirs(dest_folder, exist_ok=True)
-        signed_file = os.path.join(dest_folder, "signed_"+os.path.basename(apk_path))
+        signed_file = os.path.join(dest_folder, os.path.basename(apk_path))
         shutil.copy(apk_path, signed_file)
 
     # Keystore file path

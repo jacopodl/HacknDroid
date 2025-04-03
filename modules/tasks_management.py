@@ -47,10 +47,12 @@ class DaemonTask():
         Args:
             command (list): The command to run.
         """
-        self._PROCESS = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL ,text=True, env=os.environ)
+
+        if platform.system() != "Windows":
+            command = " ".join(command)
+
+        self._PROCESS = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL ,shell=True, env=os.environ)
         output, error = self._PROCESS.communicate()
-        # Process stoped before by the user
-        self._PROCESS = None
     
     def stop(self):
         """
@@ -63,6 +65,15 @@ class DaemonTask():
             self._THREAD = None
         else:
             print("The process was already finished!!!")
+
+    def get_thread(self):
+        """
+        Get the thread of the daemon task.
+
+        Returns:
+            threading.Thread: The thread of the daemon task.
+        """
+        return self._THREAD
 
 class DaemonTaskManager():
     def __init__(self):
@@ -145,6 +156,16 @@ class DaemonTaskManager():
         Returns:
             dict: The dictionary of all tasks.
         """
+        functionalities = list(self._TOOL_TASKS.keys())
+        for functionality in functionalities:
+            ids = list(self._TOOL_TASKS[functionality].keys())
+
+            for id in ids:
+                if self._TOOL_TASKS[functionality][id]['task'].get_thread().is_alive():
+                    continue
+                else:
+                    self.stop_task(functionality, id)
+
         return self._TOOL_TASKS
     
     def get_next_id(self):

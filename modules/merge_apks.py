@@ -9,6 +9,7 @@ import os
 from termcolor import colored
 from modules import utility
 import shutil
+from modules.app_info import app_id_from_apk
 from modules.tasks_management import Task
 
 def merge_from_dir(user_input):
@@ -25,12 +26,29 @@ def merge_from_dir(user_input):
     while not os.path.exists(user_input):
         user_input = input(colored("Insert an existing folder path:\n", "green"))
 
+    files = [f for f in os.listdir(user_input) if os.path.isfile(os.path.join(user_input,f)) and f.endswith(".apk")]
+
+    app_id = None
+    if len(files) == 0:
+        print("[ERROR in folder] No APKs inside it")
+        return None
+    elif len(files) == 1:
+        app_id = app_id_from_apk(os.path.join(user_input, files[0]))
+    elif "base.apk" in files:
+        app_id = app_id_from_apk(os.path.join(user_input, "base.apk"))       
+    else:
+        print("[ERROR in folder] Multiple APKs but base.apk not found")
+        return None
+
+    now = utility.current_date()
+    merged_folder = os.path.join("results",app_id, "merged_apk")
+    os.makedirs(merged_folder, exist_ok=True)
     # Generate the name for the merged APK file
-    apk_name = "merged_"+utility.rsc_from_path(user_input)+".apk"
+    apk_name = os.path.join(merged_folder,f"{now}.apk")
 
     # Command to merge APK files
     # -f: force overwrite of output APK file
-    command = [f'APKEditor','m',"-f","-i", user_input, "-o", apk_name]
+    command = [f'apkeditor','m',"-f","-i", user_input, "-o", apk_name]
     print(command)
     output, error = Task().run(command, is_shell=True)
 
