@@ -351,31 +351,53 @@ def android_dependencies():
             sdkmanager_path = tool_path
             break
     
-    process = subprocess.Popen([sdkmanager_path, '--list'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,text=True)
-    output, error = process.communicate()
+    
+    retry = 2
+    while retry:
+        process = subprocess.Popen([sdkmanager_path, '--list'], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE, text=True, env=os.environ)
+        output, error = process.communicate()
 
-    build_tools_versions = [ line.split("|")[0] for line in output.split('\n') if line.strip().startswith('build-tools') and "-rc" not in line]
+        retry -= 1
+        if "SKIP_JDK_VERSION_CHECK" in output:
+            os.environ["SKIP_JDK_VERSION_CHECK"] = "true"
 
-    print(f"build-tools: {build_tools_versions[-1].strip()}")
+            if retry >= 1:
+                continue
 
-    print("Installing the build-tools...", end=' ')
-    process = subprocess.Popen([sdkmanager_path, build_tools_versions[-1].strip()], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    process.communicate('y')
-    print("DONE")
+        retry = 0
 
-    os.environ['PATH'] =  os.environ['PATH'] + os.pathsep + \
-                          os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest', 'bin') + os.pathsep + \
-                          os.path.join(os.environ['ANDROID_HOME'], 'platform-tools') + os.pathsep + \
-                          os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tools_versions[-1].strip().split(";")[1]) + os.pathsep + \
-                          os.path.join(os.environ['JAVA_HOME'], 'bin') + os.pathsep + \
-                          os.path.abspath(os.path.join(dependencies_path, 'JAR')) + os.pathsep + \
-                          os.path.abspath(os.path.join(dependencies_path, 'scrcpy')) + os.pathsep + \
-                          os.path.abspath(os.path.join(dependencies_path, 'dex-tools')) + os.pathsep + \
-                          os.path.abspath(os.path.join(dependencies_path, 'jadx', 'bin'))
+        build_tools_versions = [line.split("|")[0] for line in output.split('\n') if
+                                line.strip().startswith('build-tools') and "-rc" not in line]
+
+        print(f"build-tools: {build_tools_versions[-1].strip()}")
+
+        print("Installing the build-tools...", end=' ')
+        process = subprocess.Popen([sdkmanager_path, build_tools_versions[-1].strip()], stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=os.environ)
+        process.communicate('y')
+        print("DONE")
+
+    paths = os.environ['PATH'] + os.pathsep + \
+            os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest', 'bin') + os.pathsep + \
+            os.path.join(os.environ['ANDROID_HOME'], 'platform-tools') + os.pathsep + \
+            os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
+                         build_tools_versions[-1].strip().split(";")[1]) + os.pathsep
+
+    if "JAVA_HOME" in os.environ:
+        paths += os.path.join(os.environ['JAVA_HOME'], 'bin') + os.pathsep
+    else:
+        print("Environment variable JAVA_HOME not found, it may be impossible to execute the application")
+
+    paths += os.path.abspath(os.path.join(dependencies_path, 'JAR')) + os.pathsep + \
+    os.path.abspath(os.path.join(dependencies_path, 'scrcpy')) + os.pathsep + \
+    os.path.abspath(os.path.join(dependencies_path, 'dex-tools')) + os.pathsep + \
+    os.path.abspath(os.path.join(dependencies_path, 'jadx', 'bin'))
+
+    os.environ['PATH'] = paths
 
     if platform.system() == "Darwin" or platform.system() == "Linux":
         chmod_executable_recursive(os.environ['ANDROID_HOME'])
-
 
 def set_android_home_env_var():
     config = configparser.ConfigParser()
