@@ -129,7 +129,7 @@ class CLI():
                     device_info = f"\U0001F4F1 {device_model} ({device_id})"
                     # Initialize the prompt completer with the children of the current option
                 else:
-                    device_info = "\u274C 'NO DEVICE"
+                    device_info = "\u274C NO DEVICE"
                     options_list = [k for k in options_list if (k in ['back','home'] or not CURRENT_OPTION['children'][k]['device_needed'])]
 
             
