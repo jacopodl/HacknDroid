@@ -210,7 +210,8 @@ def download(mobile_path, dest_path, permissions_check=True):
     # Check if permissions check is enabled
     if permissions_check:
         # If the output indicates a permission denied error or no files were pulled
-        if "permission denied" in output.lower() or "0 files pulled" in output.lower():
+        print(output)
+        if "permission denied" in output.lower() or "0 files pulled" in output.lower() or "permission denied" in error.lower() or "0 files pulled" in error.lower():
             # Prompt the user to decide if they want to download the file/folder as Super User
             x = input(colored("[PERMISSION DENIED] ", 'red')+colored("Do you want to download the file/folder as Super User (y/n)? ", "green"))
 

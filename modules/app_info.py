@@ -6,6 +6,7 @@ Licensed under the Apache License v2.0
 
 from modules.tasks_management import Task
 import re
+import hashlib
 
 def app_info_from_apk(apk_filepath):
     """
@@ -18,12 +19,36 @@ def app_info_from_apk(apk_filepath):
         dict: App information.
     """
 
-    # Command to extract APK information using 'aapt' tool
-    command = ['aapt', 'dump', 'badging', apk_filepath]
-    output, error = Task().run(command)
+    sha1_hash = "N/A"
+    sha256_hash = "N/A"
+    sha1_hasher = hashlib.sha1()
+    sha256_hasher = hashlib.sha256()
+
+    # Read the file in chunks to handle large files efficiently
+    try:
+        with open(apk_filepath, 'rb') as f:
+            while True:
+                chunk = f.read(4096)  # Read in 4KB chunks
+                if not chunk:
+                    break
+                sha1_hasher.update(chunk)
+                sha256_hasher.update(chunk)
+        
+        sha1_hash = sha1_hasher.hexdigest()
+        sha256_hash = sha256_hasher.hexdigest()
+    
+    except IOError as e:
+        print(f"Error reading file '{apk_filepath}': {e}")
 
     # Dictionary to store extracted APK information
     info = {}
+
+    info["SHA1"]=sha1_hash
+    info["SHA256"]=sha256_hash
+
+    # Command to extract APK information using 'aapt' tool
+    command = ['aapt', 'dump', 'badging', apk_filepath]
+    output, error = Task().run(command)
 
     # Process each line of the output
     for line in output.splitlines():
