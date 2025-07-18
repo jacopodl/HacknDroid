@@ -5,7 +5,7 @@ Licensed under the Apache License v2.0
 """
 
 from modules.cli_management import CLI
-from config.setup import github_dependencies, android_dependencies, set_android_home_env_var
+from config.setup import github_dependencies, android_dependencies, set_config_var, set_os_env_var
 from argparse import ArgumentParser
 
 def arg_parser():
@@ -23,8 +23,9 @@ def main():
     if dependencies_install:
         github_dependencies()
         android_dependencies()
-        set_android_home_env_var()
+        set_config_var()
     else:
+        set_os_env_var()
         cli_mgmt = CLI()
         cli_mgmt.cli_options()
 
