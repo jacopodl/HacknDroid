@@ -10,6 +10,7 @@ from termcolor import colored
 from modules.error import ADBConnectionException, OptionNotAvailable
 import subprocess
 import configparser
+from modules.tasks_management import Task
 
 def check_connection(adb_shell_output):
     """
@@ -93,22 +94,8 @@ def select_device(user_input):
 
 def adb_devices_list():
     while True:
-        env = None
-
-        script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-        config_file_path = os.path.join(script_folder, "config.ini")
-
-        if os.path.exists(config_file_path):
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-        
-            if config.has_section('Environment') and config.has_option('Environment', 'android_home') and config.has_option('Environment', 'path'):
-                os.environ['PATH'] = config.get('Environment', 'path')
-                os.environ['ANDROID_HOME'] = config.get('Environment', 'android_home')
-
         command = ['adb', 'devices', '-l']
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
-        output, error = process.communicate()
+        output, error = Task().run(command)
 
         headers = ["Device ID", "Device Name", "Status", "Model"]
 
@@ -213,24 +200,10 @@ def del_session_device_id():
             config.write(configfile)
         
 def start_adb_server():
-    env = None
-    script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-    config_file_path = os.path.join(script_folder, "config.ini")
-
-    if os.path.exists(config_file_path):
-        config = configparser.ConfigParser()
-        config.read(config_file_path)
-    
-        if config.has_section('Environment') and config.has_option('Environment', 'android_home') and config.has_option('Environment', 'path'):
-            os.environ['PATH'] = config.get('Environment', 'path')
-            os.environ['ANDROID_HOME'] = config.get('Environment', 'android_home')
-
     print("Killing ADB servers running...")
     command = ['adb', 'kill-server']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
-    output, error = process.communicate()
+    output, error = Task().run(command)
 
     print("Starting a new ADB server...")
     command = ['adb','start-server']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=os.environ)
-    output, error = process.communicate()
+    output, error = Task().run(command)
