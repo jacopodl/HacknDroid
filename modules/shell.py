@@ -11,6 +11,8 @@ from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit import prompt, print_formatted_text
 
+from modules.tasks_management import Task
+
 CURRENT_USER = ""
 CURRENT_DIR = ""
 
@@ -20,21 +22,18 @@ def interactive_adb_shell(user_input):
     # Load the CLI style from the tool_style configuration
     shell_style = Style.from_dict(tool_style.STYLE)
 
-    process = subprocess.Popen(["adb", '-s', get_session_device_id(), "shell"], text=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    output, error = process.communicate("whoami\npwd\n")
-
+    command = ["adb", '-s', get_session_device_id(), "shell"]
+    cmd_input = "whoami\npwd\n"
+    output, error = Task().run(command, input_to_cmd=["whoami\npwd\n",])
     CURRENT_USER, CURRENT_DIR = output.splitlines()
-
     
     while True:
-        input_str = f"{CURRENT_USER}$ "
-        process = subprocess.Popen(["adb", '-s', get_session_device_id(), "shell"], text=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-
         # Prompt the user for input (tab completion enabled)
         cmd = prompt(HTML(f"<shell_user> {CURRENT_USER} </shell_user><shell_pwd> {CURRENT_DIR} </shell_pwd> "), style=shell_style, multiline=False)
-        output, error = process.communicate(f"su {CURRENT_USER}\ncd {CURRENT_DIR}\n{cmd}\nwhoami;pwd\n")
-        
+
+        command = ["adb", '-s', get_session_device_id(), "shell"]
+        cmd_input = f"su {CURRENT_USER}\ncd {CURRENT_DIR}\n{cmd}\nwhoami;pwd\n"
+        output, error = Task().run(command, input_to_cmd=[cmd_input,])
 
         output_lines = output.strip().splitlines()
         CURRENT_USER = output_lines[-2]

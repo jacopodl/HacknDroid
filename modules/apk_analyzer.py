@@ -6,7 +6,7 @@ Licensed under the Apache License v2.0
 
 import platform
 import re
-from modules.utility import app_id_from_user_input, current_date, valid_apk_file
+from modules.utility import app_id_from_user_input, current_date, valid_apk_file, valid_aab_file
 from modules.file_transfer import download
 from modules.merge_apks import merge_from_dir
 import os
@@ -20,7 +20,8 @@ from termcolor import colored, cprint
 from alive_progress import alive_bar
 from modules.app_info import app_info_from_apk, app_id_from_apk
 import xml.etree.ElementTree as ET
-
+import zipfile
+import sys
 
 DATA_APP_FOLDER = "/data/app"
 '''
@@ -746,3 +747,69 @@ def print_scheme_info(schemes, certificates, utc_time):
             print(colored(f"> {field}: ", 'yellow')+certificates[s][field])
 
     print("")
+
+def convert_aab_to_apk(aab_filepath):
+    """
+    Convert an AAB file to an APK file.
+
+    Args:
+        aab_filepath (str): The path to the AAB file.
+
+    Returns:
+        str: The path to the converted APK file.
+    """
+
+    folder_name = os.path.basename(aab_filepath).replace(".aab", "")
+    now = current_date()
+
+    results_folder = os.path.join("results", folder_name, "aab_to_apk", now)
+    os.makedirs(results_folder, exist_ok=True)
+
+    apks_filepath = os.path.join(results_folder, aab_filepath.replace(".aab", "_universal.apks"))
+    extracted_apk_dir = os.path.join(results_folder, aab_filepath.replace(".aab", "_extracted_apk"))
+    final_apk_filepath = os.path.join(results_folder, os.path.join(extracted_apk_dir, "universal.apk"))
+
+    command = ["bundletool", "build-apks", "--mode=universal", f"--bundle={ aab_filepath}", f"--output={apks_filepath}"]
+    output, error = Task().run(command, is_shell=True)
+
+    print(output)
+    print(error)
+
+    # Create the directory to extract into, if it doesn't exist
+    os.makedirs(extracted_apk_dir, exist_ok=True)
+
+    try:
+        with zipfile.ZipFile(apks_filepath, 'r') as zip_ref:
+            # Extract only 'universal.apk' if it exists, otherwise extract all
+            if "universal.apk" in zip_ref.namelist():
+                zip_ref.extract("universal.apk", extracted_apk_dir)
+                print(f"Successfully extracted 'universal.apk' to: {final_apk_filepath}")
+            else:
+                print("Warning: 'universal.apk' not found directly in .apks. Extracting all contents.", file=sys.stderr)
+                zip_ref.extractall(extracted_apk_dir)
+                print(f"All contents extracted to: {extracted_apk_dir}")
+                print("You may need to manually locate the desired .apk file.")
+
+        # Clean up the .apks file if desired
+        # os.remove(apks_filepath)
+        # print(f"Removed temporary .apks file: {apks_filepath}")
+
+    except zipfile.BadZipFile:
+        print(f"Error: '{apks_filepath}' is not a valid ZIP file.", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"An error occurred during unzipping: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    return final_apk_filepath
+
+def aab_to_apk(user_input):
+    # Check if the AAB file path is valid
+    aab_filepath = valid_aab_file(user_input)
+
+    print(aab_filepath)
+
+    # Convert AAB to APK
+    apk_filepath = convert_aab_to_apk(aab_filepath)
+
+    return apk_filepath
