@@ -350,9 +350,10 @@ def set_current_pc_invisible_proxy(user_input):
     if pc_ssid!=mobile_ssid:
         print("\nPlease connect the mobile device and the current PC to the same network!!!")
 
-    command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
-    output, error = Task().run(command)
-    x=input(colored("Press ENTER to launch the DNS Server...\n", "green"))
+        command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+        output, error = Task().run(command)
+    
+    x=input(colored("Press ENTER to set the IPTables...\n", "green"))
 
     set_invisible_proxy(pc_wifi_ip())
 
