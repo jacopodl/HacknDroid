@@ -45,9 +45,7 @@ def check_battery_status(user_input):
     """
     # Open ADB shell
     command = ['adb' , '-s', get_session_device_id(), 'shell', 'dumpsys', 'battery']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-    output, error = process.communicate()
-
+    output, error = Task().run(command)
 
     style = Style.from_dict(tool_style.STYLE)
     

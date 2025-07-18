@@ -13,6 +13,7 @@ import requests
 from modules.adb import get_session_device_id
 from datetime import datetime
 from termcolor import colored, cprint
+from modules.tasks_management import Task
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -153,8 +154,7 @@ def active_applications():
         list: A list of active application IDs.
     """
     command = "adb -s "+get_session_device_id()+" shell \"ps -A | awk '{print $9}'\""
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-    output, error = process.communicate()
+    output, error = Task().run(command)
 
     lines = output.splitlines()
     apps = []
@@ -263,28 +263,14 @@ def sd_path():
     """
     # Open ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell']
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-
     # Print the external storage path
-    command = ['echo $EXTERNAL_STORAGE','exit']
-    output, error = process.communicate(input=cmd_to_subprocess_string(command))
+    input_cmd = ['echo $EXTERNAL_STORAGE','exit']
+    output, error = Task().run(command, input_to_cmd=input_cmd)
+    
     sdcard_path = output.splitlines()[0]
     
     # Return the found path
     return sdcard_path
-
-def cmd_to_subprocess_string(cmd):
-    """
-    Convert a list of commands into a string of commands separated by newlines.
-    (To be used as stdin for a subprcess)
-
-    Args:
-        cmd (list): A list of commands.
-
-    Returns:
-        str: A string of commands separated by newlines.
-    """
-    return '\n'.join(cmd)
 
 def rsc_from_path(path):
     """
@@ -334,6 +320,23 @@ def valid_apk_file(user_input):
     """
     while not os.path.exists(user_input) or not user_input.endswith(".apk"):
         user_input = input(colored("Write the path of an APK file on the PC:\n", "green"))
+
+    print("")
+
+    return user_input
+
+def valid_aab_file(user_input):
+    """
+    Prompt the user to provide a valid APK file path.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        str: The valid APK file path.
+    """
+    while not os.path.exists(user_input) or not user_input.endswith(".aab"):
+        user_input = input(colored("Write the path of an AAB file on the PC:\n", "green"))
 
     print("")
 
