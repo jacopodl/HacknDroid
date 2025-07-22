@@ -12,7 +12,7 @@ from modules.merge_apks import merge_from_dir
 import os
 import glob
 import shutil
-from modules.signature import certificate_info, sign_apk, scheme_verify
+from modules.signature import certificate_info, sign_apk, scheme_verify,  create_keystore
 from modules.tasks_management import Task
 from modules.adb import get_session_device_id
 from pathlib import Path
@@ -769,7 +769,18 @@ def convert_aab_to_apk(aab_filepath):
     extracted_apk_dir = os.path.join(results_folder, aab_filepath.replace(".aab", "_extracted_apk"))
     final_apk_filepath = os.path.join(results_folder, os.path.join(extracted_apk_dir, "universal.apk"))
 
-    command = ["bundletool", "build-apks", "--mode=universal", f"--bundle={ aab_filepath}", f"--output={apks_filepath}"]
+    keystore_file = os.path.join(results_folder, "keystore.jks")
+    password = "SimplePassword0!"
+    ks_alias = "keystore_alias"
+
+    if os.path.exists(keystore_file):
+        os.remove(keystore_file)
+    
+    create_keystore(keystore_file, password, ks_alias)
+    
+    command = ["bundletool", "build-apks", "--mode=universal", f"--bundle={ aab_filepath}", 
+               f"--output={apks_filepath}", f"--ks={keystore_file}", f"--ks-pass=pass:{password}",
+               f"--key-pass=pass:{password}", f"--ks-key-alias={ks_alias}"]
     output, error = Task().run(command, is_shell=True)
 
     print(output)

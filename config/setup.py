@@ -17,6 +17,8 @@ import platform
 import tarfile
 from alive_progress import alive_bar
 from termcolor import colored
+import sys
+from modules.tasks_management import Task
 
 if platform.system() != "Windows":
     import magic
@@ -83,7 +85,17 @@ GITHUB_DEPENDECIES = {
             "Linux" : "",
             "Darwin" : ""
         },
-    },    
+    },
+    "bundletool" : {
+        "release_url" : "https://api.github.com/repos/google/bundletool/releases/latest",
+        "content_type" : ["application/java-archive",],
+        "final_name": "bundletool.jar",
+        "os_specific_keywords" : {
+            "Windows" : "",
+            "Linux" : "",
+            "Darwin" : ""
+        },
+    }
 }
 
 SOFTWARE_DEPENDENCIES = {
@@ -354,9 +366,8 @@ def android_dependencies():
     
     retry = 2
     while retry:
-        process = subprocess.Popen([sdkmanager_path, '--list'], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, text=True, env=os.environ)
-        output, error = process.communicate()
+        command = [sdkmanager_path, '--list']        
+        output, error = Task().run(command)
 
         retry -= 1
         if "SKIP_JDK_VERSION_CHECK" in output:
@@ -373,16 +384,27 @@ def android_dependencies():
         print(f"build-tools: {build_tools_versions[-1].strip()}")
 
         print("Installing the build-tools...", end=' ')
-        process = subprocess.Popen([sdkmanager_path, build_tools_versions[-1].strip()], stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=os.environ)
-        process.communicate('y')
+        sys.stdout.flush()
+        
+        command = [sdkmanager_path, build_tools_versions[-1].strip()]        
+        output, error = Task().run(command, input_to_cmd=['y'])
+        
         print("DONE")
+        
+    print("Installing the emulator...", end=' ')
+    sys.stdout.flush()
+    command = [sdkmanager_path, 'emulator']
+    output, error = Task().run(command, input_to_cmd=['y'])
+    print("DONE")
+
+    os.makedirs('avds', exist_ok=True)
+    os.environ['ANDROID_AVD_HOME'] = os.path.abspath('avds')
 
     paths = os.environ['PATH'] + os.pathsep + \
             os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest', 'bin') + os.pathsep + \
             os.path.join(os.environ['ANDROID_HOME'], 'platform-tools') + os.pathsep + \
-            os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
-                         build_tools_versions[-1].strip().split(";")[1]) + os.pathsep
+            os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tools_versions[-1].strip().split(";")[1]) + os.pathsep + \
+            os.path.join(os.environ['ANDROID_HOME'], 'emulator') + os.pathsep
 
     if "JAVA_HOME" in os.environ:
         paths += os.path.join(os.environ['JAVA_HOME'], 'bin') + os.pathsep
@@ -399,7 +421,7 @@ def android_dependencies():
     if platform.system() == "Darwin" or platform.system() == "Linux":
         chmod_executable_recursive(os.environ['ANDROID_HOME'])
 
-def set_android_home_env_var():
+def set_config_var():
     config = configparser.ConfigParser()
     script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
     config_file_path = os.path.join(script_folder, "config.ini")
@@ -413,7 +435,24 @@ def set_android_home_env_var():
 
     config.set('Environment', 'PATH', os.environ['PATH'])
     config.set('Environment', 'ANDROID_HOME', os.environ['ANDROID_HOME'])
+    config.set('Environment', 'ANDROID_AVD_HOME', os.environ['ANDROID_AVD_HOME'])
+
+    if os.environ["SKIP_JDK_VERSION_CHECK"] == "true":
+        config.set('Environment', 'SKIP_JDK_VERSION_CHECK', 'true')
 
     # Write the configuration to a file
     with open(config_file_path, 'w') as configfile:
         config.write(configfile)
+
+def set_os_env_var():
+    script_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    config_file_path = os.path.join(script_folder, "config.ini")
+
+    if os.path.exists(config_file_path):
+        config = configparser.ConfigParser()
+        config.read(config_file_path)
+    
+        section = 'Environment'
+        if config.has_section(section):
+            for option in config.options(section):
+                os.environ[option.upper()] = config.get(section, option)

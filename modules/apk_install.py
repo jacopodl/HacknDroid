@@ -24,8 +24,6 @@ def install_from_apk(user_input):
 
     if utility.is_app_id(app_id):
         uninstall_app(app_id)
-    else:
-        return
 
     # Install the APK on the mobile device
     print(f"Installing {apk_path} on the device...", end=' ')
@@ -54,8 +52,6 @@ def install_from_playstore(user_input):
         sys.stdout.flush()
         uninstall_app(app_id)
         print("DONE")
-    else:
-        return
 
     # Create intent to open Play Store
     print(f"Opening {app_id} on PlayStore...", end=' ')

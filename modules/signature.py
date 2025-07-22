@@ -12,6 +12,13 @@ from modules.tasks_management import Task
 import shutil
 import re
 
+def create_keystore(keystore_file, password, alias):
+    # Command to create a new keystore file to be used to sign the zip-aligned APK
+    # keytool is related to JDK and it is usually at $JAVA_HOME/bin
+    command = ['keytool', '-genkeypair', '-v', '-keystore', keystore_file, '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000', '-alias', alias, '-storepass', password, '-keypass', password, '-dname', "CN=John Doe, OU=Development, O=MyCompany, L=New York, ST=NY, C=US"]
+    print(command)
+    output, error = Task().run(command, is_shell=True)
+
 def sign_apk(user_input, signed_file=None):
     """
     Sign an APK file
@@ -38,11 +45,7 @@ def sign_apk(user_input, signed_file=None):
     if os.path.exists(keystore_file):
         os.remove(keystore_file)
 
-    # Command to create a new keystore file to be used to sign the zip-aligned APK
-    # keytool is related to JDK and it is usually at $JAVA_HOME/bin
-    command = ['keytool', '-genkeypair', '-v', '-keystore', keystore_file, '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000', '-alias', 'my-key-alias', '-storepass', password, '-keypass', password, '-dname', "CN=John Doe, OU=Development, O=MyCompany, L=New York, ST=NY, C=US"]
-    print(command)
-    output, error = Task().run(command, is_shell=True)
+    create_keystore(keystore_file, password, "ks_alias")
 
     # Command to sign the APK using the password and the keystore created
     command = ['apksigner', 'sign', '--ks', keystore_file, '--ks-pass', f'pass:{password}', '--key-pass', f'pass:{password}', '--v1-signing-enabled', 'true', '--v2-signing-enabled', 'true', signed_file]

@@ -7,7 +7,6 @@ Licensed under the Apache License v2.0
 import platform
 import subprocess
 import threading
-from modules.utility import cmd_to_subprocess_string 
 from tabulate import tabulate
 import copy
 from termcolor import colored
@@ -213,7 +212,8 @@ class Task():
         """
         pass
 
-    def run(self, command : list, is_shell : bool = False, input_to_cmd : list = None):
+    def run(self, command : list, is_shell : bool = False, input_to_cmd : list = None, 
+            process_input=subprocess.PIPE, process_output=subprocess.PIPE, process_error=subprocess.PIPE):
         """
         Run a command as a task.
 
@@ -229,16 +229,29 @@ class Task():
             if platform.system() != "Windows":
                 command = " ".join(command)
 
-            self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,shell=True, env = os.environ)
+            self._PROCESS = subprocess.Popen(command, stdin=process_input, stdout=process_output, stderr=process_error ,shell=True, env = os.environ)
         else:
-            self._PROCESS = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE ,text=True, env = os.environ)
+            self._PROCESS = subprocess.Popen(command, stdin=process_input, stdout=process_output, stderr=process_error ,text=True, env = os.environ)
         
         if input_to_cmd:
-            output, error = self._PROCESS.communicate(cmd_to_subprocess_string(input_to_cmd))
+            output, error = self._PROCESS.communicate(self.cmd_to_subprocess_string(input_to_cmd))
         else:
             output, error = self._PROCESS.communicate()
 
         return output, error
+    
+    def cmd_to_subprocess_string(self, cmd):
+        """
+        Convert a list of commands into a string of commands separated by newlines.
+        (To be used as stdin for a subprcess)
+
+        Args:
+            cmd (list): A list of commands.
+
+        Returns:
+            str: A string of commands separated by newlines.
+        """
+        return '\n'.join(cmd)
 
 def list_daemons(user_input):
     """

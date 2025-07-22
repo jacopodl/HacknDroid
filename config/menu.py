@@ -4,7 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
-from modules import adb, apk_analyzer, apk_install, app_logs, backup, battery, connectivity, file_transfer, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
+from modules import adb, apk_analyzer, apk_install, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
 import modules.tasks_management
 from modules import utility
 
@@ -196,7 +196,18 @@ OPTIONS =   {
                                         "home" : dict()
                                     },
                                 },
-                                "compiling": { 
+                                "apk_from_aab": { 
+                                    'description': ['APK from the AAB file',
+                                                    'Write the filepath of the AAB file',],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function' : apk_analyzer.aab_to_apk
+                                },
+                                "compile_sign": { 
                                     'description': ['Compile an apk file from the folder with decompiled and modified code',],
                                     'device_needed': False,
                                     'children': {
@@ -223,12 +234,23 @@ OPTIONS =   {
                                             
                                             'function' : apk_analyzer.apk_compile_and_sign_from_folder
                                         },
+                                        "sign_apk":{
+                                            'description': ['Sign an apk on your PC.',
+                                                            'Write the path of the APK file on the PC to be signed'],
+                                            'device_needed': False,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': signature.sign_apk
+                                        },
                                         "back" : dict(),
                                         "home" : dict()
                                     },
                                     
                                 },
-                                "decompiling": { 
+                                "decompile": { 
                                     'description': ['Decompile an apk file',],
                                     'device_needed': False,
                                     'children': {
@@ -350,17 +372,6 @@ OPTIONS =   {
                                         "home" : dict()
                                     },
                                     
-                                },
-                                "sign_apk":{
-                                    'description': ['Sign an apk on your PC.',
-                                                    'Write the path of the APK file on the PC to be signed'],
-                                    'device_needed': False,
-                                    'children': {
-                                        "back" : dict(),
-                                        "home" : dict()
-                                    },
-                                    
-                                    'function': signature.sign_apk
                                 },
                                 "back" : dict(),
                                 "home" : dict()
@@ -687,6 +698,60 @@ OPTIONS =   {
                             'function': adb.select_device
 
                         },
+                        "emulator":{
+                            'description': ['Emulators management'],
+                            'device_needed': False,
+                            'children': {
+                                "avd_create":{
+                                    'description': ['Create a new AVD.',
+                                                    'Press ENTER to continue...'],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': emulator.create_avd_device
+                                },
+                                "avd_delete":{
+                                    'description': ['Delete an existing AVD.',
+                                                    'Press ENTER to continue...'],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': emulator.delete_avd
+                                },
+                                "avd_list":{
+                                    'description': ['List all the available AVDs.',
+                                                    'Press ENTER to continue...'],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': emulator.list_available_avds_pretty
+                                },
+                                "emulator_launch":{
+                                    'description': ['Launch the emulator for an available AVD.',
+                                                    'Press ENTER to continue...'],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': emulator.launch_avd_emulator
+                                },
+                                "back" : dict(),
+                                "home" : dict()
+                            },
+                            
+                            'function': signature.sign_apk
+                        },
                         'file_transfer' : {
                             'description' : ['Transfer files from/to mobile devices'],
                             'device_needed': True,
@@ -721,6 +786,60 @@ OPTIONS =   {
                                 "home" : dict()
                             },
                             
+                        },
+                        "frida":{
+                            'description': ['Frida management'],
+                            'device_needed': True,
+                            'children': {
+                                "install":{
+                                    'description': ['Install Frida via PIP and the Frida Server on the device.',
+                                                    'Press ENTER to continue...'],
+                                    'device_needed': True,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': frida_integration.install_frida
+                                },
+                                "start_server":{
+                                    'description': ['Start the Frida Server on the device.',
+                                                    'Press ENTER to continue...'],
+                                    'device_needed': True,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': frida_integration.start_frida
+                                },
+                                "run_script":{
+                                    'description': ['Run Frida scripts on a specific application.',
+                                                    'Write its app id or a keyword to identify it.'],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': frida_integration.run_script
+                                },
+                                "uninstall":{
+                                    'description': ['Uninstall Frida and the related Frida Server.',
+                                                    'Press ENTER to continue...'],
+                                    'device_needed': False,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': frida_integration.run_script
+                                },
+                                "back" : dict(),
+                                "home" : dict()
+                            },
+                            
+                            'function': signature.sign_apk
                         },
                         "install_uninstall" : {
                             'description': ['Install an app on the mobile device.',],

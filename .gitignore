@@ -4,6 +4,7 @@
 .tmp
 *.ab
 *.apk
+*.aab
 *.ab
 *.tar
 backup_*/
@@ -13,3 +14,5 @@ merged_*/
 dependencies/
 config.ini
 results
+avds/
+TO-DO.md
