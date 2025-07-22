@@ -234,13 +234,13 @@ class Task():
             self._PROCESS = subprocess.Popen(command, stdin=process_input, stdout=process_output, stderr=process_error ,text=True, env = os.environ)
         
         if input_to_cmd:
-            output, error = self._PROCESS.communicate(self.cmd_to_subprocess_string(input_to_cmd))
+            output, error = self._PROCESS.communicate(self.cmd_to_subprocess_string(input_to_cmd, is_shell))
         else:
             output, error = self._PROCESS.communicate()
 
         return output, error
     
-    def cmd_to_subprocess_string(self, cmd):
+    def cmd_to_subprocess_string(self, cmd, is_shell):
         """
         Convert a list of commands into a string of commands separated by newlines.
         (To be used as stdin for a subprcess)
@@ -251,7 +251,11 @@ class Task():
         Returns:
             str: A string of commands separated by newlines.
         """
-        return '\n'.join(cmd)
+        if is_shell:
+            return '\n'.join(cmd).encode()
+        else:
+            return'\n'.join(cmd)
+    
 
 def list_daemons(user_input):
     """

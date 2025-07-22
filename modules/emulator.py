@@ -173,7 +173,7 @@ def delete_avd(user_input):
 
     if avd_name:
         try:
-            output, error = Task().run(["avdmanager.bat", "delete", "avd", "--name", avd_name])
+            output, error = Task().run(["avdmanager", "delete", "avd", "--name", avd_name], is_shell=True)
             print(f"✅ AVD '{avd_name}' deleted successfully.")
         except subprocess.CalledProcessError as e:
             print(f"❌ Error deleting AVD '{avd_name}': {e}")
@@ -211,9 +211,8 @@ def get_installed_packages():
     """Returns a set of currently installed SDK packages."""
     installed_packages = set()
     
-    output, error = Task().run(["sdkmanager.bat", "--list_installed"])
+    output, error = Task().run(["sdkmanager", "--list_installed"], is_shell=True)
     
-
     if not error:
         # sdkmanager --list_installed output format:
         # Path | Version | Description | Location
@@ -224,7 +223,7 @@ def get_installed_packages():
         # Regular expression to capture the package path
         # It looks for lines starting with a path (not headers or separators)
         # and captures everything up to the first space or pipe.
-        for line in output.splitlines():
+        for line in output.decode("utf-8").splitlines():
             match = re.match(r'^(.*?)\s+\|', line)
             if match and not match.group(1).startswith('---') and not match.group(1).startswith('Path'):
                 package_path = match.group(1).strip()
@@ -238,11 +237,8 @@ def is_package_installed(package, installed_packages_set):
 
 def install_package(package):
     print(f"⬇️ Installing package '{package}'...")
-    output, error = Task().run(["sdkmanager.bat", package], input_to_cmd=["y",])
+    output, error = Task().run(["sdkmanager", package], is_shell=True, input_to_cmd=["y",])
     
-    print(output)
-    print("ERROR")
-    print(error)
     if not error:
         print(f"✅ Package '{package}' installed successfully.")
         return True
@@ -255,14 +251,14 @@ def get_existing_avds():
     with AVD name, device, and package.
     """
     avds = []
-    command = ["avdmanager.bat", "list", "avd"]
-    output, error = Task().run(command)
+    command = ["avdmanager", "list", "avd"]
+    output, error = Task().run(command, is_shell=True)
 
     if error or not output:
         return avds
 
     current_avd = {}
-    for line in output.splitlines():
+    for line in output.decode("utf-8").splitlines():
         line = line.strip()
 
         if not line:
@@ -312,7 +308,7 @@ def create_avd(avd_name, package, device_skin, abi="x86", sdcard_size="512M"):
     # We pass a newline character (b'\n') to accept default settings.
     print(f"🏗️ Creating AVD '{avd_name}' with package '{package}' and device '{device_skin}'...")
     sys.stdout.flush()  # Ensure output is flushed immediately
-    output, error = Task().run(cmd, input_to_cmd='\n')
+    output, error = Task().run(cmd, is_shell=True, input_to_cmd=["\n",])
     
     if not error:
         print(f"✅ AVD '{avd_name}' created successfully.")
