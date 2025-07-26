@@ -134,19 +134,3 @@ def restore_backup(user_input):
     command = ['adb', '-s', get_session_device_id(), 'restore',user_input]
     print(command)
     output, error = Task().run(command, is_shell=True)
-
-
-def app_data_reset(user_input):
-    """
-    Reset the data of an application on the mobile device.
-
-    Args:
-        user_input (str): The App ID of the application to reset.
-    """
-    # Retrieve App ID from user input
-    app_id = app_id_from_user_input(user_input)
-    
-    # Reset App data for the application with App ID <app_id>
-    command = ['adb','-s', get_session_device_id(), 'shell',"pm","clear",app_id]
-    print(command)
-    output, error = Task().run(command, is_shell=True)

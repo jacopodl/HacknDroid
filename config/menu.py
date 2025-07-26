@@ -4,7 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
-from modules import adb, apk_analyzer, apk_install, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
+from modules import adb, apk_analyzer, apk_install, app_data, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
 import modules.tasks_management
 from modules import utility
 
@@ -385,8 +385,8 @@ OPTIONS =   {
                                              ' > Track logs of an application',],
                             'device_needed': True,
                             'children' : {
-                                "backup_and_data" : {
-                                    'description': ['Backup/Reset data of an application',],
+                                "backup" : {
+                                    'description': ['Backup/Restore data of an application',],
                                     'device_needed': True,
                                     'children': {
                                         "backup_device" : { 
@@ -421,7 +421,7 @@ OPTIONS =   {
                                             
                                             'function': backup.restore_backup
                                         },
-                                        "backup_to_folder" : { 
+                                        "unzip_ab_file" : { 
                                             'description': ["Extract a backup file on your system",
                                                             "Write the file path of the .ab file to be extracted"],
                                             'device_needed': True,
@@ -432,6 +432,24 @@ OPTIONS =   {
                                             
                                             'function': backup.tar_extract
                                         },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },          
+                                },
+                                "data_storage" : {
+                                    'description': ['Collect/Delete application data ',],
+                                    'device_needed': True,
+                                    'children': {
+                                        "collect_app_data" : { 
+                                            'description': ["Collect all the data stored by the appplication on the mobile device"],
+                                            'device_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function' : app_data.collect_app_data
+                                        },
                                         "reset_app_data" : { 
                                             'description': ["Reset App data",
                                                             "Write the app id or a part of the app name to reset its data"],
@@ -441,12 +459,11 @@ OPTIONS =   {
                                                 "home" : dict()
                                             },
                                             
-                                            'function': backup.app_data_reset
+                                            'function': app_data.reset_app_data
                                         },
                                         "back" : dict(),
                                         "home" : dict()
-                                    },
-                                            
+                                    },          
                                 },
                                 "dump_mem_info" : {
                                     'description': ['Dump the memory information for an application',],
