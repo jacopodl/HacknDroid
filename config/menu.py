@@ -43,6 +43,7 @@ OPTIONS =   {
                                                     'description': ["Certificate pinning hints on an apk file on your PC",
                                                                     "Write the path of the apk on your PC",],
                                                     'device_needed': False,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -53,6 +54,7 @@ OPTIONS =   {
                                                     'description': ["Certificate pinning hints on an application on your mobile device",
                                                                     "Write the app id or a part of the app name to be analysed",],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -71,6 +73,7 @@ OPTIONS =   {
                                                     'description': ["Root detection hints on an apk file on your PC",
                                                                     "Write the path of the apk on your PC",],
                                                     'device_needed': False,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -81,6 +84,7 @@ OPTIONS =   {
                                                     'description': ["Root detection hints on an application on your mobile device",
                                                                     "Write the app id or a part of the app name to be analysed",],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -100,6 +104,7 @@ OPTIONS =   {
                                                     'description': ["Signature scheme verifier on an apk file on your PC",
                                                                     "Write the path of the apk on your PC"],
                                                     'device_needed': False,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -110,6 +115,7 @@ OPTIONS =   {
                                                     'description': ["Signature scheme verifier on an application on your mobile device",
                                                                     "Write the app id or a part of the app name to be analysed"],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -133,6 +139,7 @@ OPTIONS =   {
                                                     'description': ["Analyze an apk file on your PC",
                                                                     "Write the path of the apk on your PC",],
                                                     'device_needed': False,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -143,6 +150,7 @@ OPTIONS =   {
                                                     'description': ["Analyze an apk file of an application on your mobile device",
                                                                     "Write the app id or a part of the app name to be analysed",],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -161,6 +169,7 @@ OPTIONS =   {
                                     'description': ["Get APK of an application on your mobile device",
                                                     'Write the app id or a part of the app name to be extracted and analysed'],
                                     'device_needed': False,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -175,6 +184,7 @@ OPTIONS =   {
                                             'description': ['App info from the APK',
                                                             'Write the path of the APK file on the PC to be analysed',],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -185,6 +195,7 @@ OPTIONS =   {
                                             'description': ['App info from the APK',
                                                             'Write the app id or a part of the app name to be analysed',],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -196,10 +207,11 @@ OPTIONS =   {
                                         "home" : dict()
                                     },
                                 },
-                                "apk_from_aab": { 
-                                    'description': ['APK from the AAB file',
+                                "aab_to_apk": { 
+                                    'description': ['Convert an AAB file to APK file',
                                                     'Write the filepath of the AAB file',],
                                     'device_needed': False,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -216,6 +228,7 @@ OPTIONS =   {
                                                             'Write the path of the decompiled folder on the PC to be compiled',
                                                             '(the folder should contain the apktool.yml file and all the other smali files)'],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -227,6 +240,7 @@ OPTIONS =   {
                                                             'Write the path of the decompiled folder on the PC to be compiled',
                                                             '(the folder should contain the apktool.yml file and all the other smali files)'],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -238,6 +252,7 @@ OPTIONS =   {
                                             'description': ['Sign an apk on your PC.',
                                                             'Write the path of the APK file on the PC to be signed'],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -258,6 +273,7 @@ OPTIONS =   {
                                             'description': ["Decompile the apk file into smali code",
                                                             "Write the path of the apk on your PC (or the folder with all the APKs related to the app)"],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -269,6 +285,7 @@ OPTIONS =   {
                                             'description': ["Decompile the apk file into smali code",
                                                             "Write the app id or a part of the app name to be extracted and analysed"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home":dict()
@@ -289,6 +306,7 @@ OPTIONS =   {
                                             'description': ["Open the reversed apk in JADX-GUI.",
                                                             "Write the path of the apk on your PC (or the folder with all the APKs related to the app)",],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children':{
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -300,6 +318,7 @@ OPTIONS =   {
                                             'description': ["Open the reversed apk in JADX-GUI",
                                                             "Write the app id or a part of the app name to be extracted and analysed",],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children':{
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -320,6 +339,7 @@ OPTIONS =   {
                                             'description': ["Convert an apk file on the PC to a jar file.",
                                                             "Write the path of the apk on your PC (or the folder with all the APKs related to the app)",],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children':{
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -331,6 +351,7 @@ OPTIONS =   {
                                             'description': ["Convert the apk to a jar file",
                                                             "Write the app id or a part of the app name to be extracted and analysed"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children':{
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -350,6 +371,7 @@ OPTIONS =   {
                                             'description' : ["Merge several APKs from a directory",
                                                              "Write the path of the directory with APKs to be merged",],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -361,6 +383,7 @@ OPTIONS =   {
                                             'description' : ["Merge several APKs",
                                                              "Write the list of APKs paths to be merged (separated by spaces):",],
                                             'device_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -392,6 +415,7 @@ OPTIONS =   {
                                         "backup_device" : { 
                                             'description': ["Backup the mobile device"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -400,9 +424,10 @@ OPTIONS =   {
                                             'function' : backup.device_backup
                                         },
                                         "backup_specific_app" : { 
-                                            'device_needed': True,
                                             'description': ["Backup a specific app",
                                                             "Write its app id or a keyword to identify it"],
+                                            'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -414,6 +439,7 @@ OPTIONS =   {
                                             'description': ["Restore a backup file on your mobile device",
                                                             "Write the file path of the .ab file to be extracted"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -425,6 +451,7 @@ OPTIONS =   {
                                             'description': ["Extract a backup file on your system",
                                                             "Write the file path of the .ab file to be extracted"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -443,6 +470,7 @@ OPTIONS =   {
                                         "collect_app_data" : { 
                                             'description': ["Collect all the data stored by the appplication on the mobile device"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -453,6 +481,7 @@ OPTIONS =   {
                                         "reset_app_data" : { 
                                             'description': ["Reset App data",
                                                             "Write the app id or a part of the app name to reset its data"],
+                                            'input_needed': True,
                                             'device_needed': True,
                                             'children': {
                                                 "back" : dict(),
@@ -473,6 +502,7 @@ OPTIONS =   {
                                             'description': ["Run and dump the memory information for an application.",
                                                             "Write the app id or a part of the app name to be launched"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -484,6 +514,7 @@ OPTIONS =   {
                                             'description': ["Dump the memory information for a running application",
                                                             "Write the app id or a part of the app name"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -500,6 +531,7 @@ OPTIONS =   {
                                     'description': ["Force the stop of a running application",
                                                     "Write the app id or a part of the app name"],
                                     'device_needed': True,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -522,6 +554,7 @@ OPTIONS =   {
                                                     'description' : ["Launch an application and log all the events",
                                                                      "Write the app id or a part of the app name"],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -533,6 +566,7 @@ OPTIONS =   {
                                                     'description' : ["Launch an application and log its crash events",
                                                                      "Write the app id or a part of the app name"],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -564,6 +598,7 @@ OPTIONS =   {
                                                     'description' : ["Log the crash events of a running application",
                                                                      "Write the app id or a part of the app name"],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -577,9 +612,9 @@ OPTIONS =   {
                                             
                                         },
                                         "log_sessions" : {
-                                            'description' : ["List logging sessions",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Logging sessions"],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -606,9 +641,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "3rd_party_apps": {
-                                            'description' : ["Get list of all the installed 3rd-party apps",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["List of all the installed 3rd-party apps",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -617,9 +652,9 @@ OPTIONS =   {
                                             'function': useful_stuff.third_party_apps
                                         },
                                         "system_apps": {
-                                            'description' : ["Get list of all the installed system apps",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["List of all the installed system apps",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -633,9 +668,9 @@ OPTIONS =   {
                                     
                                 },
                                 "battery_status" : {
-                                    'description' : ["Battery Status",
-                                                             "Press ENTER to continue..."],
+                                    'description' : ["Battery Status",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -644,9 +679,9 @@ OPTIONS =   {
                                     'function': battery.check_battery_status
                                 },
                                 "cpu_info": {
-                                    'description' : ["Get CPU information",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["CPU information",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -655,9 +690,9 @@ OPTIONS =   {
                                     'function': useful_stuff.cpu_info
                                 },
                                 "general_info": {
-                                    'description' : ["Get mobile device general information",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["Mobile device general information",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -666,9 +701,9 @@ OPTIONS =   {
                                     'function': useful_stuff.general_info
                                 },
                                 "network_info": {
-                                    'description' : ["Get Network information",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["Network information",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -677,9 +712,9 @@ OPTIONS =   {
                                     'function': useful_stuff.network_info
                                 },
                                 "ram_info": {
-                                    'description' : ["Get RAM information",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["RAM information",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -688,9 +723,9 @@ OPTIONS =   {
                                     'function': useful_stuff.ram_info
                                 },
                                 "storage_info": {
-                                    'description' : ["Get Storage information",
-                                                     "Press ENTER to continue..."],
+                                    'description' : ["Storage information",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -704,25 +739,24 @@ OPTIONS =   {
                             
                         },
                         'devices':{
-                            'description': ["Select one of the available mobile devices\n(the current one is highlighted with a different background)",
-                                            "Press ENTER to continue..."],
+                            'description': ["Select one of the available mobile devices",
+                                            "(the current one is highlighted with a different background)",],
                             'device_needed': False,
+                            'input_needed': False,
                             'children': {
                                 "back" : dict(),
                                 "home" : dict()
                             },
-                            
                             'function': adb.select_device
-
                         },
                         "emulator":{
                             'description': ['Emulators management'],
                             'device_needed': False,
                             'children': {
                                 "avd_create":{
-                                    'description': ['Create a new AVD.',
-                                                    'Press ENTER to continue...'],
+                                    'description': ['Create a new Android Virtual Device (AVD)',],
                                     'device_needed': False,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -731,9 +765,9 @@ OPTIONS =   {
                                     'function': emulator.create_avd_device
                                 },
                                 "avd_delete":{
-                                    'description': ['Delete an existing AVD.',
-                                                    'Press ENTER to continue...'],
+                                    'description': ['Delete an existing Android Virtual Device (AVD)',],
                                     'device_needed': False,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -742,9 +776,9 @@ OPTIONS =   {
                                     'function': emulator.delete_avd
                                 },
                                 "avd_list":{
-                                    'description': ['List all the available AVDs.',
-                                                    'Press ENTER to continue...'],
+                                    'description': ['List of all the available Android Virtual Devices (AVDs)',],
                                     'device_needed': False,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -753,9 +787,9 @@ OPTIONS =   {
                                     'function': emulator.list_available_avds_pretty
                                 },
                                 "emulator_launch":{
-                                    'description': ['Launch the emulator for an available AVD.',
-                                                    'Press ENTER to continue...'],
+                                    'description': ['Launch the emulator for an available Android Virtual Device (AVD)',],
                                     'device_needed': False,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -779,6 +813,7 @@ OPTIONS =   {
                                                     " > the path of the file/folder on the mobile device",
                                                     " > the PC folder (where the file will be downloaded)"],
                                     'device_needed': True,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -792,6 +827,7 @@ OPTIONS =   {
                                                     " > the path of the file/folder on the PC",
                                                     " > the mobile device folder (where the file will be uploaded)"],
                                     'device_needed': True,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -809,9 +845,11 @@ OPTIONS =   {
                             'device_needed': True,
                             'children': {
                                 "install":{
-                                    'description': ['Install Frida via PIP and the Frida Server on the device.',
-                                                    'Press ENTER to continue...'],
+                                    'description': ['Frida installation,',
+                                                    '> Frida and Frida tools via PIP on the PC',
+                                                    '> Frida Server on the device'],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -820,9 +858,9 @@ OPTIONS =   {
                                     'function': frida_integration.install_frida
                                 },
                                 "start_server":{
-                                    'description': ['Start the Frida Server on the device.',
-                                                    'Press ENTER to continue...'],
+                                    'description': ['Start the Frida Server on the device',],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -834,6 +872,7 @@ OPTIONS =   {
                                     'description': ['Run Frida scripts on a specific application.',
                                                     'Write its app id or a keyword to identify it.'],
                                     'device_needed': False,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -842,9 +881,11 @@ OPTIONS =   {
                                     'function': frida_integration.run_script
                                 },
                                 "uninstall":{
-                                    'description': ['Uninstall Frida and the related Frida Server.',
-                                                    'Press ENTER to continue...'],
+                                    'description': ['Uninstall Frida',
+                                                    '> Frida and Frida Tools on the PC',
+                                                    '> Frida Server on the device',],
                                     'device_needed': False,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -866,6 +907,7 @@ OPTIONS =   {
                                     'description' : ["Install an APK file on the mobile device",
                                                      "Write the path of the apk on your PC",],
                                     'device_needed': True,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -878,6 +920,7 @@ OPTIONS =   {
                                                      "Write the app id of the app to be installed",
                                                      "(the Play Store will be opened on the mobile device and then you can manually install it)",],
                                     'device_needed': True,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -889,6 +932,7 @@ OPTIONS =   {
                                     'description' : ["Uninstall an app from the mobile device",
                                                      "Write the app id of the app to be uninstalled",],
                                     'device_needed': True,
+                                    'input_needed': True,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -902,9 +946,9 @@ OPTIONS =   {
                             
                         },
                         "interactive_shell" :{
-                            'description': ['Interactive shell for the mobile device',
-                                            "Press ENTER to continue..."],
+                            'description': ['Interactive shell for the mobile device',],
                             'device_needed': True,
+                            'input_needed': False,
                             'children': {
                                 "back" : dict(),
                                 "home" : dict()
@@ -917,9 +961,9 @@ OPTIONS =   {
                             'device_needed': True,
                             'children': {
                                 "mirroring" : {
-                                    'description': ['Launch scrcpy for mobile device mirroring',
-                                                    "Press ENTER to continue..."],
+                                    'description': ['Launch scrcpy for mobile device mirroring',],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -928,9 +972,9 @@ OPTIONS =   {
                                     'function': mirroring.mirroring
                                 },
                                 "stop_mirroring" : {
-                                    'description': ['Stop scrcpy session for mobile device mirroring',
-                                                    "Press ENTER to continue..."],
+                                    'description': ['Stop scrcpy session for mobile device mirroring',],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -943,9 +987,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "screenshot" : {
-                                            'description' : ["Screenshot",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Screenshot",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -954,9 +998,9 @@ OPTIONS =   {
                                             'function': mirroring.screenshot
                                         },
                                         "video_record" : {
-                                            'description' : ["Start Video Recording",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Start Video Recording",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -965,9 +1009,9 @@ OPTIONS =   {
                                             'function': mirroring.record_video
                                         },
                                         "stop_video_record" : {
-                                            'description' : ["Stop Video recording",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Stop Video recording",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -994,9 +1038,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "off" : {
-                                            'description' : ["Turn off battery saver mode",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn off battery saver mode",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1005,9 +1049,9 @@ OPTIONS =   {
                                             'function': battery.battery_saver_off
                                         },
                                         "on" : {
-                                            'description' : ["Turn on battery saver mode",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn on battery saver mode",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1025,9 +1069,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "off" : {
-                                            'description' : ["Turn off Do Not Disturb mode",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn off Do Not Disturb mode",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1036,9 +1080,9 @@ OPTIONS =   {
                                             'function': connectivity.donotdisturb_disabled
                                         },
                                         "alarms_only" : {
-                                            'description' : ["Turn on Do Not Disturb mode with alarms only",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn on Do Not Disturb mode with alarms only",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1047,9 +1091,9 @@ OPTIONS =   {
                                             'function': connectivity.donotdisturb_alarms_only
                                         },
                                         "priority_only" : {
-                                            'description' : ["Turn on Do Not Disturb mode with priority only",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn on Do Not Disturb mode with priority only",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1058,9 +1102,9 @@ OPTIONS =   {
                                             'function': connectivity.donotdisturb_priority_only
                                         },
                                         "total_silence" : {
-                                            'description' : ["Turn on Do Not Disturb mode with total silence",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn on Do Not Disturb mode with total silence",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1078,9 +1122,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "wifi_off" : {
-                                            'description' : ["Turn off Wifi option",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn off Wifi option",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1089,9 +1133,9 @@ OPTIONS =   {
                                             'function': connectivity.disable_wifi
                                         },
                                         "wifi_on" : {
-                                            'description' : ["Turn on Wifi option",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn on Wifi option",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1100,9 +1144,9 @@ OPTIONS =   {
                                             'function': connectivity.enable_wifi
                                         },
                                         "airplane_off" : {
-                                            'description' : ["Turn off Airplane mode",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn off Airplane mode",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1111,9 +1155,9 @@ OPTIONS =   {
                                             'function': connectivity.disable_airplane_mode
                                         },
                                         "airplane_on" : {
-                                            'description' : ["Turn on Airplane mode",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Turn on Airplane mode",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1133,9 +1177,9 @@ OPTIONS =   {
                                           
                         },
                         "processes_list" : {
-                            'description' : ["List all the processes",
-                                             'Press ENTER to continue',],
+                            'description' : ["List of all the processes",],
                             'device_needed': False,
+                            'input_needed': False,
                             'children': {
                                 "back" : dict(),
                                 "home" : dict()
@@ -1155,9 +1199,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "get_current_proxy" : {
-                                            'description' : ["List current DNS proxy settings",
-                                                             "Press ENTER to see current DNS proxy settings"],
+                                            'description' : ["Current DNS proxy settings",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1166,9 +1210,9 @@ OPTIONS =   {
                                             'function': proxy.get_current_dns_proxy
                                         },
                                         "set_proxy_with_current_ip" : {
-                                            'description' : ["Start the DNS spoofing with the current PC IP (on the same Wi-fi network of the mobile device)",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Start the DNS spoofing with the current PC IP (on the same Wi-fi network of the mobile device)",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1180,6 +1224,7 @@ OPTIONS =   {
                                             'description' : ["Start the DNS spoofing with a specific IP address",
                                                              "Write the IP address to be used in the proxy for DNS spoofing",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1188,9 +1233,9 @@ OPTIONS =   {
                                             'function': proxy.set_generic_dns_proxy
                                         },
                                         "del_proxy" : {
-                                            'description' : ["Reset current DNS Proxy configuration"
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Reset current DNS Proxy configuration",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1210,9 +1255,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "get_current_proxy" : {
-                                            'description' : ["See the current invisible proxy settings",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["See the current invisible proxy settings",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1221,9 +1266,9 @@ OPTIONS =   {
                                             'function': proxy.get_current_invisible_proxy
                                         },
                                         "set_proxy_with_current_ip" : {
-                                            'description' : ["Set the current PC IP as invisible proxy",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Set the current PC IP as invisible proxy",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1235,6 +1280,7 @@ OPTIONS =   {
                                             'description' : ["Set an IP address as invisible proxy",
                                                              "Insert the IP address you want to select as invisible proxy"],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1243,9 +1289,9 @@ OPTIONS =   {
                                             'function': proxy.set_generic_invisible_proxy
                                         },
                                         "del_proxy" : {
-                                            'description' : ["Reset current invisible proxy configuration",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Reset current invisible proxy configuration",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1265,8 +1311,9 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "get_current_proxy" : {
-                                            'description' : ["Press ENTER to see current proxy settings"],
+                                            'description' : ["Current System Proxy settings"],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1278,6 +1325,7 @@ OPTIONS =   {
                                             'description' : ["Set the current PC IP as proxy",
                                                              "Write the port number for the proxy on the current PC",],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1289,6 +1337,7 @@ OPTIONS =   {
                                             'description' : ["Set the remote IP address to be used as proxy",
                                                              "Write the remote IP address and the port number of the proxy (e.g. 127.0.0.1:8080)"],
                                             'device_needed': True,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1297,9 +1346,9 @@ OPTIONS =   {
                                             'function': proxy.set_generic_proxy
                                         },
                                         "del_proxy" : {
-                                            'description' : ["Reset current proxy configuration",
-                                                             "Press ENTER to continue..."],
+                                            'description' : ["Reset current proxy configuration",],
                                             'device_needed': True,
+                                            'input_needed': False,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1328,9 +1377,9 @@ OPTIONS =   {
                             'device_needed': True,
                             'children': {
                                 "shutdown" : {
-                                    'description' : ["Shutdown the mobile device",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["Shutdown the mobile device",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -1339,9 +1388,9 @@ OPTIONS =   {
                                     'function': useful_stuff.shutdown
                                 },
                                 "reboot" : {
-                                    'description' : ["Reboot the mobile device",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["Reboot the mobile device",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -1350,9 +1399,9 @@ OPTIONS =   {
                                     'function': useful_stuff.reboot
                                 },
                                 "reboot_recovery" : {
-                                    'description' : ["Reboot the mobile device in recovery mode",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["Reboot the mobile device in recovery mode",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
@@ -1361,9 +1410,9 @@ OPTIONS =   {
                                     'function': useful_stuff.reboot_recovery
                                 },
                                 "reboot_bootloader" : {
-                                    'description' : ["Reboot the mobile device in bootloader mode",
-                                                    "Press ENTER to continue..."],
+                                    'description' : ["Reboot the mobile device in bootloader mode",],
                                     'device_needed': True,
+                                    'input_needed': False,
                                     'children': {
                                         "back" : dict(),
                                         "home" : dict()
