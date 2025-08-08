@@ -5,7 +5,6 @@ Licensed under the Apache License v2.0
 """
 
 from secrets import choice
-import time
 import config.menu as menu
 import config.style as tool_style
 
@@ -13,7 +12,6 @@ from prompt_toolkit import prompt, print_formatted_text
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit import Application
 from prompt_toolkit.shortcuts import clear
 from pyfiglet import Figlet
 from termcolor import colored
@@ -47,6 +45,7 @@ class CLI():
         
         # Load the CLI style from the tool_style configuration
         self._style = Style.from_dict(tool_style.STYLE)
+        print(self._style)
 
         # Set the title of the CLI
         self._title = "HacknDroid"
@@ -245,16 +244,6 @@ class CLI():
                 print(self._title_f)
                 print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
                 
-                del_session_device_id()
-                break
-
-            except Exception as e:
-                # Clear the screen
-                clear()
-                # Print the title
-                print(self._title_f)
-                print_formatted_text(HTML(f"An unexpected error was raised!!!"), style=self._style, end='\n\n')
-                print(e)
                 del_session_device_id()
                 break
 

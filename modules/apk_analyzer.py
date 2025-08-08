@@ -595,7 +595,7 @@ def transfer_apks_from_device(user_input):
 
     Returns:
     int: Num of the APKs of the App specified
-    str: Path of the folder with the downloaded APK files (i.e. '.tmp/<app-id>')
+    str: Path of the folder with the downloaded APK files
     """
 
     # Get the App ID from the user input (App ID or words belonging to the App ID)
@@ -617,13 +617,13 @@ def transfer_apks_from_device(user_input):
 
     results_folder = os.path.join('results', app_id, "data_folder")
 
-    # Create a .tmp folder on the current PC
+    # Create a results folder on the current PC
     os.makedirs(results_folder, exist_ok=True)
     now = current_date()
 
-    # Download the App folder to the .tmp
+    # Download the App folder to the results folder
     download(f"{DATA_APP_FOLDER}/{app_folder}", results_folder)
-    # Rename the folder .tmp/<app-id>-<uuid> to .tmp/<app-id>
+    # Rename the folder <results_folder>/<app-id>-<uuid> to <results_folder>/<app-id>
     os.rename(os.path.join(results_folder, app_folder), os.path.join(results_folder, f"{now}_data_apk_folder"))
 
     return len(glob.glob(os.path.join(results_folder, f"{now}_data_apk_folder")+'/*.apk', )), os.path.join(os.path.join(results_folder, f"{now}_data_apk_folder")), app_id

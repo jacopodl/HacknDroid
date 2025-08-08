@@ -1,5 +1,10 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import os
-from xmlrpc import server
 import requests
 import time
 import lzma
