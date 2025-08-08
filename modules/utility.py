@@ -14,6 +14,7 @@ from modules.adb import get_session_device_id
 from datetime import datetime
 from termcolor import colored, cprint
 from modules.tasks_management import Task
+import ipaddress
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -419,3 +420,123 @@ def current_date():
 def get_terminal_size():
     size = os.get_terminal_size()
     return size.columns
+
+def is_port(user_input):
+    """
+    Check if the user input is a valid port number.
+
+    Args:
+        user_input (str): The input string from the user.
+
+    Returns:
+        bool: True if the input is a valid port number, False otherwise.
+    """
+    try:
+        port = int(user_input)
+        return (port>=0 and port< 65536)
+    except ValueError:
+        return False
+    
+def is_ip(ip_string):
+    """
+    Check if the provided string is a valid IP address.
+
+    Args:
+        ip_string (str): The string to check.
+
+    Returns:
+        bool: True if the string is a valid IP address, False otherwise.
+    """
+    try:
+        ip = ipaddress.ip_address(ip_string)
+    except ValueError:
+        return False
+    
+    return True
+
+def ip_from_user_input(user_input):
+    """
+    Prompt the user to provide a valid IP address.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        str: The valid IP address.
+    """
+    remote_ip_str = ''
+
+    while not is_ip(remote_ip_str):
+        user_input = input(f"Enter the IP address: ")
+        if is_ip(user_input):
+            remote_ip_str = user_input
+        else:
+            print(f"Address is invalid.")
+
+    # Once the loop exits, remote_ip_str contains a valid IP address string
+    # You can then convert it to an ipaddress object if needed
+    remote_ip = ipaddress.ip_address(remote_ip_str)
+
+    return remote_ip
+
+def port_from_user_input(user_input):
+    """
+    Prompt the user to provide a valid port number.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        int: The valid port number.
+    """
+    check = is_port(user_input)
+
+    while not check:
+        print(f"Port number is invalid.")
+        user_input = input(f"Enter the port number: ")
+
+        check = is_port(user_input)    
+
+    return int(user_input)
+
+def ip_and_port_from_user_input(user_input):
+    """
+    Prompt the user to provide a valid IP address and port.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        tuple: A tuple containing the valid IP address and port.
+    """
+    ip = ''
+    port = ''
+    check = True # Initialize check to True to enter the loop for validation
+
+    while check:
+        if ":" not in user_input:
+            print(f"Invalid format. Please use <ip>:<port>.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+            continue # Re-evaluate the loop condition with new input
+
+        parts = user_input.split(":")
+        if len(parts) != 2:
+            print(f"Invalid format. Please use <ip>:<port>.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+            continue # Re-evaluate the loop condition with new input
+
+        temp_ip, temp_port = parts[0], parts[1]
+
+        if not is_ip(temp_ip):
+            print(f"Invalid IP address: '{temp_ip}'.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+        elif not is_port(temp_port):
+            print(f"Invalid port number: '{temp_port}'.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+        else:
+            # If both are valid, set them and exit the loop
+            ip = temp_ip
+            port = temp_port
+            check = False # Exit condition met
+
+    return ip, port

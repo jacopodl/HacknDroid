@@ -4,9 +4,8 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
-from modules import adb, apk_analyzer, apk_install, app_data, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, mem_info, merge_apks, mirroring, proxy, shell, signature, useful_stuff
+from modules import adb, apk_analyzer, apk_install, app_data, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, mem_info, merge_apks, mirroring, proxy, shell, signature, tls_certificates, useful_stuff
 import modules.tasks_management
-from modules import utility
 
 OPTIONS =   {
                 'home': { 
@@ -1358,15 +1357,46 @@ OPTIONS =   {
                                         },
                                         "back" : dict(),
                                         "home" : dict()
-                                    },
-                                    
+                                    },          
+                                },
+                                "system_tls_certificates" : {
+                                    'description': ['Install Proxy TLS certificates:',
+                                                    ' > DER certificates',
+                                                    ' > PEM certificates',
+                                                    ' > Burp Suite certificate'],
+                                    'device_needed': True,
+                                    'children': {
+                                        "install_burp_certificate" : {
+                                            'description' : ["Download and install Burp Suite certificate in the Android system's cacerts directory",
+                                                            "Write the address of the proxy server &lt;IP&gt;:&lt;port&gt; (e.g. 127.0.0.1:8080)"],
+                                            'device_needed': True,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
                                             
+                                            'function': tls_certificates.install_burp_root_cert
+                                        },
+                                        "install_der_pem_certificate" : {
+                                            'description' : ["Install a DER/PEM certificate in the Android system's cacerts directory",
+                                                             "Write the path of the certificate file on your PC",],
+                                            'device_needed': True,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': tls_certificates.install_cert_on_cacerts
+                                        },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },    
                                 },
                                 "back" : dict(),
                                 "home" : dict()
-                            },
-                            
-                                            
+                            },      
                         },
                         "shutdown_reboot" : {
                             'description' : ["Reboot/shutdown the device with several options:",

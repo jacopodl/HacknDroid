@@ -6,14 +6,12 @@ Licensed under the Apache License v2.0
 
 import sys
 import netifaces
-import ipaddress
-
 from termcolor import colored
 from modules.tasks_management import Task, DAEMONS_MANAGER
 import platform
 import re
 from tabulate import tabulate
-from modules.utility import loading_animation
+from modules.utility import ip_and_port_from_user_input, ip_from_user_input, loading_animation, port_from_user_input
 from modules.adb import get_session_device_id
 
 DNS_TASK_ID = -1
@@ -30,23 +28,7 @@ def pc_wifi_ip():
 
     ip = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
 
-    return ip
-
-def is_port(user_input):
-    """
-    Check if the user input is a valid port number.
-
-    Args:
-        user_input (str): The input string from the user.
-
-    Returns:
-        bool: True if the input is a valid port number, False otherwise.
-    """
-    try:
-        port = int(user_input)
-        return (port>=0 and port< 65536)
-    except ValueError:
-        return False    
+    return ip  
 
 def get_current_proxy_settings(user_input):
     """
@@ -96,31 +78,12 @@ def set_current_pc_proxy(user_input):
         user_input (str): The port number to use for the proxy.
     """
     # If the user input is not a port, ask the user to insert it again
-    while not is_port(user_input):
-        user_input = input(colored("Insert a valid port number", "green"))
+    port = port_from_user_input(user_input)
 
     # Retrieve current IP of the PC on the Wi-Fi network  
     ip = pc_wifi_ip()
     # Set the proxy on the mobile device
     set_proxy(ip, user_input)
-
-
-def is_ip(ip_string):
-    """
-    Check if the provided string is a valid IP address.
-
-    Args:
-        ip_string (str): The string to check.
-
-    Returns:
-        bool: True if the string is a valid IP address, False otherwise.
-    """
-    try:
-        ip = ipaddress.ip_address(ip_string)
-    except ValueError:
-        return False
-    
-    return True
 
 
 def set_generic_proxy(user_input):
@@ -130,22 +93,7 @@ def set_generic_proxy(user_input):
     Args:
         user_input (str): The IP address and port in the format <address>:<port>.
     """
-    address = []
-    check = True
-    ip = ''
-    port = ''
-
-    if ":" in address:
-        address = user_input.split(":")        
-        check = (not is_ip(address[0])) or (not is_port(address[1]))
-
-    while check:
-        user_input = input(colored("Insert a valid port number"), "green")
-
-        if ":" in address:
-            address = user_input.split(":")
-            check = (not is_ip(address[0])) or (not is_port(address[1]))
-
+    ip, port = ip_and_port_from_user_input(user_input)
     set_proxy(ip, port)
     
 
@@ -276,22 +224,7 @@ def set_generic_dns_proxy(user_input):
     Args:
         user_input (str): The IP address to use for the DNS proxy.
     """
-    remote_ip = ''
-
-    try:
-        remote_ip = ipaddress.ip_address(user_input)
-    except ValueError:
-        remote_ip = ''
-        print('Address is invalid')
-    
-    while remote_ip == '':
-        try:
-            user_input = input(colored("Enter the IP address: ", "green"))
-            remote_ip = ipaddress.ip_address(user_input)
-        except ValueError:
-            remote_ip = ''
-            print('Address is invalid')
-
+    remote_ip = ip_from_user_input(user_input)
         
     print("\nSet the DNS1 and DNS2 on mobile device at: "+remote_ip)
     print("(If on Windows, disable the firewall)")
@@ -358,22 +291,7 @@ def set_current_pc_invisible_proxy(user_input):
     set_invisible_proxy(pc_wifi_ip())
 
 def set_generic_invisible_proxy(user_input):
-    remote_ip = ''
-
-    try:
-        remote_ip = ipaddress.ip_address(user_input)
-    except ValueError:
-        remote_ip = ''
-        print('Address is invalid')
-    
-    while remote_ip == '':
-        try:
-            user_input = input(colored("Enter the IP address: ", "green"))
-            remote_ip = ipaddress.ip_address(user_input)
-        except ValueError:
-            remote_ip = ''
-            print('Address is invalid')
-
+    remote_ip = ip_from_user_input(user_input)
     set_invisible_proxy(remote_ip)
 
 
