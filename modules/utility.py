@@ -199,7 +199,7 @@ def get_active_app_id(user_input):
         check = keywords[0] in a
 
         for k in keywords[1:]:
-            check = check and (k in l)
+            check = check and (k in a)
 
             if not check:
                 break
