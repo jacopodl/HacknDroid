@@ -106,10 +106,19 @@ def track_running_logs(app_id, pid, crash_logs, id):
             cycle_pid = get_pid(app_id)
             time.sleep(2)
 
+    filtered_lines = []
 
-        # Terminate the process
-        process.terminate()
-        process.wait()
+    with open(file_path , "r") as fd:
+        lines = fd.readlines()
+    
+        filtered_lines = [line for line in lines if pid in line]
+
+    with open(file_path , "w") as fd:
+        fd.writelines(filtered_lines)
+
+    # Terminate the process
+    process.terminate()
+    process.wait()
 
     DAEMONS_MANAGER.stop_task('logging', id)
 
@@ -205,9 +214,18 @@ def track_logs(app_id, crash_logs, id):
 
         pid = run_app_and_wait(app_id)
 
-        # Terminate the process
-        process.terminate()
-        process.wait()
+    filtered_lines = []
+    with open(file_path , "r") as fd:
+        lines = fd.readlines()
+    
+        filtered_lines = [line for line in lines if pid in line]
+
+    with open(file_path , "w") as fd:
+        fd.writelines(filtered_lines)
+    
+    # Terminate the process
+    process.terminate()
+    process.wait()
 
     lines = []
 
