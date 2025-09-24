@@ -247,5 +247,10 @@ class CLI():
                 del_session_device_id()
                 break
 
+            except Exception as e:
+                print(colored(f"An error occurred: {e}", 'red'))
+                print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+                x = input()
+                
         # Stop all the tasks
         DAEMONS_MANAGER.stop_all_tasks()
