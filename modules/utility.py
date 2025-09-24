@@ -5,6 +5,7 @@ Licensed under the Apache License v2.0
 """
 
 import subprocess
+import netifaces
 import re
 import os
 import sys
@@ -540,3 +541,18 @@ def ip_and_port_from_user_input(user_input):
             check = False # Exit condition met
 
     return ip, port
+
+
+def pc_wifi_ip():
+    """
+    Get the IP address of the current PC on the Wi-Fi network.
+
+    Returns:
+        str: The IP address of the PC.
+    """
+    netifaces.gateways()
+    iface = netifaces.gateways()['default'][netifaces.AF_INET][1]
+
+    ip = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
+
+    return ip 

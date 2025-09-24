@@ -5,30 +5,15 @@ Licensed under the Apache License v2.0
 """
 
 import sys
-import netifaces
 from termcolor import colored
 from modules.tasks_management import Task, DAEMONS_MANAGER
 import platform
 import re
 from tabulate import tabulate
-from modules.utility import ip_and_port_from_user_input, ip_from_user_input, loading_animation, port_from_user_input
+from modules.utility import ip_and_port_from_user_input, ip_from_user_input, loading_animation, port_from_user_input, pc_wifi_ip
 from modules.adb import get_session_device_id
 
-DNS_TASK_ID = -1
-
-def pc_wifi_ip():
-    """
-    Get the IP address of the current PC on the Wi-Fi network.
-
-    Returns:
-        str: The IP address of the PC.
-    """
-    netifaces.gateways()
-    iface = netifaces.gateways()['default'][netifaces.AF_INET][1]
-
-    ip = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
-
-    return ip  
+DNS_TASK_ID = -1 
 
 def get_current_proxy_settings(user_input):
     """
