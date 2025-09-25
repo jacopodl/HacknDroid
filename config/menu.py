@@ -164,17 +164,6 @@ OPTIONS =   {
                                         "home" : dict()                                        
                                     }
                                 },
-                                "get_apk_from_mobile": { 
-                                    'description': ["Get APK of an application on your mobile device",
-                                                    'Write the app id or a part of the app name to be extracted and analysed'],
-                                    'device_needed': False,
-                                    'input_needed': True,
-                                    'children': {
-                                        "back" : dict(),
-                                        "home" : dict()
-                                    },
-                                    'function': apk_analyzer.get_apk_from_device
-                                },
                                 "app_info": { 
                                     'description': ['App info from the APK',],
                                     'device_needed': False,
@@ -264,6 +253,51 @@ OPTIONS =   {
                                     },
                                     
                                 },
+                                "custom_urls" :{
+                                    'description': ['Start server for Custom URLs exported and identified in the AndroidManifest.xml',],
+                                    'device_needed': True,
+                                    'input_needed': True,
+                                    'children': {
+                                        "from_android_manifest" :{
+                                            'description': ['Start server for Custom URLs exported and identified in the AndroidManifest.xml',
+                                                            "Write the path of the AndroidManifest.xml file"],
+                                            'device_needed': True,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': intent_server.custom_urls_server_from_manifest
+                                        },
+                                        "from_apk" :{
+                                            'description': ['Start server for Custom URLs exported and identified in the AndroidManifest.xml',
+                                                            "Write the path of the APK file"],
+                                            'device_needed': True,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': intent_server.custom_urls_server_from_apk
+                                        },
+                                        "from_mobile" :{
+                                            'description': ['Start server for Custom URLs exported and identified in the AndroidManifest.xml',
+                                                            "Write the app id or a part of the app name installed on the mobile device"],
+                                            'device_needed': True,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': intent_server.custom_urls_server_from_mobile
+                                        },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },                            
+                                },
                                 "decompile": { 
                                     'description': ['Decompile an apk file',],
                                     'device_needed': False,
@@ -296,6 +330,17 @@ OPTIONS =   {
                                         "home":dict()
                                     },
                                     
+                                },
+                                "get_apk_from_mobile": { 
+                                    'description': ["Get APK of an application on your mobile device",
+                                                    'Write the app id or a part of the app name to be extracted and analysed'],
+                                    'device_needed': False,
+                                    'input_needed': True,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    'function': apk_analyzer.get_apk_from_device
                                 },
                                 "jadx_run_on_apk" : { 
                                     'description': ["Open an APK in JADX-GUI"],

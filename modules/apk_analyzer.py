@@ -385,7 +385,7 @@ def apk_decompiler_from_device(user_input):
 
     # Decompile the program
     # apktool d APP.apk -o <dir>
-    apk_decompiler_from_file(apk_filepath, app_id)
+    return apk_decompiler_from_file(apk_filepath)
     
 
 def apk_decompiler_from_file(user_input):
@@ -401,7 +401,7 @@ def apk_decompiler_from_file(user_input):
     apk_path = valid_apk_file(user_input)
 
     # Folder name for the decompiled APK is the name of the APK without extension 
-    app_id = app_id_from_apk(user_input)
+    app_id = app_id_from_apk(apk_path)
 
     dest_folder = os.path.join("results", app_id, "decompiled")
 
