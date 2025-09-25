@@ -4,7 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
-from modules import adb, apk_analyzer, apk_install, app_data, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, mem_info, merge_apks, mirroring, proxy, shell, signature, tls_certificates, useful_stuff
+from modules import adb, apk_analyzer, apk_install, app_data, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, intent_server, mem_info, merge_apks, mirroring, proxy, secrets_finder, shell, signature, tls_certificates, useful_stuff
 import modules.tasks_management
 
 OPTIONS =   {
@@ -191,7 +191,7 @@ OPTIONS =   {
                                             'function' : apk_analyzer.print_app_info_from_pc
                                         },
                                         "from_mobile_device": { 
-                                            'description': ['App info from the APK',
+                                            'description': ['App info from the mobile application',
                                                             'Write the app id or a part of the app name to be analysed',],
                                             'device_needed': True,
                                             'input_needed': True,
@@ -467,7 +467,8 @@ OPTIONS =   {
                                     'device_needed': True,
                                     'children': {
                                         "collect_app_data" : { 
-                                            'description': ["Collect all the data stored by the appplication on the mobile device"],
+                                            'description': ["Collect all the data stored by the appplication on the mobile device",
+                                                            "Write the app id or a part of the app name to reset its data"],
                                             'device_needed': True,
                                             'input_needed': True,
                                             'children': {
@@ -870,14 +871,35 @@ OPTIONS =   {
                                 "run_script":{
                                     'description': ['Run Frida scripts on a specific application.',
                                                     'Write its app id or a keyword to identify it.'],
-                                    'device_needed': False,
+                                    'device_needed': True,
                                     'input_needed': True,
                                     'children': {
+                                        "running_app":{
+                                            'description': ['Run Frida scripts on a specific running application.',],
+                                            'device_needed': True,
+                                            'input_needed': False,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': frida_integration.run_frida_script_on_running_app
+                                        },
+                                        "spawn_app":{
+                                            'description': ['Spawn the application and run Frida scripts on a specific application.',
+                                                            'Write its app id or a keyword to identify it.'],
+                                            'device_needed': True,
+                                            'input_needed': False,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': frida_integration.spawn_app_and_run_frida_script
+                                        },
                                         "back" : dict(),
                                         "home" : dict()
                                     },
-                                    
-                                    'function': frida_integration.run_script
                                 },
                                 "uninstall":{
                                     'description': ['Uninstall Frida',
@@ -890,13 +912,11 @@ OPTIONS =   {
                                         "home" : dict()
                                     },
                                     
-                                    'function': frida_integration.run_script
+                                    'function': frida_integration.uninstall_frida
                                 },
                                 "back" : dict(),
                                 "home" : dict()
                             },
-                            
-                            'function': signature.sign_apk
                         },
                         "install_uninstall" : {
                             'description': ['Install an app on the mobile device.',],
@@ -1361,25 +1381,58 @@ OPTIONS =   {
                                 },
                                 "system_tls_certificates" : {
                                     'description': ['Install Proxy TLS certificates:',
-                                                    ' > DER certificates',
                                                     ' > PEM certificates',
+                                                    ' > DER certificates',
                                                     ' > Burp Suite certificate'],
                                     'device_needed': True,
                                     'children': {
-                                        "install_burp_certificate" : {
-                                            'description' : ["Download and install Burp Suite certificate in the Android system's cacerts directory",
-                                                            "Write the address of the proxy server &lt;IP&gt;:&lt;port&gt; (e.g. 127.0.0.1:8080)"],
+                                        "download_and_install_from_proxy" : {
+                                            'description' : ["Download and install the Proxy Root certificate in the Android system's cacerts directory",],
                                             'device_needed': True,
                                             'input_needed': True,
                                             'children': {
+                                                "burp_suite_certificate" : {
+                                                    'description' : ["Download and install Burp Suite certificate in the Android system's cacerts directory",
+                                                                    "Write the address of the proxy server &lt;IP&gt;:&lt;port&gt; (e.g. 127.0.0.1:8080)"],
+                                                    'device_needed': True,
+                                                    'input_needed': True,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    
+                                                    'function': tls_certificates.download_and_install_burp_root_cert
+                                                },
+                                                "zap_certificate" : {
+                                                    'description' : ["Download and install Burp Suite certificate in the Android system's cacerts directory",
+                                                                    "Write the address of the proxy server &lt;IP&gt;:&lt;port&gt; (e.g. 127.0.0.1:8080)"],
+                                                    'device_needed': True,
+                                                    'input_needed': True,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+                                                    
+                                                    'function': tls_certificates.download_and_install_zap_root_cert
+                                                },
+                                                "mitmproxy_certificate" : {
+                                                    'description' : ["Download and install Burp Suite certificate in the Android system's cacerts directory",
+                                                                    "Write the address of the proxy server &lt;IP&gt;:&lt;port&gt; (e.g. 127.0.0.1:8080)"],
+                                                    'device_needed': True,
+                                                    'input_needed': True,
+                                                    'children': {
+                                                        "back" : dict(),
+                                                        "home" : dict()
+                                                    },
+
+                                                    'function': tls_certificates.download_and_install_mitmproxy_root_cert
+                                                },
                                                 "back" : dict(),
                                                 "home" : dict()
                                             },
-                                            
-                                            'function': tls_certificates.install_burp_root_cert
                                         },
-                                        "install_der_pem_certificate" : {
-                                            'description' : ["Install a DER/PEM certificate in the Android system's cacerts directory",
+                                        "install_certificate_from_pc" : {
+                                            'description' : ["Install a DER/PEM/PKCS12 certificate in the Android system's cacerts directory",
                                                              "Write the path of the certificate file on your PC",],
                                             'device_needed': True,
                                             'input_needed': True,
@@ -1398,6 +1451,39 @@ OPTIONS =   {
                                 "home" : dict()
                             },      
                         },
+                        "secrets_finder" : {
+                            'description' : ["Reboot/shutdown the device with several options:",
+                                            ' Write the path of the file/folder on your PC',],
+                            'device_needed': False,
+                            'children': {
+                                "full_search" : {
+                                    'description' : ["Full search for secrets in the file/folder\n(it could generate a lot of false positives)",
+                                                     "Specify the file/folder path on your PC",],
+                                    'device_needed': False,
+                                    'input_needed': True,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': secrets_finder.full_secrets_search
+                                },
+                                "light_search" : {
+                                    'description' : ["Light search for secrets in the file/folder\n(it could generate few false positives)",
+                                                     "Specify the file/folder path on your PC",],
+                                    'device_needed': False,
+                                    'input_needed': True,
+                                    'children': {
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                    'function': secrets_finder.light_secrets_search
+                                },
+                                "back" : dict(),
+                                "home" : dict()
+                            },
+                        },                        
                         "shutdown_reboot" : {
                             'description' : ["Reboot/shutdown the device with several options:",
                                             ' > Shutdown',
