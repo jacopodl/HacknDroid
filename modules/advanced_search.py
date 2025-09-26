@@ -122,7 +122,7 @@ SECRETS_REGEX = {
     },
     "Basic Auth String": {
         "regex": regex.compile(b'(username|user|email)[\'"\s:=]+[^\s\'"@]{1,100}[\'"].*?(password|pwd)[\'"\s:=]+[^\s\'"]{4,100}', flags=regex.IGNORECASE),
-        "light_search": True,
+        "light_search": False,
     },
     "Basic Auth Credentials": {
         "regex": regex.compile(b'(?<=:\/\/)[a-zA-Z0-9]+:[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]+', flags=0),
@@ -762,7 +762,7 @@ def regex_match(name, patterns, content, filepath, light_search):
             print(f"Error processing pattern {name} in {filepath}: {e}")
     return found_matches
 
-def scan_file(filepath_tuple, light_search=False):
+def regex_scan_file(filepath_tuple, light_search=False):
     rootpath, filepath = filepath_tuple
     print(f"{filepath}")
     all_matches = []
@@ -797,7 +797,7 @@ def gather_files(target_path):
         files.append((target_path, target_path))
     return files
 
-def write_results_csv(all_matches, output_file):
+def write_regex_results_csv(all_matches, output_file):
     if not all_matches:
         return
     
@@ -814,7 +814,7 @@ def write_results_csv(all_matches, output_file):
                 "File": match["file"]
             })
 
-def print_results_console(all_matches, root_folder):
+def print_regex_results_console(all_matches, root_folder):
     if not all_matches:
         print(colored("No matches found.", "yellow"))
         return
@@ -862,18 +862,18 @@ def full_secrets_search(user_input):
     all_matches = []
     # Use multiprocessing for faster scanning
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        for file_matches in executor.map(scan_file, all_files, [False]*len(all_files)):
+        for file_matches in executor.map(regex_scan_file, all_files, [False]*len(all_files)):
             all_matches.extend(file_matches)
 
     now = current_date()
-    results_folder = os.path.join("results", "secrets_finder")
+    results_folder = os.path.join("results", "advanced_search")
     os.makedirs(results_folder, exist_ok=True)
 
-    results_filepath = os.path.join(results_folder, f"{now}_full_search_results.csv")
-    write_results_csv(all_matches, results_filepath)
+    results_filepath = os.path.join(results_folder, f"{now}_full_secrets.csv")
+    write_regex_results_csv(all_matches, results_filepath)
     print("Full search results saved to " + colored(results_filepath, "red"))
 
-    print_results_console(all_matches)
+    print_regex_results_console(all_matches)
 
 def light_secrets_search(user_input):
     target_path = user_input
@@ -888,15 +888,157 @@ def light_secrets_search(user_input):
     all_matches = []
     # Use multiprocessing for faster scanning (light mode)
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        for file_matches in executor.map(scan_file, all_files, [True]*len(all_files)):
+        for file_matches in executor.map(regex_scan_file, all_files, [True]*len(all_files)):
             all_matches.extend(file_matches)
 
     now = current_date()
-    results_folder = os.path.join("results", "secrets_finder")
+    results_folder = os.path.join("results", "advanced_search")
     os.makedirs(results_folder, exist_ok=True)
 
-    results_filepath = os.path.join(results_folder, f"{now}_light_search_results.csv")
-    write_results_csv(all_matches, results_filepath)
+    results_filepath = os.path.join(results_folder, f"{now}_light_secrets.csv")
+    write_regex_results_csv(all_matches, results_filepath)
     print("Light search results saved to " + colored(results_filepath, "red"))
 
-    print_results_console(all_matches, user_input)
+    print_regex_results_console(all_matches, user_input)
+
+
+def bytes_search_in_file(filepath_tuple: tuple, search_bytes_lower: bytes) -> list:
+    rootpath, filepath = filepath_tuple
+    matches = []
+
+    try:
+        with open(filepath, "rb") as f:
+            content = f.read()
+        
+        content_lower = content.lower()
+        search_len = len(search_bytes_lower)
+        
+        # We need to find the index of the match in the lowercase content
+        # and then extract the original string from the original content.
+        index = content_lower.find(search_bytes_lower)
+        while index != -1:
+            found_bytes = content[index : index + search_len]
+            
+            # Check if the found bytes are decodable as UTF-8
+            try:
+                found_string = found_bytes.decode('utf-8')
+                matches.append((filepath, found_string))
+            except UnicodeDecodeError:
+                # If it's not a valid UTF-8 string, we'll represent it as a hex string
+                matches.append((filepath, f"0x{found_bytes.hex()}"))
+
+            # Continue searching for the next occurrence
+            index = content_lower.find(search_bytes_lower, index + 1)
+            
+    except (FileNotFoundError, IOError) as e:
+        print(f"Error opening {filepath}: {e}", file=sys.stderr)
+        
+    return matches
+
+def write_string_results_csv(all_matches, search_string, output_file):
+    """
+    Writes the search results to a CSV file.
+    """
+    if not all_matches:
+        print("No matches found.")
+        return
+    
+    with open(output_file, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["Search String", "Found String", "File Path"])
+        writer.writeheader()
+        for filepath, found_string in all_matches:
+            writer.writerow({
+                "Search String": search_string,
+                "Found String": found_string,
+                "File Path": filepath
+            })
+            
+    print("Advanced search results for "+colored(search_string, "yellow")+" saved to "+colored(output_file, "red"))
+
+def input_string_from_user(prompt_string, lowercase):
+    while True:
+        search_string = input(prompt_string)
+        if search_string.strip():
+            break
+
+    if search_string.startswith('0x'):
+        bytes_string = bytes.fromhex(search_string[2:])
+    else:
+        bytes_string = search_string.encode('utf-8')
+
+    if lowercase:
+        return search_string, bytes_string.lower()
+    else:
+        return search_string, bytes_string
+
+def search_string_in_files(user_input):
+    while not os.path.exists(user_input):
+        user_input = input("Insert a valid path (file or folder):\n")
+
+    search_string, bytes_string = input_string_from_user("Insert the string or the byte sequence (0x<hex>) to be searched in all the files:\n", lowercase=True)
+
+    all_files = gather_files(user_input)
+    max_workers = min(os.cpu_count(), len(all_files))
+    print(f"Advanced search of the input string on '{user_input}' ({len(all_files)} files) with {max_workers} processes...")
+
+    all_matches = []
+    # Use multiprocessing for faster scanning (light mode)
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        for file_matches in executor.map(bytes_search_in_file, all_files, [bytes_string]*len(all_files)):
+            all_matches.extend(file_matches)
+
+    now = current_date()
+    results_folder = os.path.join("results", "advanced_search")
+    os.makedirs(results_folder, exist_ok=True)
+
+    results_filepath = os.path.join(results_folder, f"{now}_advanced_search.csv")
+    write_string_results_csv(all_matches, search_string, results_filepath)
+
+def bytes_replacement_in_file(filepath_tuple: tuple, search_bytes: bytes, replace_bytes: bytes) -> list:
+    rootpath, filepath = filepath_tuple
+    print(filepath, end="", flush=True)
+    matches = []
+
+    try:
+        with open(filepath, "rb") as f:
+            content = f.read()
+        
+        count = content.count(search_bytes)
+        
+        if count > 0:
+            content = content.replace(search_bytes, replace_bytes)
+
+            with open(filepath, "wb") as f:
+                f.write(content)
+                
+            print(" > "+colored(count, "green")+" replacements done")
+
+        else:
+            print(" > "+colored(count, "red")+" occurrences found")
+
+    except (FileNotFoundError, IOError) as e:
+        print(f"Error opening {filepath}: {e}", file=sys.stderr)
+        
+    return matches
+
+
+def replace_string_in_files(user_input):
+    while not os.path.exists(user_input):
+        user_input = input("Insert a valid path (file or folder):\n")
+
+    search_string, bytes_search_string = input_string_from_user("Insert the string or the byte sequence (0x<hex>) to be searched in all the files:\n", lowercase=False)
+    replace_string, bytes_replace_string = input_string_from_user("Insert the string or the byte sequence (0x<hex>) that will replace the previous one in all the files:\n", lowercase=False)
+
+    all_files = gather_files(user_input)
+    max_workers = min(os.cpu_count(), len(all_files))
+
+    print("Searching for: "+colored(search_string, "yellow"))
+    print("Replacing with: "+colored(replace_string, "yellow"))
+
+    print(f"Advanced replacement of the input string on '{user_input}' ({len(all_files)} files) with {max_workers} processes...")
+
+    all_matches = []
+    # Use multiprocessing for faster scanning (light mode)
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        for file_matches in executor.map(bytes_replacement_in_file, all_files, [bytes_search_string]*len(all_files), [bytes_replace_string]*len(all_files)):
+            all_matches.extend(file_matches)

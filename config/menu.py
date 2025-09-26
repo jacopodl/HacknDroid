@@ -4,13 +4,88 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
-from modules import adb, apk_analyzer, apk_install, app_data, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, intent_server, mem_info, merge_apks, mirroring, proxy, secrets_finder, shell, signature, tls_certificates, useful_stuff
+from modules import adb, advanced_search, apk_analyzer, apk_install, app_data, app_logs, backup, battery, connectivity, emulator, file_transfer, frida_integration, intent_server, mem_info, merge_apks, mirroring, proxy, shell, signature, tls_certificates, useful_stuff
 import modules.tasks_management
 
 OPTIONS =   {
                 'home': { 
                     "description":['',],
                     'children':{
+                        "advanced_search" : {
+                            'description' : ["Search for secrets in the file/folder",
+                                            ' Write the path of the file/folder on your PC',],
+                            'device_needed': False,
+                            'children': {
+                                "secrets_finder" : {
+                                    'description' : ["Search for secrets in the file/folder"],
+                                    'device_needed': False,
+                                    'children': {
+                                        "full_search" : {
+                                            'description' : ["Full search for secrets in the file/folder\n(it could generate a lot of false positives)",
+                                                            "Specify the file/folder path on your PC",],
+                                            'device_needed': False,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': advanced_search.full_secrets_search
+                                        },
+                                        "light_search" : {
+                                            'description' : ["Light search for secrets in the file/folder\n(it could generate few false positives)",
+                                                            "Specify the file/folder path on your PC",],
+                                            'device_needed': False,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': advanced_search.light_secrets_search
+                                        },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                },
+                                "string_search" : {
+                                    'description' : ["Search for a string/bytes sequence in the file/folder"],
+                                    'device_needed': False,
+                                    'children': {
+                                        "search_string" : {
+                                            'description' : ["Search for a string/bytes sequence (CASE INSENSITIVE) in the file/folder",
+                                                            "Specify the file/folder path on your PC",
+                                                            "(if folder the search will be recursive in all the files)",],
+                                            'device_needed': False,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': advanced_search.search_string_in_files
+                                        },
+                                        "replace_string" : {
+                                            'description' : ["Replacement a string/bytes sequence (CASE SENSITIVE) in the file/folder",
+                                                            "Specify the file/folder path on your PC",
+                                                            "(if folder the search will be recursive in all the files)",],
+                                            'device_needed': False,
+                                            'input_needed': True,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': advanced_search.replace_string_in_files
+                                        },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                },
+                                "back" : dict(),
+                                "home" : dict()
+                            },
+                        },
                         "apk": {
                             'description': ['Several APKs related operations:',
                                             ' > Analysis',
@@ -1495,40 +1570,7 @@ OPTIONS =   {
                                 "back" : dict(),
                                 "home" : dict()
                             },      
-                        },
-                        "secrets_finder" : {
-                            'description' : ["Reboot/shutdown the device with several options:",
-                                            ' Write the path of the file/folder on your PC',],
-                            'device_needed': False,
-                            'children': {
-                                "full_search" : {
-                                    'description' : ["Full search for secrets in the file/folder\n(it could generate a lot of false positives)",
-                                                     "Specify the file/folder path on your PC",],
-                                    'device_needed': False,
-                                    'input_needed': True,
-                                    'children': {
-                                        "back" : dict(),
-                                        "home" : dict()
-                                    },
-                                    
-                                    'function': secrets_finder.full_secrets_search
-                                },
-                                "light_search" : {
-                                    'description' : ["Light search for secrets in the file/folder\n(it could generate few false positives)",
-                                                     "Specify the file/folder path on your PC",],
-                                    'device_needed': False,
-                                    'input_needed': True,
-                                    'children': {
-                                        "back" : dict(),
-                                        "home" : dict()
-                                    },
-                                    
-                                    'function': secrets_finder.light_secrets_search
-                                },
-                                "back" : dict(),
-                                "home" : dict()
-                            },
-                        },                        
+                        },                    
                         "shutdown_reboot" : {
                             'description' : ["Reboot/shutdown the device with several options:",
                                             ' > Shutdown',
