@@ -1387,8 +1387,64 @@ OPTIONS =   {
                                     },
                                     
                                 },
-                                "invisible_proxy" : {
-                                    'description': ['Set global proxy on the mobile device:',
+                                "invisible_proxy_app" : {
+                                    'description': ['Set invisible proxy on the mobile device for a specific app (using iptables):',
+                                                    ' > using the current PC IP',
+                                                    ' > using another IP'],
+                                    'device_needed': True,
+                                    'children': {
+                                        "get_current_proxy" : {
+                                            'description' : ["Show the current invisible proxy settings",],
+                                            'device_needed': True,
+                                            'input_needed': False,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': proxy.get_current_invisible_proxy
+                                        },
+                                        "set_proxy_with_current_ip" : {
+                                            'description' : ["Set the current PC IP as invisible proxy for a specific app (using iptables)",],
+                                            'device_needed': True,
+                                            'input_needed': False,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': proxy.set_current_pc_invisible_app_proxy
+                                        },
+                                        "set_proxy_with_other_ip" : {
+                                            'description' : ["Set an IP address as invisible proxy for a specific app (using iptables)",
+                                                             "Insert the IP address you want to select as invisible proxy"],
+                                            'device_needed': True,
+                                            'input_needed': False,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': proxy.set_generic_invisible_app_proxy
+                                        },
+                                        "del_proxy" : {
+                                            'description' : ["Delete the current invisible proxy configuration (from iptables rules)",],
+                                            'device_needed': True,
+                                            'input_needed': False,
+                                            'children': {
+                                                "back" : dict(),
+                                                "home" : dict()
+                                            },
+                                            
+                                            'function': proxy.del_invisible_proxy
+                                        },
+                                        "back" : dict(),
+                                        "home" : dict()
+                                    },
+                                    
+                                },
+                                "invisible_proxy_global" : {
+                                    'description': ['Set invisibleglobal proxy on the mobile device (using iptables):',
                                                     ' > using the current PC IP',
                                                     ' > using another IP'],
                                     'device_needed': True,
@@ -1413,7 +1469,7 @@ OPTIONS =   {
                                                 "home" : dict()
                                             },
                                             
-                                            'function': proxy.set_current_pc_invisible_proxy
+                                            'function': proxy.set_current_pc_invisible_global_proxy
                                         },
                                         "set_proxy_with_other_ip" : {
                                             'description' : ["Set an IP address as invisible proxy",
@@ -1425,10 +1481,10 @@ OPTIONS =   {
                                                 "home" : dict()
                                             },
                                             
-                                            'function': proxy.set_generic_invisible_proxy
+                                            'function': proxy.set_generic_invisible_global_proxy
                                         },
                                         "del_proxy" : {
-                                            'description' : ["Reset current invisible proxy configuration",],
+                                            'description' : ["Delete the current invisible proxy configuration (from iptables rules)",],
                                             'device_needed': True,
                                             'input_needed': False,
                                             'children': {

@@ -555,4 +555,26 @@ def pc_wifi_ip():
 
     ip = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
 
-    return ip 
+    return ip
+
+def get_owner_from_app_id(app_id):
+    cmd = ["adb", "-s", get_session_device_id(), "shell", f"pm list packages -U | grep {app_id} | cut -d: -f3"]
+
+    output, error = Task().run(cmd)
+
+    if error:
+        print(f"Error occurred while getting owner from app ID {app_id}: {error}")
+        return None
+
+    return output.strip()
+
+def get_app_id_from_owner_uid(owner_uid):
+    cmd = ["adb", "-s", get_session_device_id(), "shell", f"pm list packages -U | grep {owner_uid} | cut -d: -f2 | cut -d' ' -f1"]
+
+    output, error = Task().run(cmd)
+
+    if error:
+        print(f"Error occurred while getting app ID from owner UID {owner_uid}: {error}")
+        return None
+
+    return output.strip()

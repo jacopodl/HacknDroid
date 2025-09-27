@@ -10,7 +10,7 @@ from modules.tasks_management import Task, DAEMONS_MANAGER
 import platform
 import re
 from tabulate import tabulate
-from modules.utility import ip_and_port_from_user_input, ip_from_user_input, loading_animation, port_from_user_input, pc_wifi_ip
+from modules.utility import app_id_from_user_input, get_app_id_from_owner_uid, get_owner_from_app_id, ip_and_port_from_user_input, ip_from_user_input, loading_animation, port_from_user_input, pc_wifi_ip
 from modules.adb import get_session_device_id
 
 DNS_TASK_ID = -1 
@@ -239,13 +239,77 @@ def del_dns_proxy(user_input):
 def get_current_invisible_proxy(user_input):
     command = ['adb', '-s', get_session_device_id(), 'shell']
     shell_input = [ "su root",
-                   """iptables -t nat -L OUTPUT -v -n | grep 'DNAT' | awk '{print $NF}' | cut -d: -f2"""]
+                   """iptables -t nat -L OUTPUT -v -n | grep 'DNAT'"""]
     
     output, error = Task().run(command, input_to_cmd=shell_input)
-    print(output)
 
+    lines = output.strip().splitlines()
+    uid_pattern = re.compile(r'UID match (\d+)')
+    dst_port_port = re.compile(r'dpt:(\d+)')
+    proxy_ip_pattern = re.compile(r'to:([\d\.]+):\d+')
+    proxy_port_pattern = re.compile(r'to:[\d\.]+:(\d+)')
 
-def set_current_pc_invisible_proxy(user_input):
+    info = []
+    info_headers = []
+    for line in lines:
+        line_info = {}
+        uid_match = uid_pattern.search(line)
+        dst_port_match = dst_port_port.search(line)
+        proxy_ip_match = proxy_ip_pattern.search(line)
+        proxy_port_match = proxy_port_pattern.search(line)
+
+        if uid_match:
+            uid = uid_match.group(1)
+            line_info["Owner"] = get_app_id_from_owner_uid(uid) +f" ({uid})"
+            
+            if "Owner" not in info_headers:
+                info_headers.append("Owner")
+
+        if dst_port_match: 
+            line_info["Destination Port"] = dst_port_match.group(1)
+
+            if "Destination Port" not in info_headers:
+                info_headers.append("Destination Port")
+        
+        if proxy_ip_match: 
+            line_info["Proxy IP"] = proxy_ip_match.group(1)
+
+            if "Proxy IP" not in info_headers:
+                info_headers.append("Proxy IP")
+
+        if proxy_port_match:
+            line_info["Proxy Port"] = proxy_port_match.group(1)
+
+            if "Proxy Port" not in info_headers:
+                info_headers.append("Proxy Port")
+            
+        info.append(line_info)
+
+    if info:
+        table_content = []
+        for line in info:
+            row = []
+
+            for header in info_headers:
+                if header in line:
+                    row.append(line[header])
+                else:
+                    row.append("-")
+
+            table_content.append(row)
+
+        for header in info_headers:
+            if "Proxy" in header:
+                info_headers[info_headers.index(header)] = colored(header, 'red')
+            else:
+                info_headers[info_headers.index(header)] = colored(header, 'yellow')
+
+        print(tabulate(table_content, headers=info_headers, tablefmt='fancy_grid', colalign=('center',)*len(info_headers)))
+
+    else:
+        print("No invisible proxy is set on the mobile device")
+
+def set_current_pc_invisible_global_proxy(user_input):
     # Get the current Wi-Fi SSID
     pc_ssid = get_current_pc_wifi_ssid()
     mobile_ssid = get_mobile_wifi_ssid()
@@ -273,22 +337,65 @@ def set_current_pc_invisible_proxy(user_input):
     
     x=input(colored("Press ENTER to set the IPTables...\n", "green"))
 
-    set_invisible_proxy(pc_wifi_ip())
+    set_invisible_proxy(pc_wifi_ip(), limit_owner=False)
 
-def set_generic_invisible_proxy(user_input):
+def set_generic_invisible_global_proxy(user_input):
     remote_ip = ip_from_user_input(user_input)
-    set_invisible_proxy(remote_ip)
+    set_invisible_proxy(remote_ip, limit_owner=False)
 
 
-def set_invisible_proxy(target_ip):
-    command = ['adb', '-s', get_session_device_id(), 'shell']
-    shell_input = [ "su root",
-                   f"iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to-destination {target_ip}:443",
-                   f"iptables -t nat -A OUTPUT -p tcp --dport 80 -j DNAT --to-destination {target_ip}:80",
-                   "iptables -t nat -A POSTROUTING -p tcp --dport 443 -j MASQUERADE",
-                   "iptables -t nat -A POSTROUTING -p tcp --dport 80 -j MASQUERADE"
-                ]
+def set_current_pc_invisible_app_proxy(user_input):
+    # Get the current Wi-Fi SSID
+    pc_ssid = get_current_pc_wifi_ssid()
+    mobile_ssid = get_mobile_wifi_ssid()
+
+    print("\nWi-Fi SSIDs")
+    row_list = []
     
+    if pc_ssid:
+        row_list.append(["Current PC",pc_ssid])
+    else:
+        row_list.append(["Current PC","Undetectable"])
+
+    if pc_ssid:
+        row_list.append(["Mobile Device",mobile_ssid])
+    else:
+        row_list.append(["Mobile Device","Undetectable"])
+
+    print(tabulate(row_list, headers=['Device', 'Wi-Fi SSID'], tablefmt='fancy_grid'))
+
+    if pc_ssid!=mobile_ssid:
+        print("\nPlease connect the mobile device and the current PC to the same network!!!")
+
+        command = ['adb', '-s', get_session_device_id(), 'shell', 'am', 'start', '-a', 'android.settings.WIFI_SETTINGS']
+        output, error = Task().run(command)
+
+    set_invisible_proxy(pc_wifi_ip(), limit_owner=True)
+
+def set_generic_invisible_app_proxy(user_input):
+    remote_ip = ip_from_user_input(user_input)
+    set_invisible_proxy(remote_ip, limit_owner=True)
+
+def set_invisible_proxy(target_ip, limit_owner):
+    del_invisible_proxy("")
+
+    command = ['adb', '-s', get_session_device_id(), 'shell']
+    
+    owner_filtering = ""
+
+    if limit_owner:
+        user_input = input(colored("Write a valid app ID or a set of keyword to be searched\n", "green"))
+        app_id = app_id_from_user_input(user_input)
+        uid_owner = get_owner_from_app_id(app_id)
+
+        owner_filtering = f" -m owner --uid-owner {uid_owner}"
+
+    shell_input = [ "su root",
+                    f"iptables -t nat -A OUTPUT{owner_filtering} -p tcp --dport 443 -j DNAT --to-destination {target_ip}:443",
+                    f"iptables -t nat -A OUTPUT{owner_filtering} -p tcp --dport 80 -j DNAT --to-destination {target_ip}:80",
+                    f"iptables -t nat -A POSTROUTING{owner_filtering} -p tcp --dport 443 -j MASQUERADE",
+                    f"iptables -t nat -A POSTROUTING{owner_filtering} -p tcp --dport 80 -j MASQUERADE"
+                ]
     output, error = Task().run(command, input_to_cmd=shell_input)
 
 
