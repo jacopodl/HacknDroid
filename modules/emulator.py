@@ -1,6 +1,11 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import subprocess
 import uuid
-import os
 import re # Import regex for parsing avdmanager list avd output
 from termcolor import colored
 from modules.tasks_management import Task, DAEMONS_MANAGER
