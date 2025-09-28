@@ -5,7 +5,7 @@ Licensed under the Apache License v2.0
 """
 
 from modules.cli_management import CLI
-from config.setup import github_dependencies, android_dependencies, set_config_var, set_os_env_var
+from config.dependencies_setup import github_dependencies, android_dependencies, set_config_var, set_os_env_var
 from argparse import ArgumentParser
 
 def arg_parser():

@@ -20,5 +20,5 @@ STYLE = {
     'scrollbar.background': 'bg:#88aaaa',
     'scrollbar.button': 'bg:#222222',
     'space':'white',
-    'input': 'white bold'
+    'input': 'ansiwhite bold',
 }

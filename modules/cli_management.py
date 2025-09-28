@@ -4,7 +4,7 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
-import time
+from secrets import choice
 import config.menu as menu
 import config.style as tool_style
 
@@ -12,7 +12,6 @@ from prompt_toolkit import prompt, print_formatted_text
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit import Application
 from prompt_toolkit.shortcuts import clear
 from pyfiglet import Figlet
 from termcolor import colored
@@ -46,6 +45,7 @@ class CLI():
         
         # Load the CLI style from the tool_style configuration
         self._style = Style.from_dict(tool_style.STYLE)
+        print(self._style)
 
         # Set the title of the CLI
         self._title = "HacknDroid"
@@ -174,39 +174,54 @@ class CLI():
                     # Print the home path ('main')
                     path = f"<section> {self._current_path[-1]} </section>"
 
-                # Prompt the user for input (tab completion enabled)
-                choice = prompt(HTML(path+" "), completer=self._prompt_completer, style=self._style, multiline=False, bottom_toolbar=device_info)
-                
-                if choice in CURRENT_OPTION['children']:
-                    # If the input (choice) is a valid option, navigate to the selected level
+                if len(CURRENT_OPTION['children']) == 2 and not CURRENT_OPTION['input_needed']:
+                    print_formatted_text(HTML(path+" "), style=self._style)
+                    f = CURRENT_OPTION
 
-                    if choice == 'back' and len(self._current_path)>1:
-                        # If the input is 'back' and the program is not in the homepage, navigate back to the parent level
-                        self._current_path = self._current_path[:-2]
-                        CURRENT_OPTION = self._options[self._current_path[0]]
-                        for i in self._current_path[1:]:
-                            CURRENT_OPTION = CURRENT_OPTION[i]
+                    self._current_path = self._current_path[:-2]
+                    CURRENT_OPTION = self._options[self._current_path[0]]
+                    for i in self._current_path[1:]:
+                        CURRENT_OPTION = CURRENT_OPTION[i]
 
-                    elif choice == 'home' and len(self._current_path)>1:
-                        self._current_path = self._current_path[:1]
-                        CURRENT_OPTION = self._options[self._current_path[0]]
-
-                    else:
-                        # If the input is not 'back', navigate to the selected level
-                        self._current_path.append('children')
-                        self._current_path.append(choice)
-                        CURRENT_OPTION = CURRENT_OPTION['children'][choice]
-
-                    # Update the completer with the new options for the current level
-                    self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
-                
-                elif len(CURRENT_OPTION['children']) == 2:
-                    # If the input is a leaf node, execute the associated function
-                    CURRENT_OPTION['function'](choice)
-                    # Wait for the user to press ENTER to continue
+                    f['function']("\n")
                     print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+
                     x=input()
+
+                else:
+                    # Prompt the user for input (tab completion enabled)
+                    choice = prompt(HTML(path+" "), completer=self._prompt_completer, style=self._style, multiline=False, bottom_toolbar=device_info)
+
+                    if choice in CURRENT_OPTION['children']:
+                        # If the input (choice) is a valid option, navigate to the selected level
+
+                        if choice == 'back' and len(self._current_path)>1:
+                            # If the input is 'back' and the program is not in the homepage, navigate back to the parent level
+                            self._current_path = self._current_path[:-2]
+                            CURRENT_OPTION = self._options[self._current_path[0]]
+                            for i in self._current_path[1:]:
+                                CURRENT_OPTION = CURRENT_OPTION[i]
+
+                        elif choice == 'home' and len(self._current_path)>1:
+                            self._current_path = self._current_path[:1]
+                            CURRENT_OPTION = self._options[self._current_path[0]]
+
+                        else:
+                            # If the input is not 'back', navigate to the selected level
+                            self._current_path.append('children')
+                            self._current_path.append(choice)
+                            CURRENT_OPTION = CURRENT_OPTION['children'][choice]
+
+                        # Update the completer with the new options for the current level
+                        self._prompt_completer = WordCompleter(list(CURRENT_OPTION['children'].keys()))
                     
+                    elif len(CURRENT_OPTION['children']) == 2:
+                        # If the input is a leaf node with input needed, execute the associated function
+                        CURRENT_OPTION['function'](choice)
+                        # Wait for the user to press ENTER to continue
+                        print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+                        x=input()
+
             except OptionNotAvailable:
                 print(colored("Invalid choice. Please select a valid device.", 'red'))
                 print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
@@ -232,15 +247,10 @@ class CLI():
                 del_session_device_id()
                 break
 
-            except Exception:
-                # Clear the screen
-                clear()
-                # Print the title
-                print(self._title_f)
-                print_formatted_text(HTML(f"An unexpected error was raised!!!"), style=self._style, end='\n\n')
+            except Exception as e:
+                print(colored(f"An error occurred: {e}", 'red'))
+                print_formatted_text(HTML("<option>Press ENTER to continue</option>"), style=self._style)
+                x = input()
                 
-                del_session_device_id()
-                break
-
         # Stop all the tasks
         DAEMONS_MANAGER.stop_all_tasks()

@@ -5,6 +5,7 @@ Licensed under the Apache License v2.0
 """
 
 import subprocess
+import netifaces
 import re
 import os
 import sys
@@ -14,6 +15,7 @@ from modules.adb import get_session_device_id
 from datetime import datetime
 from termcolor import colored, cprint
 from modules.tasks_management import Task
+import ipaddress
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -198,7 +200,7 @@ def get_active_app_id(user_input):
         check = keywords[0] in a
 
         for k in keywords[1:]:
-            check = check and (k in l)
+            check = check and (k in a)
 
             if not check:
                 break
@@ -419,3 +421,160 @@ def current_date():
 def get_terminal_size():
     size = os.get_terminal_size()
     return size.columns
+
+def is_port(user_input):
+    """
+    Check if the user input is a valid port number.
+
+    Args:
+        user_input (str): The input string from the user.
+
+    Returns:
+        bool: True if the input is a valid port number, False otherwise.
+    """
+    try:
+        port = int(user_input)
+        return (port>=0 and port< 65536)
+    except ValueError:
+        return False
+    
+def is_ip(ip_string):
+    """
+    Check if the provided string is a valid IP address.
+
+    Args:
+        ip_string (str): The string to check.
+
+    Returns:
+        bool: True if the string is a valid IP address, False otherwise.
+    """
+    try:
+        ip = ipaddress.ip_address(ip_string)
+    except ValueError:
+        return False
+    
+    return True
+
+def ip_from_user_input(user_input):
+    """
+    Prompt the user to provide a valid IP address.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        str: The valid IP address.
+    """
+    remote_ip_str = ''
+
+    while not is_ip(remote_ip_str):
+        user_input = input(f"Enter the IP address: ")
+        if is_ip(user_input):
+            remote_ip_str = user_input
+        else:
+            print(f"Address is invalid.")
+
+    # Once the loop exits, remote_ip_str contains a valid IP address string
+    # You can then convert it to an ipaddress object if needed
+    remote_ip = ipaddress.ip_address(remote_ip_str)
+
+    return remote_ip
+
+def port_from_user_input(user_input):
+    """
+    Prompt the user to provide a valid port number.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        int: The valid port number.
+    """
+    check = is_port(user_input)
+
+    while not check:
+        print(f"Port number is invalid.")
+        user_input = input(f"Enter the port number: ")
+
+        check = is_port(user_input)    
+
+    return int(user_input)
+
+def ip_and_port_from_user_input(user_input):
+    """
+    Prompt the user to provide a valid IP address and port.
+
+    Args:
+        user_input (str): The initial input string from the user.
+
+    Returns:
+        tuple: A tuple containing the valid IP address and port.
+    """
+    ip = ''
+    port = ''
+    check = True # Initialize check to True to enter the loop for validation
+
+    while check:
+        if ":" not in user_input:
+            print(f"Invalid format. Please use <ip>:<port>.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+            continue # Re-evaluate the loop condition with new input
+
+        parts = user_input.split(":")
+        if len(parts) != 2:
+            print(f"Invalid format. Please use <ip>:<port>.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+            continue # Re-evaluate the loop condition with new input
+
+        temp_ip, temp_port = parts[0], parts[1]
+
+        if not is_ip(temp_ip):
+            print(f"Invalid IP address: '{temp_ip}'.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+        elif not is_port(temp_port):
+            print(f"Invalid port number: '{temp_port}'.")
+            user_input = input(f"Insert a valid IP address and port (e.g., 192.168.1.100:8080): ")
+        else:
+            # If both are valid, set them and exit the loop
+            ip = temp_ip
+            port = temp_port
+            check = False # Exit condition met
+
+    return ip, port
+
+
+def pc_wifi_ip():
+    """
+    Get the IP address of the current PC on the Wi-Fi network.
+
+    Returns:
+        str: The IP address of the PC.
+    """
+    netifaces.gateways()
+    iface = netifaces.gateways()['default'][netifaces.AF_INET][1]
+
+    ip = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
+
+    return ip
+
+def get_owner_from_app_id(app_id):
+    cmd = ["adb", "-s", get_session_device_id(), "shell", f"pm list packages -U | grep {app_id} | cut -d: -f3"]
+
+    output, error = Task().run(cmd)
+
+    if error:
+        print(f"Error occurred while getting owner from app ID {app_id}: {error}")
+        return None
+
+    return output.strip()
+
+def get_app_id_from_owner_uid(owner_uid):
+    cmd = ["adb", "-s", get_session_device_id(), "shell", f"pm list packages -U | grep {owner_uid} | cut -d: -f2 | cut -d' ' -f1"]
+
+    output, error = Task().run(cmd)
+
+    if error:
+        print(f"Error occurred while getting app ID from owner UID {owner_uid}: {error}")
+        return None
+
+    return output.strip()

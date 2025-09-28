@@ -385,7 +385,7 @@ def apk_decompiler_from_device(user_input):
 
     # Decompile the program
     # apktool d APP.apk -o <dir>
-    apk_decompiler_from_file(apk_filepath, app_id)
+    return apk_decompiler_from_file(apk_filepath)
     
 
 def apk_decompiler_from_file(user_input):
@@ -401,7 +401,7 @@ def apk_decompiler_from_file(user_input):
     apk_path = valid_apk_file(user_input)
 
     # Folder name for the decompiled APK is the name of the APK without extension 
-    app_id = app_id_from_apk(user_input)
+    app_id = app_id_from_apk(apk_path)
 
     dest_folder = os.path.join("results", app_id, "decompiled")
 
@@ -595,7 +595,7 @@ def transfer_apks_from_device(user_input):
 
     Returns:
     int: Num of the APKs of the App specified
-    str: Path of the folder with the downloaded APK files (i.e. '.tmp/<app-id>')
+    str: Path of the folder with the downloaded APK files
     """
 
     # Get the App ID from the user input (App ID or words belonging to the App ID)
@@ -617,13 +617,13 @@ def transfer_apks_from_device(user_input):
 
     results_folder = os.path.join('results', app_id, "data_folder")
 
-    # Create a .tmp folder on the current PC
+    # Create a results folder on the current PC
     os.makedirs(results_folder, exist_ok=True)
     now = current_date()
 
-    # Download the App folder to the .tmp
+    # Download the App folder to the results folder
     download(f"{DATA_APP_FOLDER}/{app_folder}", results_folder)
-    # Rename the folder .tmp/<app-id>-<uuid> to .tmp/<app-id>
+    # Rename the folder <results_folder>/<app-id>-<uuid> to <results_folder>/<app-id>
     os.rename(os.path.join(results_folder, app_folder), os.path.join(results_folder, f"{now}_data_apk_folder"))
 
     return len(glob.glob(os.path.join(results_folder, f"{now}_data_apk_folder")+'/*.apk', )), os.path.join(os.path.join(results_folder, f"{now}_data_apk_folder")), app_id
