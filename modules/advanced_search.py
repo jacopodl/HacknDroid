@@ -1,3 +1,9 @@
+"""
+This source file is part of the HacknDroid project.
+
+Licensed under the Apache License v2.0
+"""
+
 import regex
 import os
 import sys
