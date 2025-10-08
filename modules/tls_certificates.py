@@ -245,39 +245,40 @@ def identify_cert_format(file_path):
 
     # Try PEM format first (most common)
     try:
+        print("\nTrying PEM format...", end=' ')
         cert = x509.load_pem_x509_certificate(cert_data, default_backend())
-        prompt("PEM certificate")
+        print("OK")
         print(f"Subject: {cert.subject}")
         return "PEM", cert, None
     except ValueError as e:
-        prompt("Not PEM format")
+        print("Not PEM format")
         
     # Try DER format
     try:
+        print("\nTrying DER format...", end=' ')
         cert = x509.load_der_x509_certificate(cert_data, default_backend())
-        print("DER certificate")
+        print("OK")
         print(f"Subject: {cert.subject}")
         return "DER", cert, None
     except ValueError as e:
-        prompt("Not PEM format")
+        print("Not DER format")
 
     # Try PKCS#12 (PFX) format
     try:
-        print("Trying PKCS#12 (PFX) format...")
+        print("\nTrying PKCS#12 (PFX) format...", end=' ')
         p12_password = input("Provide the password of the file if it is password protected:")
 
-        print(p12_password)
         _, cert, _ = pkcs12.load_key_and_certificates(cert_data, p12_password.encode(), default_backend())
         if cert:
-            print("PKCS#12 (PFX) certificate")
+            print("OK")
             print(f"Subject: {cert.subject}")
             return "PKCS#12", cert, p12_password.encode()
         else:
             print("Failed to load PKCS#12: Certificate not found in file.")
     except (ValueError, TypeError, InvalidSignature) as e:
-        prompt("Not PKCS#12 format")
+        print("Not PKCS#12 format")
 
-    print("Could not determine the certificate format.")
+    print("\nCould not determine the certificate format.")
     return None, None, None
 
 def install_cert_on_cacerts(user_input):

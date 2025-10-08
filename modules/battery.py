@@ -4,7 +4,6 @@ This source file is part of the HacknDroid project.
 Licensed under the Apache License v2.0
 """
 
-import subprocess
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML

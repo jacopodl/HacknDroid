@@ -13,7 +13,6 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import clear
-from pyfiglet import Figlet
 from termcolor import colored
 
 # Function pointer in OPTIONS
@@ -21,7 +20,7 @@ from modules.tasks_management import DAEMONS_MANAGER
 from modules.adb import del_session_device_id, get_session_device_model, select_device, start_adb_server
 from modules.error import ADBConnectionException, OptionNotAvailable
 from modules.adb import get_session_device_id
-from modules.utility import loading_animation, get_terminal_size
+from modules.utility import loading_animation, get_terminal_size, print_title
 
 class CLI():
 
@@ -45,13 +44,8 @@ class CLI():
         
         # Load the CLI style from the tool_style configuration
         self._style = Style.from_dict(tool_style.STYLE)
-        print(self._style)
-
-        # Set the title of the CLI
-        self._title = "HacknDroid"
         
-        # Initialize the Figlet object for rendering the title
-        self._title_f = colored(Figlet(font='slant').renderText(self._title), 'red')
+        print_title()
 
     def completer(text, state):
         """
@@ -85,7 +79,7 @@ class CLI():
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f)
+                print_title()
                 # Print the shortcut keys
                 print_formatted_text(HTML("<option> > TAB to see options</option>"), style=self._style)
                 print_formatted_text(HTML("<option> > Ctrl+C to skip the device selection</option>"), style=self._style)
@@ -117,7 +111,7 @@ class CLI():
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f)
+                print_title()
                 # Print the shortcut keys
                 device_id = get_session_device_id()
                 device_model = get_session_device_model()
@@ -241,7 +235,7 @@ class CLI():
                 # Clear the screen
                 clear()
                 # Print the title
-                print(self._title_f)
+                print_title()
                 print_formatted_text(HTML(f"<descr>Thank you for using the program!!!</descr>"), style=self._style, end='\n\n')
                 
                 del_session_device_id()

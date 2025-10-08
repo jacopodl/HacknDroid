@@ -778,7 +778,7 @@ def convert_aab_to_apk(aab_filepath):
     
     create_keystore(keystore_file, password, ks_alias)
     
-    command = ["bundletool", "build-apks", "--mode=universal", f"--bundle={ aab_filepath}", 
+    command = ["bundletool", "build-apks", "--mode=universal", f"--bundle={aab_filepath}", 
                f"--output={apks_filepath}", f"--ks={keystore_file}", f"--ks-pass=pass:{password}",
                f"--key-pass=pass:{password}", f"--ks-key-alias={ks_alias}"]
     output, error = Task().run(command, is_shell=True)

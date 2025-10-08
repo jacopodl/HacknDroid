@@ -5,7 +5,6 @@ Licensed under the Apache License v2.0
 """
 
 import os
-
 from termcolor import colored
 from modules import utility
 import shutil

@@ -53,7 +53,6 @@ def sign_apk(user_input, signed_file=None):
     output, error = Task().run(command, is_shell=True)
 
 def scheme_verify(apk_filepath):
-    # Command to sign the APK using the password and the keystore created
     command = ['apksigner', 'verify', '--verbose', apk_filepath]
     output, error = Task().run(command, is_shell=True)
     
