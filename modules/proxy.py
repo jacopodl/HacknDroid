@@ -133,37 +133,6 @@ def set_current_pc_dns_proxy(user_input):
     Args:
         user_input (str): User input (not used in this function).
     """
-    """
-    Method 1 (NOT WORKING)
-    adb shell settings put global wifi_static_ip 1  # Enable Static IP
-    adb shell settings put global wifi_static_ip_address "192.168.1.100"  # Set static IP address
-    adb shell settings put global wifi_static_gateway "192.168.1.1"  # Set gateway
-    adb shell settings put global wifi_static_dns1 "8.8.8.8"  # Set DNS 1
-    adb shell settings put global wifi_static_dns2 "8.8.4.4"  # Set DNS 2
-    """
-
-    """
-    Method 2 (NOT WORKING)
-    Define static IP in Wifi configuration page of the Wifi SSID
-    adb shell su -c setprop net.dns1 192.168.1.52
-    adb shell su -c setprop net.dns2 192.168.1.52
-    """
-
-    """
-    Method 3 (NOT WORKING)
-    adb shell
-    su
-    then, edit the file /data/misc/wifi/WifiConfigStore.xml
-    am broadcast -a android.intent.action.WIFI_STATE_CHANGED
-    am broadcast -a android.intent.action.WIFI_SCAN
-    am broadcast -a android.intent.action.CONNECTIVITY_CHANGE
-
-    Status:
-    0: Disabled (Network is saved but not enabled; it will not be connected).
-    1: Enabled (Network is available and can be connected; it might be used by the system to connect automatically).
-    2: Connected (Network is currently connected and active).
-    3: Disconnected (Network is saved but not connected, and it has been explicitly disconnected).
-    """
     
     print("\nSet the DNS1 and DNS2 on mobile device at: "+pc_wifi_ip())
     current_os = platform.system()

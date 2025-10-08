@@ -5,7 +5,6 @@ Licensed under the Apache License v2.0
 """
 
 from modules import utility
-import subprocess
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.styles import Style
 from prompt_toolkit.formatted_text import HTML
@@ -32,7 +31,7 @@ def reboot(user_input):
 
     if choice == 'y':
         # Reboot using ADB
-        command = ['adb', '-s', get_session_device_id(), 'shell', 'reboot']
+        command = ['adb', '-s', get_session_device_id(), 'reboot']
         output, error = Task().run(command, is_shell=True)
 
 
@@ -123,42 +122,36 @@ def general_info(user_input):
     
     print('')
     print_formatted_text(HTML(f"<option>Device Information</option>"), style=style)
-    # Get model via ADB shell
+    
+    # Get device information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.product.model']
     output, error = Task().run(command)
     print(f"Device Model: {output.strip()}")
 
-    # Get brand information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.product.brand']
     output, error = Task().run(command)
     print(f"Brand: {output.strip()}")
 
-    # Get brand information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.product.manufacturer']
     output, error = Task().run(command)
     print(f"Manufacturer: {output.strip()}")
 
-    # Get brand information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.version.release']
     output, error = Task().run(command)
     print(f"Android Version: {output.strip()}")
 
-    # Get brand information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.id']
     output, error = Task().run(command)
     print(f"Build ID: {output.strip()}")
 
-    # Get brand information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.version.sdk']
     output, error = Task().run(command)
     print(f"SDK Version: {output.strip()}")
 
-    # Get brand information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.build.date']
     output, error = Task().run(command)
     print(f"Build Date: {output.strip()}")
 
-    # Get brand information via ADB shell
     command = ['adb', '-s', get_session_device_id(), 'shell', 'getprop', 'ro.serialno']
     output, error = Task().run(command)
     print(f"Device Serial Number: {output.strip()}", end='\n\n')

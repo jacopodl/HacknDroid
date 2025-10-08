@@ -16,6 +16,7 @@ from datetime import datetime
 from termcolor import colored, cprint
 from modules.tasks_management import Task
 import ipaddress
+from pyfiglet import Figlet
 
 APP_ID_REGEX = r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
@@ -465,20 +466,15 @@ def ip_from_user_input(user_input):
     Returns:
         str: The valid IP address.
     """
-    remote_ip_str = ''
+    check = is_ip(user_input)
 
-    while not is_ip(remote_ip_str):
+    while not check:
+        print(f"Address is invalid.")
         user_input = input(f"Enter the IP address: ")
-        if is_ip(user_input):
-            remote_ip_str = user_input
-        else:
-            print(f"Address is invalid.")
 
-    # Once the loop exits, remote_ip_str contains a valid IP address string
-    # You can then convert it to an ipaddress object if needed
-    remote_ip = ipaddress.ip_address(remote_ip_str)
+        check = is_ip(user_input)
 
-    return remote_ip
+    return user_input
 
 def port_from_user_input(user_input):
     """
@@ -578,3 +574,8 @@ def get_app_id_from_owner_uid(owner_uid):
         return None
 
     return output.strip()
+
+def print_title():
+    title = "HacknDroid"
+    title_f = colored(Figlet(font='slant').renderText(title), 'red')
+    print(title_f)

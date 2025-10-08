@@ -8,7 +8,6 @@ import os
 from tabulate import tabulate
 from termcolor import colored
 from modules.error import ADBConnectionException, OptionNotAvailable
-import subprocess
 import configparser
 from modules.tasks_management import Task
 
