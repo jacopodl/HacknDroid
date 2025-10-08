@@ -707,6 +707,7 @@ OPTIONS =   {
                                                     'description' : ["Log all the events of a running application",
                                                                      "Write the app id or a part of the app name"],
                                                     'device_needed': True,
+                                                    'input_needed': True,
                                                     'children': {
                                                         "back" : dict(),
                                                         "home" : dict()
@@ -1337,17 +1338,6 @@ OPTIONS =   {
                                     'description': ['Set proxy routes using a DNS server'],
                                     'device_needed': True,
                                     'children': {
-                                        "get_current_proxy" : {
-                                            'description' : ["Current DNS proxy settings",],
-                                            'device_needed': True,
-                                            'input_needed': False,
-                                            'children': {
-                                                "back" : dict(),
-                                                "home" : dict()
-                                            },
-                                            
-                                            'function': proxy.get_current_dns_proxy
-                                        },
                                         "set_proxy_with_current_ip" : {
                                             'description' : ["Start the DNS spoofing with the current PC IP (on the same Wi-fi network of the mobile device)",],
                                             'device_needed': True,
@@ -1363,7 +1353,7 @@ OPTIONS =   {
                                             'description' : ["Start the DNS spoofing with a specific IP address",
                                                              "Write the IP address to be used in the proxy for DNS spoofing",],
                                             'device_needed': True,
-                                            'input_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1419,7 +1409,7 @@ OPTIONS =   {
                                             'description' : ["Set an IP address as invisible proxy for a specific app (using iptables)",
                                                              "Insert the IP address you want to select as invisible proxy"],
                                             'device_needed': True,
-                                            'input_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()
@@ -1475,7 +1465,7 @@ OPTIONS =   {
                                             'description' : ["Set an IP address as invisible proxy",
                                                              "Insert the IP address you want to select as invisible proxy"],
                                             'device_needed': True,
-                                            'input_needed': False,
+                                            'input_needed': True,
                                             'children': {
                                                 "back" : dict(),
                                                 "home" : dict()

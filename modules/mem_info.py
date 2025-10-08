@@ -28,7 +28,7 @@ def run_app_meminfo(user_input):
     command = ['adb', '-s', get_session_device_id(), 'shell','monkey', f"-p '{app_id}'", '-v 1']
     output, error = Task().run(command)
     # Dump memory for the current package
-    command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'meminfo', ]
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'meminfo', app_id]
     output, error = Task().run(command)
     print(output)
 
@@ -48,6 +48,6 @@ def running_app_meminfo(user_input):
     # Get the app ID from user input
     app_id = active_app_id_from_user_input(user_input)
     # Dump memory for the current package
-    command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'meminfo', ]
+    command = ['adb', '-s', get_session_device_id(), 'shell', 'dumpsys', 'meminfo', app_id]
     output, error = Task().run(command)
     print(output)
